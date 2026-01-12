@@ -72,7 +72,7 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
 
 export default async function ProductSection() {
   const products: Product[] = await fetch(
-    "http://localhost:4000/api/products",
+    `${process.env.NEXT_PUBLIC_API_URL}/api/products`,
     { cache: "no-store" }
   ).then((res) => res.json());
 

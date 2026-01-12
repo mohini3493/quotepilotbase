@@ -12,7 +12,7 @@ export default function AddProductPage() {
   const [form, setForm] = useState<any>({ isActive: true });
 
   async function saveProduct() {
-    await fetch("http://localhost:4000/api/products", {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -40,14 +40,6 @@ export default function AddProductPage() {
       <Input
         placeholder="Image URL"
         onChange={(e) => setForm({ ...form, image: e.target.value })}
-      />
-      <Input
-        placeholder="Button Text"
-        onChange={(e) => setForm({ ...form, buttonText: e.target.value })}
-      />
-      <Input
-        placeholder="Button Link"
-        onChange={(e) => setForm({ ...form, buttonLink: e.target.value })}
       />
 
       <div className="flex items-center gap-3">

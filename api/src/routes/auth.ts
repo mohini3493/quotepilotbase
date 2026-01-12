@@ -25,8 +25,8 @@ router.post("/login", async (req, res) => {
 
   res.cookie("admin_token", token, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: false, // IMPORTANT for localhost
+    sameSite: "none",
+    secure: true,
     path: "/",
   });
 

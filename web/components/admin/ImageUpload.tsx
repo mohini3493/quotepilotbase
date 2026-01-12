@@ -19,11 +19,14 @@ export default function ImageUpload({
     const formData = new FormData();
     formData.append("image", file);
 
-    const res = await fetch("http://localhost:4000/api/upload/image", {
-      method: "POST",
-      credentials: "include",
-      body: formData,
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/upload/image`,
+      {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      }
+    );
 
     const data = await res.json();
     onUploaded(data.url);

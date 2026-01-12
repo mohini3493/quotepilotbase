@@ -14,9 +14,12 @@ export default async function ProductPage({
 }) {
   const { slug } = await params;
 
-  const res = await fetch(`http://localhost:4000/api/products/slug/${slug}`, {
-    cache: "no-store",
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/products/slug/${slug}`,
+    {
+      cache: "no-store",
+    }
+  );
 
   if (!res.ok) return notFound();
 

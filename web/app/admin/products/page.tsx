@@ -138,7 +138,7 @@ export default function ProductsPage() {
       setLoading(true);
       setError(null);
 
-      const res = await fetch("http://localhost:4000/api/admin/products", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/products`, {
         credentials: "include",
       });
 
@@ -228,7 +228,7 @@ export default function ProductsPage() {
     const reordered = arrayMove(products, oldIndex, newIndex);
     setProducts(reordered);
 
-    await fetch("http://localhost:4000/api/products/reorder", {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/reorder`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
