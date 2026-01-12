@@ -2,7 +2,6 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { Request, Response } from "express";
 import quoteRoutes from "./routes/quote";
 import authRoutes from "./routes/auth";
 import productRoutes from "./routes/product";
@@ -20,7 +19,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-app.get("/", (req: Request, res: Response) => {
+app.get("/", (req, res) => {
   res.json({ message: "QuotePilot API running 🚀" });
 });
 app.get("/api/health", (req, res) => {
