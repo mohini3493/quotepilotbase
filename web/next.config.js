@@ -1,3 +1,4 @@
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
 
@@ -8,10 +9,6 @@ const nextConfig = {
         hostname: "**",
       },
     ],
-  },
-
-  eslint: {
-    ignoreDuringBuilds: true,
   },
 
   typescript: {
