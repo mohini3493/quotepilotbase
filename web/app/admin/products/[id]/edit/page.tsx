@@ -40,7 +40,7 @@ export default function EditProductPage() {
   if (!form) return <p>Loading...</p>;
 
   async function save() {
-    await fetch(`http://localhost:4000/api/products/${id}`, {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`, {
       method: "PUT",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
