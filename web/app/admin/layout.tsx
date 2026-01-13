@@ -15,16 +15,16 @@ export default async function AdminLayout({
     redirect("/admin-login");
   }
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
-    headers: {
-      Cookie: `admin_token=${adminToken}`,
-    },
-    cache: "no-store",
-  });
+  // const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+  //   headers: {
+  //     Cookie: `admin_token=${adminToken}`,
+  //   },
+  //   cache: "no-store",
+  // });
 
-  if (!res.ok) {
-    redirect("/admin-login");
-  }
+  // if (!res.ok) {
+  //   redirect("/admin-login");
+  // }
 
   return <AdminLayoutClient>{children}</AdminLayoutClient>;
 }
