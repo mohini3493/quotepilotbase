@@ -9,6 +9,8 @@ import uploadRoutes from "./routes/upload";
 import adminProductRoutes from "./routes/adminProducts";
 
 const app = express();
+app.options("*", cors());
+console.log("ORIGIN:", req.headers.origin);
 
 app.use(
   cors({
