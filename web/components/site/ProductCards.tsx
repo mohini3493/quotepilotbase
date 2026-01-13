@@ -71,10 +71,25 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
 }
 
 export default async function ProductSection() {
-  const products: Product[] = await fetch(
+  const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/products`,
     { cache: "no-store" }
-  ).then((res) => res.json());
+  );
+
+  if (!res.ok) {
+    console.error("Failed to fetch products:", res.status);
+    return null;
+  }
+
+  const text = await res.text();
+
+  // 🛑 Protect against HTML response
+  if (text.startsWith("<!DOCTYPE")) {
+    console.error("API returned HTML instead of JSON");
+    return null;
+  }
+
+  const products: Product[] = JSON.parse(text);
 
   const activeProducts = products
     .filter((p) => p.isActive)
