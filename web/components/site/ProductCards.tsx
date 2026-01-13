@@ -71,10 +71,18 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
 }
 
 export default async function ProductSection() {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/products`,
-    { cache: "no-store" }
-  );
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+  if (!API_URL) {
+    console.error("NEXT_PUBLIC_API_URL is missing");
+    return null;
+  }
+
+  console.log("Fetching products from API:", API_URL);
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`, {
+    cache: "no-store",
+  });
 
   if (!res.ok) {
     console.error("Failed to fetch products:", res.status);
