@@ -10,14 +10,28 @@ import adminProductRoutes from "./routes/adminProducts";
 
 const app = express();
 
+const allowedOrigins = ["https://quotepilotbase.vercel.app"];
+
+// ✅ CORS middleware
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://quotepilotbase.vercel.app/"],
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(null, false);
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+// ✅ THIS LINE GOES HERE (after cors, before routes)
+app.options("*", cors());
 app.use(express.json());
 app.use(cookieParser());
 
