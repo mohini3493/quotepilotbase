@@ -138,9 +138,12 @@ export default function ProductsPage() {
       setLoading(true);
       setError(null);
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/products`, {
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/products`,
+        {
+          credentials: "include",
+        }
+      );
 
       console.log("Response status:", res.status);
       console.log(
@@ -196,10 +199,13 @@ export default function ProductsPage() {
 
   async function toggleProduct(id: number) {
     try {
-      await fetch(`http://localhost:4000/api/products/${id}/toggle`, {
-        method: "PATCH",
-        credentials: "include",
-      });
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}/toggle`,
+        {
+          method: "PATCH",
+          credentials: "include",
+        }
+      );
       loadProducts();
     } catch (error) {
       console.error("Error toggling product:", error);
@@ -208,7 +214,7 @@ export default function ProductsPage() {
 
   async function deleteProduct(id: number) {
     try {
-      await fetch(`http://localhost:4000/api/products/${id}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`, {
         method: "DELETE",
         credentials: "include",
       });

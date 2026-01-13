@@ -25,7 +25,7 @@ export default function EditProductPage() {
   useEffect(() => {
     if (!id) return;
 
-    fetch(`http://localhost:4000/api/products/admin/${id}`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/admin/${id}`, {
       credentials: "include",
     })
       .then((res) => {
