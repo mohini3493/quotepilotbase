@@ -144,13 +144,13 @@ export default function Header() {
 
               <Link href="/admin-login">
                 <Button variant="outline" className="font-medium">
-                  Admin Login
+                  Admin Login 🫆
                 </Button>
               </Link>
 
               <Link href="/quote">
                 <Button className="bg-primary hover:bg-primary/90 font-medium px-6">
-                  Get Quote
+                  Get Quote 💼
                 </Button>
               </Link>
             </div>

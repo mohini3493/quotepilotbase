@@ -7,6 +7,8 @@ import { requireAdmin } from "../middleware/auth";
 const router = Router();
 
 router.post("/login", async (req, res) => {
+  console.log("ORIGIN:", req.headers.origin);
+
   const { email, password } = req.body;
 
   const admin = await prisma.admin.findUnique({ where: { email } });

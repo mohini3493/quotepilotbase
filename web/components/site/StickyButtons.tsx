@@ -17,8 +17,8 @@ export default function StickyButtons() {
           className="block bg-primary hover:bg-primary/90 text-white shadow-lg transition-all duration-300 rounded-l-lg w-16 h-40 relative"
         >
           <div className="absolute top-16 left-1/2 transform -translate-x-1/2">
-            <div className="transform -rotate-90 text-xs font-bold whitespace-nowrap">
-              Book a Service Call
+            <div className="transform -rotate-90 text-sm font-bold whitespace-nowrap">
+              Book a Service Call ☎️
             </div>
           </div>
         </a>
@@ -35,8 +35,8 @@ export default function StickyButtons() {
           className="block bg-primary hover:bg-primary/90 text-white shadow-lg transition-all duration-300 rounded-l-lg w-16 h-28 relative"
         >
           <div className="absolute top-12 left-1/2 transform -translate-x-1/2">
-            <div className="transform -rotate-90 text-xs font-bold whitespace-nowrap">
-              Enquire Now
+            <div className="transform -rotate-90 text-sm font-bold whitespace-nowrap">
+              Enquire Now 📩
             </div>
           </div>
         </a>
