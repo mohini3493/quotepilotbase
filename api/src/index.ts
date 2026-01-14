@@ -12,6 +12,7 @@ const app = express();
 
 app.set("trust proxy", 1);
 
+
 // ✅ CORS middleware
 app.use(
   cors({
@@ -36,7 +37,7 @@ app.use("/api/quote", quoteRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/upload", uploadRoutes);
-app.use("/api/products/admin/all", adminProductRoutes);
+app.use("/api/products", adminProductRoutes);
 
 const PORT = Number(process.env.PORT) || 4000;
 
