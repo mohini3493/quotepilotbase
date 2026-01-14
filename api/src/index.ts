@@ -36,7 +36,7 @@ app.use("/api/quote", quoteRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/upload", uploadRoutes);
-app.use("/api/admin/products", adminProductRoutes);
+app.use("/api/products/admin/all", adminProductRoutes);
 
 const PORT = Number(process.env.PORT) || 4000;
 
