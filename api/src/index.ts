@@ -10,7 +10,7 @@ import adminProductRoutes from "./routes/adminProducts";
 
 const app = express();
 
-const allowedOrigins = ["https://quotepilotbase.vercel.app"];
+app.set("trust proxy", 1);
 
 // ✅ CORS middleware
 app.use(
