@@ -139,7 +139,7 @@ export default function ProductsPage() {
       setError(null);
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/products`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/products/admin/all`,
         {
           credentials: "include",
         }

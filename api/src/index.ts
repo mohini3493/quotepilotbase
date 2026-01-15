@@ -12,12 +12,13 @@ const app = express();
 
 app.set("trust proxy", 1);
 
-
 // ✅ CORS middleware
 app.use(
   cors({
     origin: "https://quotepilotbase.vercel.app",
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -37,7 +38,7 @@ app.use("/api/quote", quoteRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/upload", uploadRoutes);
-app.use("/api/products", adminProductRoutes);
+app.use("/api/products/admin/all", adminProductRoutes);
 
 const PORT = Number(process.env.PORT) || 4000;
 
