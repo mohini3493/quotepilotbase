@@ -15,7 +15,7 @@ app.set("trust proxy", 1);
 // ✅ CORS middleware
 app.use(
   cors({
-    origin: "https://quotepilotbase.vercel.app",
+    origin: "https://quotepilot-lz06.onrender.com",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
