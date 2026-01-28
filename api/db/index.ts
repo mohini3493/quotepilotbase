@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { Pool } from "pg";
 
 export const pool = new Pool({
@@ -5,4 +6,9 @@ export const pool = new Pool({
   ssl: {
     rejectUnauthorized: false,
   },
+});
+
+// Handle pool errors
+pool.on("error", (err) => {
+  console.error("Unexpected error on idle client", err);
 });

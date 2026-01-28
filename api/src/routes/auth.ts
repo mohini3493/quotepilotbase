@@ -6,35 +6,42 @@ import { requireAdmin } from "../middleware/auth";
 
 const router = Router();
 
+const isProduction = process.env.NODE_ENV === "production";
+
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const result = await pool.query("SELECT * FROM admins WHERE email = $1", [
-    email,
-  ]);
-  const admin = result.rows[0];
+    const result = await pool.query("SELECT * FROM admins WHERE email = $1", [
+      email,
+    ]);
+    const admin = result.rows[0];
 
-  if (!admin) {
-    return res.status(401).json({ message: "Invalid credentials" });
+    if (!admin) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const valid = await bcrypt.compare(password, admin.password);
+    if (!valid) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const token = jwt.sign({ adminId: admin.id }, process.env.JWT_SECRET!, {
+      expiresIn: "1d",
+    });
+
+    res.cookie("admin_token", token, {
+      httpOnly: true,
+      sameSite: isProduction ? "none" : "lax",
+      secure: isProduction,
+      path: "/",
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
-
-  const valid = await bcrypt.compare(password, admin.password);
-  if (!valid) {
-    return res.status(401).json({ message: "Invalid credentials" });
-  }
-
-  const token = jwt.sign({ adminId: admin.id }, process.env.JWT_SECRET!, {
-    expiresIn: "1d",
-  });
-
-  res.cookie("admin_token", token, {
-    httpOnly: true,
-    sameSite: "none",
-    secure: true,
-    path: "/",
-  });
-
-  res.json({ success: true });
 });
 
 router.get("/me", requireAdmin, async (req, res) => {

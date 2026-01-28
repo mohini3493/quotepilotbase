@@ -18,10 +18,12 @@ export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
 
   async function login() {
     setIsLoading(true);
+    setError("");
     try {
       const res = await fetch(`/api/auth/login`, {
         method: "POST",
@@ -30,9 +32,15 @@ export default function AdminLogin() {
         body: JSON.stringify({ email, password }),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
-        router.replace("/admin");
+        router.push("/admin");
+      } else {
+        setError(data.message || "Login failed");
       }
+    } catch (err) {
+      setError("Network error. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -108,6 +116,12 @@ export default function AdminLogin() {
                   />
                 </div>
               </div>
+
+              {error && (
+                <div className="text-sm text-red-500 bg-red-50 p-3 rounded-md">
+                  {error}
+                </div>
+              )}
 
               <Button
                 type="submit"
