@@ -30,9 +30,9 @@ router.post(
       res.json({ url: result.secure_url });
     } catch (error: any) {
       console.error("Cloudinary upload error:", error);
-      res.status(500).json({ 
-        message: "Failed to upload image", 
-        error: error.message 
+      res.status(500).json({
+        message: "Failed to upload image",
+        error: error.message,
       });
     }
   },

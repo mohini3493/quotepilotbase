@@ -18,19 +18,20 @@ import { Switch } from "@/components/ui/switch";
 
 type Dimension = {
   id: number;
-  name: string;
-  slug: string;
-  image: string;
+  width: number;
+  height: number;
   isActive: boolean;
   order: number;
 };
 
 function SortableRow({
   dimension,
+  index,
   onToggle,
   onDelete,
 }: {
   dimension: Dimension;
+  index: number;
   onToggle: (id: number) => void;
   onDelete: (id: number) => void;
 }) {
@@ -60,13 +61,9 @@ function SortableRow({
         <GripVertical className="w-4 h-4 text-muted-foreground hover:text-foreground" />
       </button>
 
-      <img
-        src={dimension.image}
-        alt={dimension.name}
-        className={`h-12 w-12 rounded object-cover border transition-all ${
-          dimension.isActive ? "border-border" : "border-muted grayscale"
-        }`}
-      />
+      <div className="w-10 h-10 rounded bg-muted flex items-center justify-center font-bold text-lg">
+        {index + 1}
+      </div>
 
       <div className="flex-1">
         <div className="flex items-center gap-2">
@@ -75,7 +72,7 @@ function SortableRow({
               dimension.isActive ? "text-foreground" : "text-muted-foreground"
             }`}
           >
-            {dimension.name}
+            {dimension.width} x {dimension.height} mm
           </p>
           <div
             className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -87,7 +84,9 @@ function SortableRow({
             {dimension.isActive ? "Active" : "Inactive"}
           </div>
         </div>
-        <p className="text-xs text-muted-foreground">/{dimension.slug}</p>
+        <p className="text-xs text-muted-foreground">
+          Width: {dimension.width}mm | Height: {dimension.height}mm
+        </p>
       </div>
 
       <div className="flex items-center gap-2">
@@ -301,10 +300,11 @@ export default function DimensionsPage() {
             strategy={verticalListSortingStrategy}
           >
             <div className="space-y-2">
-              {dimensions.map((dimension) => (
+              {dimensions.map((dimension, index) => (
                 <SortableRow
                   key={dimension.id}
                   dimension={dimension}
+                  index={index}
                   onToggle={toggleDimension}
                   onDelete={deleteDimension}
                 />

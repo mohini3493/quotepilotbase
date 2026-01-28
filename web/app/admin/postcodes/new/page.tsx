@@ -3,13 +3,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useRouter } from "next/navigation";
 
 export default function AddPostcodePage() {
   const router = useRouter();
-  const [form, setForm] = useState<any>({ isActive: true });
+  const [form, setForm] = useState<any>({ code: "", isActive: true });
   const [saving, setSaving] = useState(false);
 
   async function savePostcode() {
@@ -39,30 +38,10 @@ export default function AddPostcodePage() {
           <label className="text-sm font-medium mb-2 block">Postcode</label>
           <Input
             placeholder="e.g., SW1A"
-            value={form.code || ""}
+            value={form.code}
             onChange={(e) =>
               setForm({ ...form, code: e.target.value.toUpperCase() })
             }
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-medium mb-2 block">Area Name</label>
-          <Input
-            placeholder="e.g., Westminster, London"
-            value={form.area || ""}
-            onChange={(e) => setForm({ ...form, area: e.target.value })}
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-medium mb-2 block">
-            Description (Optional)
-          </label>
-          <Textarea
-            placeholder="Additional notes about this postcode area"
-            value={form.description || ""}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
           />
         </div>
 

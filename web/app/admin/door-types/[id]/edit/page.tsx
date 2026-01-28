@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 type DoorType = {
   name: string;
@@ -83,11 +84,15 @@ export default function EditDoorTypePage() {
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-2 block">Image URL</label>
-          <Input
-            value={form.image}
-            onChange={(e) => setForm({ ...form, image: e.target.value })}
-          />
+          <label className="text-sm font-medium mb-2 block">Image</label>
+          <ImageUpload onUploaded={(url) => setForm({ ...form, image: url })} />
+          {form.image && (
+            <img
+              src={form.image}
+              alt="Preview"
+              className="mt-2 w-32 h-32 object-cover rounded border"
+            />
+          )}
         </div>
 
         <div className="flex items-center gap-3">

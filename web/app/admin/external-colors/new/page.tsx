@@ -9,7 +9,11 @@ import ImageUpload from "@/components/admin/ImageUpload";
 
 export default function AddExternalColorPage() {
   const router = useRouter();
-  const [form, setForm] = useState<any>({ isActive: true });
+  const [form, setForm] = useState<any>({
+    name: "",
+    image: "",
+    isActive: true,
+  });
   const [saving, setSaving] = useState(false);
 
   async function saveExternalColor() {

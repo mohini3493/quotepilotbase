@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 type Product = {
   title: string;
@@ -68,10 +69,19 @@ export default function EditProductPage() {
         value={form.description}
         onChange={(e) => setForm({ ...form, description: e.target.value })}
       />
-      <Input
-        value={form.image}
-        onChange={(e) => setForm({ ...form, image: e.target.value })}
-      />
+
+      <div>
+        <label className="text-sm font-medium mb-2 block">Image</label>
+        <ImageUpload onUploaded={(url) => setForm({ ...form, image: url })} />
+        {form.image && (
+          <img
+            src={form.image}
+            alt="Preview"
+            className="mt-2 w-32 h-32 object-cover rounded border"
+          />
+        )}
+      </div>
+
       <Input
         value={form.buttonText}
         onChange={(e) => setForm({ ...form, buttonText: e.target.value })}

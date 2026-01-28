@@ -25,36 +25,26 @@ const links = [
 ];
 
 const productLinks = [
-  { name: "All Products", href: "/admin/products", icon: Package },
   { name: "Add Product", href: "/admin/products/new", icon: Plus },
 ];
 
 const doorTypeLinks = [
-  { name: "All Door Types", href: "/admin/door-types", icon: Package },
   { name: "Add Door Type", href: "/admin/door-types/new", icon: Plus },
 ];
 
 const panelStyleLinks = [
-  { name: "All Panel Styles", href: "/admin/panel-styles", icon: Package },
   { name: "Add Panel Style", href: "/admin/panel-styles/new", icon: Plus },
 ];
 
 const dimensionLinks = [
-  { name: "All Dimensions", href: "/admin/dimensions", icon: Package },
   { name: "Add Dimension", href: "/admin/dimensions/new", icon: Plus },
 ];
 
 const postcodeLinks = [
-  { name: "All Postcodes", href: "/admin/postcodes", icon: Package },
   { name: "Add Postcode", href: "/admin/postcodes/new", icon: Plus },
 ];
 
 const externalColorLinks = [
-  {
-    name: "All External Colors",
-    href: "/admin/external-colors",
-    icon: Package,
-  },
   {
     name: "Add External Color",
     href: "/admin/external-colors/new",
@@ -64,11 +54,6 @@ const externalColorLinks = [
 
 const internalColorLinks = [
   {
-    name: "All Internal Colors",
-    href: "/admin/internal-colors",
-    icon: Package,
-  },
-  {
     name: "Add Internal Color",
     href: "/admin/internal-colors/new",
     icon: Plus,
@@ -76,11 +61,6 @@ const internalColorLinks = [
 ];
 
 const handleColorLinks = [
-  {
-    name: "All Handle Colors",
-    href: "/admin/handle-colors",
-    icon: Package,
-  },
   {
     name: "Add Handle Color",
     href: "/admin/handle-colors/new",

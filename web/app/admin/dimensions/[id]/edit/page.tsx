@@ -4,13 +4,11 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 
 type Dimension = {
-  name: string;
-  description: string;
-  image: string;
+  width: string;
+  height: string;
   isActive: boolean;
 };
 
@@ -33,7 +31,8 @@ export default function EditDimensionPage() {
       })
       .then((data) => {
         setForm({
-          ...data,
+          width: data.width || "",
+          height: data.height || "",
           isActive: data.is_active ?? data.isActive ?? true,
         });
       })
@@ -67,26 +66,20 @@ export default function EditDimensionPage() {
 
       <div className="space-y-4">
         <div>
-          <label className="text-sm font-medium mb-2 block">Name</label>
+          <label className="text-sm font-medium mb-2 block">Width (mm)</label>
           <Input
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            type="number"
+            value={form.width}
+            onChange={(e) => setForm({ ...form, width: e.target.value })}
           />
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-2 block">Description</label>
-          <Textarea
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-medium mb-2 block">Image URL</label>
+          <label className="text-sm font-medium mb-2 block">Height (mm)</label>
           <Input
-            value={form.image}
-            onChange={(e) => setForm({ ...form, image: e.target.value })}
+            type="number"
+            value={form.height}
+            onChange={(e) => setForm({ ...form, height: e.target.value })}
           />
         </div>
 

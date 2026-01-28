@@ -4,13 +4,10 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 
 type Postcode = {
   code: string;
-  area: string;
-  description: string;
   isActive: boolean;
 };
 
@@ -33,7 +30,7 @@ export default function EditPostcodePage() {
       })
       .then((data) => {
         setForm({
-          ...data,
+          code: data.code || "",
           isActive: data.is_active ?? data.isActive ?? true,
         });
       })
@@ -73,24 +70,6 @@ export default function EditPostcodePage() {
             onChange={(e) =>
               setForm({ ...form, code: e.target.value.toUpperCase() })
             }
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-medium mb-2 block">Area Name</label>
-          <Input
-            value={form.area}
-            onChange={(e) => setForm({ ...form, area: e.target.value })}
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-medium mb-2 block">
-            Description (Optional)
-          </label>
-          <Textarea
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
           />
         </div>
 

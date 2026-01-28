@@ -51,11 +51,8 @@ CREATE TABLE IF NOT EXISTS panel_styles (
 -- Dimensions table
 CREATE TABLE IF NOT EXISTS dimensions (
   id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
-  slug TEXT UNIQUE NOT NULL,
   width INT,
   height INT,
-  image TEXT,
   "order" INT DEFAULT 0,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP DEFAULT now()

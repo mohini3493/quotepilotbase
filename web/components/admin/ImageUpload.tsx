@@ -22,20 +22,32 @@ export default function ImageUpload({
     formData.append("image", file);
 
     try {
+      console.log("Starting upload to /api/upload/image...");
+
       const res = await fetch(`/api/upload/image`, {
         method: "POST",
         credentials: "include",
         body: formData,
       });
 
+      console.log("Upload response status:", res.status);
+
+      const text = await res.text();
+      console.log("Upload response body:", text);
+
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
+        let errorData = {};
+        try {
+          errorData = JSON.parse(text);
+        } catch {}
         console.error("Upload failed:", res.status, errorData);
-        alert("Upload failed. Please try again.");
+        alert(
+          `Upload failed: ${(errorData as any).message || (errorData as any).error || res.status}`,
+        );
         return;
       }
 
-      const data = await res.json();
+      const data = JSON.parse(text);
       if (data.url) {
         onUploaded(data.url);
       } else {

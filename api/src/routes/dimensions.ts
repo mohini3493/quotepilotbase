@@ -43,24 +43,36 @@ router.get("/admin/:id", requireAdmin, async (req, res) => {
 
 /** Admin – create dimension */
 router.post("/", requireAdmin, async (req, res) => {
-  const { name, slug, width, height, image, order, isActive } = req.body;
-  const result = await pool.query(
-    `INSERT INTO dimensions (name, slug, width, height, image, "order", is_active) 
-     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-    [name, slug, width, height, image, order || 0, isActive ?? true],
-  );
-  res.json(result.rows[0]);
+  try {
+    const { width, height, order, isActive } = req.body;
+
+    const result = await pool.query(
+      `INSERT INTO dimensions (width, height, "order", is_active) 
+       VALUES ($1, $2, $3, $4) RETURNING *`,
+      [width, height, order || 0, isActive ?? true],
+    );
+    res.json(result.rows[0]);
+  } catch (error: any) {
+    console.error("Error creating dimension:", error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 /** Admin – update dimension */
 router.put("/:id", requireAdmin, async (req, res) => {
-  const { name, slug, width, height, image, order, isActive } = req.body;
-  const result = await pool.query(
-    `UPDATE dimensions SET name = $1, slug = $2, width = $3, height = $4, image = $5, "order" = $6, is_active = $7 
-     WHERE id = $8 RETURNING *`,
-    [name, slug, width, height, image, order, isActive, req.params.id],
-  );
-  res.json(result.rows[0]);
+  try {
+    const { width, height, order, isActive } = req.body;
+
+    const result = await pool.query(
+      `UPDATE dimensions SET width = $1, height = $2, "order" = $3, is_active = $4 
+       WHERE id = $5 RETURNING *`,
+      [width, height, order || 0, isActive, req.params.id],
+    );
+    res.json(result.rows[0]);
+  } catch (error: any) {
+    console.error("Error updating dimension:", error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 /** Admin – delete dimension */

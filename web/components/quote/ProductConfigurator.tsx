@@ -25,17 +25,13 @@ type PanelStyle = {
 
 type Dimension = {
   id: number;
-  name: string;
-  slug: string;
-  image: string;
-  description?: string;
+  width: number;
+  height: number;
 };
 
 type Postcode = {
   id: number;
   code: string;
-  area: string;
-  description?: string;
 };
 
 type ExternalColor = {
@@ -224,10 +220,10 @@ export default function ProductConfigurator({
             panelStyleId: selection.panelStyle?.id,
             panelStyleName: selection.panelStyle?.name,
             dimensionId: selection.dimension?.id,
-            dimensionName: selection.dimension?.name,
+            dimensionWidth: selection.dimension?.width,
+            dimensionHeight: selection.dimension?.height,
             postcodeId: selection.postcode?.id,
             postcodeCode: selection.postcode?.code,
-            postcodeArea: selection.postcode?.area,
             externalColorId: selection.externalColor?.id,
             externalColorName: selection.externalColor?.name,
             internalColorId: selection.internalColor?.id,
@@ -329,74 +325,71 @@ export default function ProductConfigurator({
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 py-8">
+    <div className="w-full">
       {/* Step Indicator */}
-      <div className="mb-8">
-        {/* Desktop Step Indicator */}
-        <div className="hidden lg:flex items-center justify-center">
-          {STEPS.map((step, index) => (
-            <div key={step.id} className="flex items-center">
-              <button
-                onClick={() => handleStepClick(step.id)}
+      <div className="mb-10">
+        {/* Desktop Step Indicator - Full Width */}
+        <div className="hidden lg:grid grid-cols-8 gap-1 bg-gray-100 rounded-2xl p-2">
+          {STEPS.map((step) => (
+            <button
+              key={step.id}
+              onClick={() => handleStepClick(step.id)}
+              className={cn(
+                "flex flex-col items-center justify-center gap-2 py-4 px-2 rounded-xl transition-all",
+                currentStep === step.id
+                  ? "bg-white shadow-lg text-primary"
+                  : step.id < currentStep
+                    ? "text-primary hover:bg-white/60 cursor-pointer"
+                    : "text-gray-400 hover:bg-white/30",
+              )}
+            >
+              <div
                 className={cn(
-                  "flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-all min-w-[70px]",
+                  "w-10 h-10 rounded-xl flex items-center justify-center text-base font-bold transition-all",
                   currentStep === step.id
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-primary text-white shadow-lg shadow-primary/40"
                     : step.id < currentStep
-                      ? "bg-primary/20 text-primary cursor-pointer hover:bg-primary/30"
-                      : "bg-muted text-muted-foreground",
+                      ? "bg-primary text-white"
+                      : "bg-gray-200 text-gray-400",
                 )}
               >
-                <div
-                  className={cn(
-                    "w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold",
-                    currentStep === step.id
-                      ? "bg-primary-foreground text-primary"
-                      : step.id < currentStep
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted-foreground/20 text-muted-foreground",
-                  )}
-                >
-                  {step.id < currentStep ? (
-                    <Check className="w-3 h-3" />
-                  ) : (
-                    step.id
-                  )}
-                </div>
-                <span className="text-[10px] font-medium whitespace-nowrap">
-                  {step.title}
-                </span>
-              </button>
-              {index < STEPS.length - 1 && (
-                <div
-                  className={cn(
-                    "w-4 h-0.5",
-                    step.id < currentStep ? "bg-primary" : "bg-muted",
-                  )}
-                />
-              )}
-            </div>
+                {step.id < currentStep ? (
+                  <Check className="w-5 h-5" />
+                ) : (
+                  step.id
+                )}
+              </div>
+              <span className="text-xs font-semibold text-center leading-tight">
+                {step.title}
+              </span>
+            </button>
           ))}
         </div>
 
         {/* Tablet/Mobile Step Indicator */}
         <div className="lg:hidden">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm text-muted-foreground">
-              Step {currentStep} of {STEPS.length}
-            </span>
-            <span className="text-sm font-medium">
-              {STEPS[currentStep - 1].title}
+          <div className="flex items-center justify-between mb-3 px-1">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-sm">
+                {currentStep}
+              </div>
+              <span className="font-semibold text-gray-900">
+                {STEPS[currentStep - 1].title}
+              </span>
+            </div>
+            <span className="text-sm text-gray-500">
+              {currentStep} / {STEPS.length}
             </span>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1.5">
             {STEPS.map((step) => (
               <button
                 key={step.id}
                 onClick={() => handleStepClick(step.id)}
                 className={cn(
-                  "flex-1 h-2 rounded-full transition-all",
-                  step.id <= currentStep ? "bg-primary" : "bg-muted",
+                  "flex-1 h-2.5 rounded-full transition-all",
+                  step.id <= currentStep ? "bg-primary" : "bg-gray-200",
+                  step.id === currentStep && "bg-primary shadow-sm shadow-primary/50",
                 )}
               />
             ))}
@@ -433,7 +426,7 @@ export default function ProductConfigurator({
                     <img
                       src={doorType.image || "/placeholder.jpg"}
                       alt={doorType.name}
-                      className="w-full h-40 object-cover"
+                      className="w-full h-full object-cover min-h-[220px] max-h-[340px]"
                     />
                     {selection.doorType?.id === doorType.id && (
                       <div className="absolute top-3 right-3 w-8 h-8 bg-primary rounded-full flex items-center justify-center">
@@ -487,7 +480,7 @@ export default function ProductConfigurator({
                     <img
                       src={panelStyle.image || "/placeholder.jpg"}
                       alt={panelStyle.name}
-                      className="w-full h-40 object-cover"
+                      className="w-full h-full object-cover min-h-[220px] max-h-[340px]"
                     />
                     {selection.panelStyle?.id === panelStyle.id && (
                       <div className="absolute top-3 right-3 w-8 h-8 bg-primary rounded-full flex items-center justify-center">
@@ -523,38 +516,34 @@ export default function ProductConfigurator({
                 Select the dimensions that fit your space
               </p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {dimensions.map((dimension) => (
                 <Card
                   key={dimension.id}
                   className={cn(
                     "cursor-pointer transition-all hover:shadow-lg overflow-hidden",
                     selection.dimension?.id === dimension.id
-                      ? "ring-2 ring-primary shadow-lg"
+                      ? "ring-2 ring-primary shadow-lg bg-primary/5"
                       : "hover:ring-1 hover:ring-primary/50",
                   )}
                   onClick={() =>
                     setSelection({ ...selection, dimension: dimension })
                   }
                 >
-                  <div className="relative">
-                    <img
-                      src={dimension.image || "/placeholder.jpg"}
-                      alt={dimension.name}
-                      className="w-full h-40 object-cover"
-                    />
+                  <CardContent className="p-6 flex flex-col items-center justify-center text-center">
+                    <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
+                      <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                      </svg>
+                    </div>
+                    <h3 className="font-bold text-lg text-foreground">
+                      {dimension.width} x {dimension.height}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mt-1">mm</p>
                     {selection.dimension?.id === dimension.id && (
-                      <div className="absolute top-3 right-3 w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                        <Check className="w-5 h-5 text-primary-foreground" />
+                      <div className="mt-3 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                        <Check className="w-4 h-4 text-primary-foreground" />
                       </div>
-                    )}
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold text-lg">{dimension.name}</h3>
-                    {dimension.description && (
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                        {dimension.description}
-                      </p>
                     )}
                   </CardContent>
                 </Card>
@@ -572,45 +561,31 @@ export default function ProductConfigurator({
         {currentStep === 4 && (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-2xl font-bold">Select Your Postcode Area</h2>
+              <h2 className="text-2xl font-bold">Enter Your Postcode</h2>
               <p className="text-muted-foreground mt-2">
-                Choose your delivery/installation area
+                Select your delivery/installation area
               </p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               {postcodes.map((postcode) => (
                 <Card
                   key={postcode.id}
                   className={cn(
-                    "cursor-pointer transition-all hover:shadow-lg overflow-hidden",
+                    "cursor-pointer transition-all hover:shadow-lg",
                     selection.postcode?.id === postcode.id
-                      ? "ring-2 ring-primary shadow-lg"
+                      ? "ring-2 ring-primary shadow-lg bg-primary/5"
                       : "hover:ring-1 hover:ring-primary/50",
                   )}
                   onClick={() =>
                     setSelection({ ...selection, postcode: postcode })
                   }
                 >
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold text-lg">
-                          {postcode.code}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          {postcode.area}
-                        </p>
+                  <CardContent className="p-4 flex items-center justify-center gap-2">
+                    <h3 className="font-bold text-lg">{postcode.code}</h3>
+                    {selection.postcode?.id === postcode.id && (
+                      <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                        <Check className="w-3 h-3 text-primary-foreground" />
                       </div>
-                      {selection.postcode?.id === postcode.id && (
-                        <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                          <Check className="w-4 h-4 text-primary-foreground" />
-                        </div>
-                      )}
-                    </div>
-                    {postcode.description && (
-                      <p className="text-xs text-muted-foreground mt-2 line-clamp-2">
-                        {postcode.description}
-                      </p>
                     )}
                   </CardContent>
                 </Card>
@@ -633,7 +608,7 @@ export default function ProductConfigurator({
                 Select the outside finish for your door
               </p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {externalColors.map((color) => (
                 <Card
                   key={color.id}
@@ -647,16 +622,16 @@ export default function ProductConfigurator({
                     setSelection({ ...selection, externalColor: color })
                   }
                 >
-                  <div className="relative">
+                  <div className="relative aspect-square">
                     {color.image ? (
                       <img
                         src={color.image}
                         alt={color.name}
-                        className="w-full h-28 object-cover"
+                        className="w-full h-full object-cover"
                       />
                     ) : (
                       <div
-                        className="w-full h-28"
+                        className="w-full h-full"
                         style={{ backgroundColor: color.colorCode || "#ccc" }}
                       />
                     )}
@@ -667,13 +642,7 @@ export default function ProductConfigurator({
                     )}
                   </div>
                   <CardContent className="p-3">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-5 h-5 rounded-full border"
-                        style={{ backgroundColor: color.colorCode || "#ccc" }}
-                      />
-                      <h3 className="font-medium text-sm">{color.name}</h3>
-                    </div>
+                    <h3 className="font-medium text-sm text-center">{color.name}</h3>
                   </CardContent>
                 </Card>
               ))}
@@ -695,7 +664,7 @@ export default function ProductConfigurator({
                 Select the inside finish for your door
               </p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {internalColors.map((color) => (
                 <Card
                   key={color.id}
@@ -709,16 +678,16 @@ export default function ProductConfigurator({
                     setSelection({ ...selection, internalColor: color })
                   }
                 >
-                  <div className="relative">
+                  <div className="relative aspect-square">
                     {color.image ? (
                       <img
                         src={color.image}
                         alt={color.name}
-                        className="w-full h-28 object-cover"
+                        className="w-full h-full object-cover"
                       />
                     ) : (
                       <div
-                        className="w-full h-28"
+                        className="w-full h-full"
                         style={{ backgroundColor: color.colorCode || "#ccc" }}
                       />
                     )}
@@ -729,13 +698,7 @@ export default function ProductConfigurator({
                     )}
                   </div>
                   <CardContent className="p-3">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-5 h-5 rounded-full border"
-                        style={{ backgroundColor: color.colorCode || "#ccc" }}
-                      />
-                      <h3 className="font-medium text-sm">{color.name}</h3>
-                    </div>
+                    <h3 className="font-medium text-sm text-center">{color.name}</h3>
                   </CardContent>
                 </Card>
               ))}
@@ -757,7 +720,7 @@ export default function ProductConfigurator({
                 Select the handle finish for your door
               </p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {handleColors.map((color) => (
                 <Card
                   key={color.id}
@@ -771,16 +734,16 @@ export default function ProductConfigurator({
                     setSelection({ ...selection, handleColor: color })
                   }
                 >
-                  <div className="relative">
+                  <div className="relative aspect-square">
                     {color.image ? (
                       <img
                         src={color.image}
                         alt={color.name}
-                        className="w-full h-28 object-cover"
+                        className="w-full h-full object-cover"
                       />
                     ) : (
                       <div
-                        className="w-full h-28"
+                        className="w-full h-full"
                         style={{ backgroundColor: color.colorCode || "#ccc" }}
                       />
                     )}
@@ -791,13 +754,7 @@ export default function ProductConfigurator({
                     )}
                   </div>
                   <CardContent className="p-3">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-5 h-5 rounded-full border"
-                        style={{ backgroundColor: color.colorCode || "#ccc" }}
-                      />
-                      <h3 className="font-medium text-sm">{color.name}</h3>
-                    </div>
+                    <h3 className="font-medium text-sm text-center">{color.name}</h3>
                   </CardContent>
                 </Card>
               ))}
@@ -875,18 +832,17 @@ export default function ProductConfigurator({
                   </h3>
                 </div>
                 {selection.dimension && (
-                  <>
-                    <img
-                      src={selection.dimension.image || "/placeholder.jpg"}
-                      alt={selection.dimension.name}
-                      className="w-full h-16 sm:h-20 object-cover"
-                    />
-                    <CardContent className="p-1.5 sm:p-2">
-                      <p className="font-medium text-[10px] sm:text-xs truncate">
-                        {selection.dimension.name}
-                      </p>
-                    </CardContent>
-                  </>
+                  <CardContent className="p-3 flex flex-col items-center justify-center">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2">
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                      </svg>
+                    </div>
+                    <p className="font-bold text-sm sm:text-base">
+                      {selection.dimension.width} x {selection.dimension.height}
+                    </p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">mm</p>
+                  </CardContent>
                 )}
               </Card>
 
@@ -898,12 +854,9 @@ export default function ProductConfigurator({
                   </h3>
                 </div>
                 {selection.postcode && (
-                  <CardContent className="p-1.5 sm:p-2">
-                    <p className="font-medium text-[10px] sm:text-xs">
+                  <CardContent className="p-3 flex items-center justify-center">
+                    <p className="font-bold text-lg sm:text-xl">
                       {selection.postcode.code}
-                    </p>
-                    <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">
-                      {selection.postcode.area}
                     </p>
                   </CardContent>
                 )}
@@ -918,34 +871,27 @@ export default function ProductConfigurator({
                 </div>
                 {selection.externalColor && (
                   <>
-                    {selection.externalColor.image ? (
-                      <img
-                        src={selection.externalColor.image}
-                        alt={selection.externalColor.name}
-                        className="w-full h-16 sm:h-20 object-cover"
-                      />
-                    ) : (
-                      <div
-                        className="w-full h-16 sm:h-20"
-                        style={{
-                          backgroundColor:
-                            selection.externalColor.colorCode || "#ccc",
-                        }}
-                      />
-                    )}
-                    <CardContent className="p-1.5 sm:p-2">
-                      <div className="flex items-center gap-1">
+                    <div className="aspect-square">
+                      {selection.externalColor.image ? (
+                        <img
+                          src={selection.externalColor.image}
+                          alt={selection.externalColor.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
                         <div
-                          className="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full border flex-shrink-0"
+                          className="w-full h-full"
                           style={{
                             backgroundColor:
                               selection.externalColor.colorCode || "#ccc",
                           }}
                         />
-                        <p className="font-medium text-[10px] sm:text-xs truncate">
-                          {selection.externalColor.name}
-                        </p>
-                      </div>
+                      )}
+                    </div>
+                    <CardContent className="p-1.5 sm:p-2">
+                      <p className="font-medium text-[10px] sm:text-xs text-center truncate">
+                        {selection.externalColor.name}
+                      </p>
                     </CardContent>
                   </>
                 )}
@@ -960,34 +906,27 @@ export default function ProductConfigurator({
                 </div>
                 {selection.internalColor && (
                   <>
-                    {selection.internalColor.image ? (
-                      <img
-                        src={selection.internalColor.image}
-                        alt={selection.internalColor.name}
-                        className="w-full h-16 sm:h-20 object-cover"
-                      />
-                    ) : (
-                      <div
-                        className="w-full h-16 sm:h-20"
-                        style={{
-                          backgroundColor:
-                            selection.internalColor.colorCode || "#ccc",
-                        }}
-                      />
-                    )}
-                    <CardContent className="p-1.5 sm:p-2">
-                      <div className="flex items-center gap-1">
+                    <div className="aspect-square">
+                      {selection.internalColor.image ? (
+                        <img
+                          src={selection.internalColor.image}
+                          alt={selection.internalColor.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
                         <div
-                          className="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full border flex-shrink-0"
+                          className="w-full h-full"
                           style={{
                             backgroundColor:
                               selection.internalColor.colorCode || "#ccc",
                           }}
                         />
-                        <p className="font-medium text-[10px] sm:text-xs truncate">
-                          {selection.internalColor.name}
-                        </p>
-                      </div>
+                      )}
+                    </div>
+                    <CardContent className="p-1.5 sm:p-2">
+                      <p className="font-medium text-[10px] sm:text-xs text-center truncate">
+                        {selection.internalColor.name}
+                      </p>
                     </CardContent>
                   </>
                 )}
@@ -1000,34 +939,27 @@ export default function ProductConfigurator({
                 </div>
                 {selection.handleColor && (
                   <>
-                    {selection.handleColor.image ? (
-                      <img
-                        src={selection.handleColor.image}
-                        alt={selection.handleColor.name}
-                        className="w-full h-16 sm:h-20 object-cover"
-                      />
-                    ) : (
-                      <div
-                        className="w-full h-16 sm:h-20"
-                        style={{
-                          backgroundColor:
-                            selection.handleColor.colorCode || "#ccc",
-                        }}
-                      />
-                    )}
-                    <CardContent className="p-1.5 sm:p-2">
-                      <div className="flex items-center gap-1">
+                    <div className="aspect-square">
+                      {selection.handleColor.image ? (
+                        <img
+                          src={selection.handleColor.image}
+                          alt={selection.handleColor.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
                         <div
-                          className="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full border flex-shrink-0"
+                          className="w-full h-full"
                           style={{
                             backgroundColor:
                               selection.handleColor.colorCode || "#ccc",
                           }}
                         />
-                        <p className="font-medium text-[10px] sm:text-xs truncate">
-                          {selection.handleColor.name}
-                        </p>
-                      </div>
+                      )}
+                    </div>
+                    <CardContent className="p-1.5 sm:p-2">
+                      <p className="font-medium text-[10px] sm:text-xs text-center truncate">
+                        {selection.handleColor.name}
+                      </p>
                     </CardContent>
                   </>
                 )}
