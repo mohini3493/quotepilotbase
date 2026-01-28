@@ -21,9 +21,22 @@ const app = express();
 app.set("trust proxy", 1);
 
 // ✅ CORS middleware
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "https://quotepilot-lz06.onrender.com",
+];
+
 app.use(
   cors({
-    origin: "https://quotepilot-lz06.onrender.com",
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -56,8 +69,27 @@ app.use("/api/internal-colors", internalColorsRoutes);
 app.use("/api/handle-colors", handleColorsRoutes);
 app.use("/api/customers", customersRoutes);
 
+// Global error handler
+app.use((err: any, req: any, res: any, next: any) => {
+  console.error("Global error:", err);
+  res.status(500).json({ error: "Internal server error" });
+});
+
+// Handle uncaught exceptions
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+});
+
 const PORT = Number(process.env.PORT) || 3000;
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`API running on http://0.0.0.0:${PORT}`);
+const server = app.listen(PORT, () => {
+  console.log(`API running on http://localhost:${PORT}`);
 });
+
+// Keep the server running
+server.keepAliveTimeout = 65000;
+server.headersTimeout = 66000;

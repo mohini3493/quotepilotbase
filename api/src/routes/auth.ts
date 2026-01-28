@@ -1,7 +1,7 @@
 import { Router } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { pool } from "../../db";
+import { pool } from "../db";
 import { requireAdmin } from "../middleware/auth";
 
 const router = Router();

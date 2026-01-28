@@ -1,5 +1,6 @@
+import "dotenv/config";
 import bcrypt from "bcryptjs";
-import { pool } from "../db";
+import { pool } from "../src/db";
 
 async function createAdmin() {
   const email = "admin@quotepilot.com";
