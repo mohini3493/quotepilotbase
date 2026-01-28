@@ -24,14 +24,19 @@ export default function EditPostcodePage() {
   useEffect(() => {
     if (!id) return;
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/postcodes/admin/${id}`, {
+    fetch(`/api/postcodes/admin/${id}`, {
       credentials: "include",
     })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load postcode");
         return res.json();
       })
-      .then(setForm)
+      .then((data) => {
+        setForm({
+          ...data,
+          isActive: data.is_active ?? data.isActive ?? true,
+        });
+      })
       .catch(() => setError("Failed to load postcode"));
   }, [id]);
 
@@ -41,7 +46,7 @@ export default function EditPostcodePage() {
   async function save() {
     setSaving(true);
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/postcodes/${id}`, {
+      await fetch(`/api/postcodes/${id}`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

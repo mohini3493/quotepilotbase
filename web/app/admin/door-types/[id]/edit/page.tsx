@@ -24,14 +24,19 @@ export default function EditDoorTypePage() {
   useEffect(() => {
     if (!id) return;
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/door-types/admin/${id}`, {
+    fetch(`/api/door-types/admin/${id}`, {
       credentials: "include",
     })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load door type");
         return res.json();
       })
-      .then(setForm)
+      .then((data) => {
+        setForm({
+          ...data,
+          isActive: data.is_active ?? data.isActive ?? true,
+        });
+      })
       .catch(() => setError("Failed to load door type"));
   }, [id]);
 
@@ -41,7 +46,7 @@ export default function EditDoorTypePage() {
   async function save() {
     setSaving(true);
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/door-types/${id}`, {
+      await fetch(`/api/door-types/${id}`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

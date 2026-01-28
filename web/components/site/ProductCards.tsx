@@ -71,80 +71,92 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
 }
 
 export default async function ProductSection() {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-  if (!API_URL) {
-    console.error("NEXT_PUBLIC_API_URL is missing");
-    return null;
-  }
+  // For server components, use the API URL directly or a relative URL
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
   console.log("Fetching products from API:", API_URL);
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`, {
-    cache: "no-store",
-  });
+  try {
+    const res = await fetch(`${API_URL}/api/products`, {
+      cache: "no-store",
+    });
 
-  if (!res.ok) {
-    console.error("Failed to fetch products:", res.status);
-    return null;
-  }
+    if (!res.ok) {
+      console.error("Failed to fetch products:", res.status);
+      return null;
+    }
 
-  const text = await res.text();
+    const text = await res.text();
 
-  // 🛑 Protect against HTML response
-  if (text.startsWith("<!DOCTYPE")) {
-    console.error("API returned HTML instead of JSON");
-    return null;
-  }
+    // 🛑 Protect against HTML response
+    if (text.startsWith("<!DOCTYPE")) {
+      console.error("API returned HTML instead of JSON");
+      return null;
+    }
 
-  const products: Product[] = JSON.parse(text);
+    const rawProducts = JSON.parse(text);
 
-  const activeProducts = products
-    .filter((p) => p.isActive)
-    .sort((a, b) => a.order - b.order);
+    // Map snake_case to camelCase
+    const products: Product[] = rawProducts.map((p: any) => ({
+      id: p.id,
+      title: p.title,
+      description: p.description,
+      image: p.image,
+      isActive: p.is_active ?? p.isActive ?? true,
+      order: p.order ?? 0,
+      slug: p.slug,
+    }));
 
-  if (!activeProducts.length) return null;
+    const activeProducts = products
+      .filter((p) => p.isActive)
+      .sort((a, b) => a.order - b.order);
 
-  return (
-    <section className="py-24 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/5 rounded-full blur-3xl" />
-      </div>
+    if (!activeProducts.length) return null;
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        {/* Enhanced header */}
-        <div className="text-center mb-16 space-y-4">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
-            <Sparkles className="w-4 h-4" />
-            Discover Our Solutions
-          </div>
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
-            Our <span className="text-primary">Products</span>
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Explore our range of innovative solutions designed to streamline
-            your business operations and boost productivity.
-          </p>
+    return (
+      <section className="py-24 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/5 rounded-full blur-3xl" />
         </div>
 
-        {/* Grid with staggered animation */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {activeProducts.map((product, index) => (
-            <div
-              key={product.id}
-              className="animate-in fade-in slide-in-from-bottom-4 duration-700"
-              style={{
-                animationDelay: `${index * 100}ms`,
-                animationFillMode: "both",
-              }}
-            >
-              <ProductCard product={product} index={index} />
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          {/* Enhanced header */}
+          <div className="text-center mb-16 space-y-4">
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
+              <Sparkles className="w-4 h-4" />
+              Discover Our Solutions
             </div>
-          ))}
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
+              Our <span className="text-primary">Products</span>
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Explore our range of innovative solutions designed to streamline
+              your business operations and boost productivity.
+            </p>
+          </div>
+
+          {/* Grid with staggered animation */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {activeProducts.map((product, index) => (
+              <div
+                key={product.id}
+                className="animate-in fade-in slide-in-from-bottom-4 duration-700"
+                style={{
+                  animationDelay: `${index * 100}ms`,
+                  animationFillMode: "both",
+                }}
+              >
+                <ProductCard product={product} index={index} />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
-  );
+      </section>
+    );
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return null;
+  }
 }

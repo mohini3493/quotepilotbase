@@ -34,7 +34,7 @@ export default function CustomersPage() {
     async function fetchCustomers() {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/customers`,
+          `/api/customers`,
           {
             credentials: "include",
           },

@@ -144,12 +144,9 @@ export default function ExternalColorsPage() {
       setLoading(true);
       setError(null);
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/external-colors/admin/all`,
-        {
-          credentials: "include",
-        },
-      );
+      const res = await fetch(`/api/external-colors/admin/all`, {
+        credentials: "include",
+      });
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -172,8 +169,12 @@ export default function ExternalColorsPage() {
         externalColors = [];
       }
 
+      const mappedExternalColors = externalColors.map((item: any) => ({
+        ...item,
+        isActive: item.is_active ?? item.isActive ?? true,
+      }));
       setExternalColors(
-        externalColors.sort(
+        mappedExternalColors.sort(
           (a: ExternalColor, b: ExternalColor) =>
             (a.order || 0) - (b.order || 0),
         ),
@@ -195,15 +196,12 @@ export default function ExternalColorsPage() {
     if (!externalColor) return;
 
     try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/external-colors/${id}`,
-        {
-          method: "PUT",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ isActive: !externalColor.isActive }),
-        },
-      );
+      await fetch(`/api/external-colors/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: !externalColor.isActive }),
+      });
 
       setExternalColors((prev) =>
         prev.map((ec) =>
@@ -220,13 +218,10 @@ export default function ExternalColorsPage() {
       return;
 
     try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/external-colors/${id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        },
-      );
+      await fetch(`/api/external-colors/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
 
       setExternalColors((prev) => prev.filter((ec) => ec.id !== id));
     } catch (error) {
@@ -245,17 +240,14 @@ export default function ExternalColorsPage() {
     setExternalColors(newOrder);
 
     try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/external-colors/reorder`,
-        {
-          method: "PUT",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            order: newOrder.map((ec, index) => ({ id: ec.id, order: index })),
-          }),
-        },
-      );
+      await fetch(`/api/external-colors/reorder`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          order: newOrder.map((ec, index) => ({ id: ec.id, order: index })),
+        }),
+      });
     } catch (error) {
       console.error("Error reordering external colors:", error);
       loadExternalColors();

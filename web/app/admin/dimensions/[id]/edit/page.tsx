@@ -24,14 +24,19 @@ export default function EditDimensionPage() {
   useEffect(() => {
     if (!id) return;
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dimensions/admin/${id}`, {
+    fetch(`/api/dimensions/admin/${id}`, {
       credentials: "include",
     })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load dimension");
         return res.json();
       })
-      .then(setForm)
+      .then((data) => {
+        setForm({
+          ...data,
+          isActive: data.is_active ?? data.isActive ?? true,
+        });
+      })
       .catch(() => setError("Failed to load dimension"));
   }, [id]);
 
@@ -41,7 +46,7 @@ export default function EditDimensionPage() {
   async function save() {
     setSaving(true);
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dimensions/${id}`, {
+      await fetch(`/api/dimensions/${id}`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

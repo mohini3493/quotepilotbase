@@ -15,7 +15,7 @@ export default function AddHandleColorPage() {
   async function saveHandleColor() {
     setSaving(true);
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/handle-colors`, {
+      await fetch(`/api/handle-colors`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

@@ -25,14 +25,20 @@ export default function EditProductPage() {
   useEffect(() => {
     if (!id) return;
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/admin/${id}`, {
+    fetch(`/api/products/admin/${id}`, {
       credentials: "include",
     })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load product");
         return res.json();
       })
-      .then(setForm)
+      .then((data) => {
+        // Map snake_case to camelCase
+        setForm({
+          ...data,
+          isActive: data.is_active ?? data.isActive ?? true,
+        });
+      })
       .catch(() => setError("Failed to load product"));
   }, [id]);
 
@@ -40,7 +46,7 @@ export default function EditProductPage() {
   if (!form) return <p>Loading...</p>;
 
   async function save() {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`, {
+    await fetch(`/api/products/${id}`, {
       method: "PUT",
       credentials: "include",
       headers: { "Content-Type": "application/json" },

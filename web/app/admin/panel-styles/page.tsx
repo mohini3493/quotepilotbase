@@ -125,12 +125,9 @@ export default function PanelStylesPage() {
       setLoading(true);
       setError(null);
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/panel-styles/admin/all`,
-        {
-          credentials: "include",
-        },
-      );
+      const res = await fetch(`/api/panel-styles/admin/all`, {
+        credentials: "include",
+      });
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -153,8 +150,12 @@ export default function PanelStylesPage() {
         panelStyles = [];
       }
 
+      const mappedPanelStyles = panelStyles.map((item: any) => ({
+        ...item,
+        isActive: item.is_active ?? item.isActive ?? true,
+      }));
       setPanelStyles(
-        panelStyles.sort(
+        mappedPanelStyles.sort(
           (a: PanelStyle, b: PanelStyle) => (a.order || 0) - (b.order || 0),
         ),
       );
@@ -173,7 +174,7 @@ export default function PanelStylesPage() {
     if (!panelStyle) return;
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/panel-styles/${id}`, {
+      await fetch(`/api/panel-styles/${id}`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -194,7 +195,7 @@ export default function PanelStylesPage() {
     if (!confirm("Are you sure you want to delete this panel style?")) return;
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/panel-styles/${id}`, {
+      await fetch(`/api/panel-styles/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -216,17 +217,14 @@ export default function PanelStylesPage() {
     setPanelStyles(newOrder);
 
     try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/panel-styles/reorder`,
-        {
-          method: "PUT",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            order: newOrder.map((ps, index) => ({ id: ps.id, order: index })),
-          }),
-        },
-      );
+      await fetch(`/api/panel-styles/reorder`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          order: newOrder.map((ps, index) => ({ id: ps.id, order: index })),
+        }),
+      });
     } catch (error) {
       console.error("Error reordering panel styles:", error);
       loadPanelStyles();

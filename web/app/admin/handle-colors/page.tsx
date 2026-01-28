@@ -142,12 +142,9 @@ export default function HandleColorsPage() {
       setLoading(true);
       setError(null);
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/handle-colors/admin/all`,
-        {
-          credentials: "include",
-        },
-      );
+      const res = await fetch(`/api/handle-colors/admin/all`, {
+        credentials: "include",
+      });
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -170,8 +167,12 @@ export default function HandleColorsPage() {
         handleColors = [];
       }
 
+      const mappedHandleColors = handleColors.map((item: any) => ({
+        ...item,
+        isActive: item.is_active ?? item.isActive ?? true,
+      }));
       setHandleColors(
-        handleColors.sort(
+        mappedHandleColors.sort(
           (a: HandleColor, b: HandleColor) => (a.order || 0) - (b.order || 0),
         ),
       );
@@ -190,15 +191,12 @@ export default function HandleColorsPage() {
     if (!handleColor) return;
 
     try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/handle-colors/${id}`,
-        {
-          method: "PUT",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ isActive: !handleColor.isActive }),
-        },
-      );
+      await fetch(`/api/handle-colors/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: !handleColor.isActive }),
+      });
 
       setHandleColors((prev) =>
         prev.map((hc) =>
@@ -214,13 +212,10 @@ export default function HandleColorsPage() {
     if (!confirm("Are you sure you want to delete this handle color?")) return;
 
     try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/handle-colors/${id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        },
-      );
+      await fetch(`/api/handle-colors/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
 
       setHandleColors((prev) => prev.filter((hc) => hc.id !== id));
     } catch (error) {
@@ -239,17 +234,14 @@ export default function HandleColorsPage() {
     setHandleColors(newOrder);
 
     try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/handle-colors/reorder`,
-        {
-          method: "PUT",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            order: newOrder.map((hc, index) => ({ id: hc.id, order: index })),
-          }),
-        },
-      );
+      await fetch(`/api/handle-colors/reorder`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          order: newOrder.map((hc, index) => ({ id: hc.id, order: index })),
+        }),
+      });
     } catch (error) {
       console.error("Error reordering handle colors:", error);
       loadHandleColors();

@@ -12,7 +12,7 @@ export default function AddProductPage() {
   const [form, setForm] = useState<any>({ isActive: true });
 
   async function saveProduct() {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`, {
+    await fetch(`/api/products`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },

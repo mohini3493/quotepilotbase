@@ -15,7 +15,7 @@ export default function AddDoorTypePage() {
   async function saveDoorType() {
     setSaving(true);
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/door-types`, {
+      await fetch(`/api/door-types`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

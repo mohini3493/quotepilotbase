@@ -144,12 +144,9 @@ export default function InternalColorsPage() {
       setLoading(true);
       setError(null);
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/internal-colors/admin/all`,
-        {
-          credentials: "include",
-        },
-      );
+      const res = await fetch(`/api/internal-colors/admin/all`, {
+        credentials: "include",
+      });
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -172,8 +169,12 @@ export default function InternalColorsPage() {
         internalColors = [];
       }
 
+      const mappedInternalColors = internalColors.map((item: any) => ({
+        ...item,
+        isActive: item.is_active ?? item.isActive ?? true,
+      }));
       setInternalColors(
-        internalColors.sort(
+        mappedInternalColors.sort(
           (a: InternalColor, b: InternalColor) =>
             (a.order || 0) - (b.order || 0),
         ),
@@ -195,15 +196,12 @@ export default function InternalColorsPage() {
     if (!internalColor) return;
 
     try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/internal-colors/${id}`,
-        {
-          method: "PUT",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ isActive: !internalColor.isActive }),
-        },
-      );
+      await fetch(`/api/internal-colors/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: !internalColor.isActive }),
+      });
 
       setInternalColors((prev) =>
         prev.map((ic) =>
@@ -220,13 +218,10 @@ export default function InternalColorsPage() {
       return;
 
     try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/internal-colors/${id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        },
-      );
+      await fetch(`/api/internal-colors/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
 
       setInternalColors((prev) => prev.filter((ic) => ic.id !== id));
     } catch (error) {
@@ -245,17 +240,14 @@ export default function InternalColorsPage() {
     setInternalColors(newOrder);
 
     try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/internal-colors/reorder`,
-        {
-          method: "PUT",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            order: newOrder.map((ic, index) => ({ id: ic.id, order: index })),
-          }),
-        },
-      );
+      await fetch(`/api/internal-colors/reorder`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          order: newOrder.map((ic, index) => ({ id: ic.id, order: index })),
+        }),
+      });
     } catch (error) {
       console.error("Error reordering internal colors:", error);
       loadInternalColors();

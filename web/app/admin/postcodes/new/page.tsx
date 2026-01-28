@@ -15,7 +15,7 @@ export default function AddPostcodePage() {
   async function savePostcode() {
     setSaving(true);
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/postcodes`, {
+      await fetch(`/api/postcodes`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

@@ -138,24 +138,21 @@ export default function ProductsPage() {
       setLoading(true);
       setError(null);
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/products/admin/all`,
-        {
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`/api/products/admin/all`, {
+        credentials: "include",
+      });
 
       console.log("Response status:", res.status);
       console.log(
         "Response headers:",
-        Object.fromEntries(res.headers.entries())
+        Object.fromEntries(res.headers.entries()),
       );
 
       if (!res.ok) {
         const errorText = await res.text();
         console.log("Error response:", errorText);
         throw new Error(
-          `API Error: ${res.status} ${res.statusText} - ${errorText}`
+          `API Error: ${res.status} ${res.statusText} - ${errorText}`,
         );
       }
 
@@ -163,7 +160,7 @@ export default function ProductsPage() {
       console.log("Raw API response:", data);
       console.log(
         "Product count (ACTIVE ONLY):",
-        data?.length || "Not an array"
+        data?.length || "Not an array",
       );
       console.log("First product (if exists):", data?.[0]);
 
@@ -181,16 +178,24 @@ export default function ProductsPage() {
       }
 
       console.log("Processed products (ACTIVE ONLY):", products);
-      // Add a note that all products shown are active since the API filters them
+      // Map snake_case to camelCase
+      const mappedProducts = products.map((p: any) => ({
+        id: p.id,
+        title: p.title,
+        slug: p.slug,
+        image: p.image,
+        isActive: p.is_active ?? p.isActive ?? true,
+        order: p.order ?? 0,
+      }));
       setProducts(
-        products.sort(
-          (a: Product, b: Product) => (a.order || 0) - (b.order || 0)
-        )
+        mappedProducts.sort(
+          (a: Product, b: Product) => (a.order || 0) - (b.order || 0),
+        ),
       );
     } catch (error) {
       console.error("Error loading products:", error);
       setError(
-        error instanceof Error ? error.message : "Failed to load products"
+        error instanceof Error ? error.message : "Failed to load products",
       );
     } finally {
       setLoading(false);
@@ -199,13 +204,10 @@ export default function ProductsPage() {
 
   async function toggleProduct(id: number) {
     try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}/toggle`,
-        {
-          method: "PATCH",
-          credentials: "include",
-        }
-      );
+      await fetch(`/api/products/${id}/toggle`, {
+        method: "PATCH",
+        credentials: "include",
+      });
       loadProducts();
     } catch (error) {
       console.error("Error toggling product:", error);
@@ -214,7 +216,7 @@ export default function ProductsPage() {
 
   async function deleteProduct(id: number) {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`, {
+      await fetch(`/api/products/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -234,7 +236,7 @@ export default function ProductsPage() {
     const reordered = arrayMove(products, oldIndex, newIndex);
     setProducts(reordered);
 
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/reorder`, {
+    await fetch(`/api/products/reorder`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },

@@ -11,19 +11,30 @@ router.post(
   requireAdmin,
   upload.single("image"),
   async (req, res) => {
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      console.log("Uploading file:", req.file.originalname, req.file.mimetype);
+
+      const base64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString(
+        "base64",
+      )}`;
+
+      const result = await cloudinary.uploader.upload(base64, {
+        folder: "quotepilot/products",
+      });
+
+      console.log("Cloudinary upload success:", result.secure_url);
+      res.json({ url: result.secure_url });
+    } catch (error: any) {
+      console.error("Cloudinary upload error:", error);
+      res.status(500).json({ 
+        message: "Failed to upload image", 
+        error: error.message 
+      });
     }
-
-    const base64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString(
-      "base64",
-    )}`;
-
-    const result = await cloudinary.uploader.upload(base64, {
-      folder: "quotepilot/products",
-    });
-
-    res.json({ url: result.secure_url });
   },
 );
 

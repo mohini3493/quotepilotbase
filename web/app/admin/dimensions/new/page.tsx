@@ -15,7 +15,7 @@ export default function AddDimensionPage() {
   async function saveDimension() {
     setSaving(true);
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dimensions`, {
+      await fetch(`/api/dimensions`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

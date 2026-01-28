@@ -122,12 +122,9 @@ export default function PostcodesPage() {
       setLoading(true);
       setError(null);
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/postcodes/admin/all`,
-        {
-          credentials: "include",
-        },
-      );
+      const res = await fetch(`/api/postcodes/admin/all`, {
+        credentials: "include",
+      });
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -150,8 +147,12 @@ export default function PostcodesPage() {
         postcodes = [];
       }
 
+      const mappedPostcodes = postcodes.map((item: any) => ({
+        ...item,
+        isActive: item.is_active ?? item.isActive ?? true,
+      }));
       setPostcodes(
-        postcodes.sort(
+        mappedPostcodes.sort(
           (a: Postcode, b: Postcode) => (a.order || 0) - (b.order || 0),
         ),
       );
@@ -170,7 +171,7 @@ export default function PostcodesPage() {
     if (!postcode) return;
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/postcodes/${id}`, {
+      await fetch(`/api/postcodes/${id}`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -189,7 +190,7 @@ export default function PostcodesPage() {
     if (!confirm("Are you sure you want to delete this postcode?")) return;
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/postcodes/${id}`, {
+      await fetch(`/api/postcodes/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -211,7 +212,7 @@ export default function PostcodesPage() {
     setPostcodes(newOrder);
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/postcodes/reorder`, {
+      await fetch(`/api/postcodes/reorder`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

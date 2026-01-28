@@ -22,19 +22,29 @@ export default function ImageUpload({
     formData.append("image", file);
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/upload/image`,
-        {
-          method: "POST",
-          credentials: "include",
-          body: formData,
-        },
-      );
+      const res = await fetch(`/api/upload/image`, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error("Upload failed:", res.status, errorData);
+        alert("Upload failed. Please try again.");
+        return;
+      }
 
       const data = await res.json();
-      onUploaded(data.url);
+      if (data.url) {
+        onUploaded(data.url);
+      } else {
+        console.error("No URL in response:", data);
+        alert("Upload failed. No URL returned.");
+      }
     } catch (error) {
       console.error("Upload failed:", error);
+      alert("Upload failed. Please check your connection.");
     } finally {
       setLoading(false);
     }

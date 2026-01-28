@@ -24,14 +24,19 @@ export default function EditPanelStylePage() {
   useEffect(() => {
     if (!id) return;
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/panel-styles/admin/${id}`, {
+    fetch(`/api/panel-styles/admin/${id}`, {
       credentials: "include",
     })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load panel style");
         return res.json();
       })
-      .then(setForm)
+      .then((data) => {
+        setForm({
+          ...data,
+          isActive: data.is_active ?? data.isActive ?? true,
+        });
+      })
       .catch(() => setError("Failed to load panel style"));
   }, [id]);
 
@@ -41,7 +46,7 @@ export default function EditPanelStylePage() {
   async function save() {
     setSaving(true);
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/panel-styles/${id}`, {
+      await fetch(`/api/panel-styles/${id}`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

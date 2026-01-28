@@ -15,7 +15,7 @@ export default function AddInternalColorPage() {
   async function saveInternalColor() {
     setSaving(true);
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/internal-colors`, {
+      await fetch(`/api/internal-colors`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

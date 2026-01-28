@@ -15,7 +15,7 @@ export default function AddExternalColorPage() {
   async function saveExternalColor() {
     setSaving(true);
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/external-colors`, {
+      await fetch(`/api/external-colors`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

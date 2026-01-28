@@ -125,12 +125,9 @@ export default function DimensionsPage() {
       setLoading(true);
       setError(null);
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/dimensions/admin/all`,
-        {
-          credentials: "include",
-        },
-      );
+      const res = await fetch(`/api/dimensions/admin/all`, {
+        credentials: "include",
+      });
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -153,8 +150,12 @@ export default function DimensionsPage() {
         dimensions = [];
       }
 
+      const mappedDimensions = dimensions.map((item: any) => ({
+        ...item,
+        isActive: item.is_active ?? item.isActive ?? true,
+      }));
       setDimensions(
-        dimensions.sort(
+        mappedDimensions.sort(
           (a: Dimension, b: Dimension) => (a.order || 0) - (b.order || 0),
         ),
       );
@@ -173,7 +174,7 @@ export default function DimensionsPage() {
     if (!dimension) return;
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dimensions/${id}`, {
+      await fetch(`/api/dimensions/${id}`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -192,7 +193,7 @@ export default function DimensionsPage() {
     if (!confirm("Are you sure you want to delete this dimension?")) return;
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dimensions/${id}`, {
+      await fetch(`/api/dimensions/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -214,7 +215,7 @@ export default function DimensionsPage() {
     setDimensions(newOrder);
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dimensions/reorder`, {
+      await fetch(`/api/dimensions/reorder`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

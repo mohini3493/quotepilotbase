@@ -15,7 +15,7 @@ export default async function AdminLayout({
     redirect("/admin-login");
   }
 
-  // const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+  // const res = await fetch(`/api/auth/me`, {
   //   headers: {
   //     Cookie: `admin_token=${adminToken}`,
   //   },

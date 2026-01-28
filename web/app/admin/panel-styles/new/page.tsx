@@ -15,7 +15,7 @@ export default function AddPanelStylePage() {
   async function savePanelStyle() {
     setSaving(true);
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/panel-styles`, {
+      await fetch(`/api/panel-styles`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

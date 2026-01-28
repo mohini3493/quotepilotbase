@@ -25,14 +25,19 @@ export default function EditHandleColorPage() {
   useEffect(() => {
     if (!id) return;
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/handle-colors/admin/${id}`, {
+    fetch(`/api/handle-colors/admin/${id}`, {
       credentials: "include",
     })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load handle color");
         return res.json();
       })
-      .then(setForm)
+      .then((data) => {
+        setForm({
+          ...data,
+          isActive: data.is_active ?? data.isActive ?? true,
+        });
+      })
       .catch(() => setError("Failed to load handle color"));
   }, [id]);
 
@@ -42,15 +47,12 @@ export default function EditHandleColorPage() {
   async function save() {
     setSaving(true);
     try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/handle-colors/${id}`,
-        {
-          method: "PUT",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
-        },
-      );
+      await fetch(`/api/handle-colors/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
       router.push("/admin/handle-colors");
     } catch (error) {
