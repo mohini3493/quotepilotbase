@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { prisma } from "../prisma";
+import { pool } from "../../db";
 import { requireAdmin } from "../middleware/auth";
 
 const router = Router();
@@ -10,11 +10,10 @@ const router = Router();
 
 /** Get ACTIVE postcodes */
 router.get("/", async (_, res) => {
-  const postcodes = await prisma.postcode.findMany({
-    where: { isActive: true },
-    orderBy: { order: "asc" },
-  });
-  res.json(postcodes);
+  const result = await pool.query(
+    'SELECT * FROM postcodes WHERE is_active = true ORDER BY "order" ASC',
+  );
+  res.json(result.rows);
 });
 
 /* ===============================
@@ -23,63 +22,65 @@ router.get("/", async (_, res) => {
 
 /** Admin – get ALL postcodes */
 router.get("/admin/all", requireAdmin, async (_, res) => {
-  const postcodes = await prisma.postcode.findMany({
-    orderBy: { order: "asc" },
-  });
-  res.json(postcodes);
+  const result = await pool.query(
+    'SELECT * FROM postcodes ORDER BY "order" ASC',
+  );
+  res.json(result.rows);
 });
 
 /** Admin – get postcode by ID */
 router.get("/admin/:id", requireAdmin, async (req, res) => {
-  const postcode = await prisma.postcode.findUnique({
-    where: { id: Number(req.params.id) },
-  });
+  const result = await pool.query("SELECT * FROM postcodes WHERE id = $1", [
+    req.params.id,
+  ]);
 
-  if (!postcode) {
+  if (result.rows.length === 0) {
     return res.status(404).json({ error: "Postcode not found" });
   }
 
-  res.json(postcode);
+  res.json(result.rows[0]);
 });
 
 /** Admin – create postcode */
 router.post("/", requireAdmin, async (req, res) => {
-  const postcode = await prisma.postcode.create({
-    data: req.body,
-  });
-  res.json(postcode);
+  const { code, area, order, isActive } = req.body;
+  const result = await pool.query(
+    `INSERT INTO postcodes (code, area, "order", is_active) 
+     VALUES ($1, $2, $3, $4) RETURNING *`,
+    [code, area, order || 0, isActive ?? true],
+  );
+  res.json(result.rows[0]);
 });
 
 /** Admin – update postcode */
 router.put("/:id", requireAdmin, async (req, res) => {
-  const postcode = await prisma.postcode.update({
-    where: { id: Number(req.params.id) },
-    data: req.body,
-  });
-  res.json(postcode);
+  const { code, area, order, isActive } = req.body;
+  const result = await pool.query(
+    `UPDATE postcodes SET code = $1, area = $2, "order" = $3, is_active = $4 
+     WHERE id = $5 RETURNING *`,
+    [code, area, order, isActive, req.params.id],
+  );
+  res.json(result.rows[0]);
 });
 
 /** Admin – delete postcode */
 router.delete("/:id", requireAdmin, async (req, res) => {
-  await prisma.postcode.delete({
-    where: { id: Number(req.params.id) },
-  });
+  await pool.query("DELETE FROM postcodes WHERE id = $1", [req.params.id]);
   res.json({ success: true });
 });
 
 /** Admin – toggle active/inactive */
 router.patch("/:id/toggle", requireAdmin, async (req, res) => {
-  const id = Number(req.params.id);
+  const result = await pool.query(
+    "UPDATE postcodes SET is_active = NOT is_active WHERE id = $1 RETURNING *",
+    [req.params.id],
+  );
 
-  const postcode = await prisma.postcode.findUnique({ where: { id } });
-  if (!postcode) return res.status(404).json({});
+  if (result.rows.length === 0) {
+    return res.status(404).json({});
+  }
 
-  const updated = await prisma.postcode.update({
-    where: { id },
-    data: { isActive: !postcode.isActive },
-  });
-
-  res.json(updated);
+  res.json(result.rows[0]);
 });
 
 /** Admin – reorder postcodes */
@@ -88,10 +89,10 @@ router.post("/reorder", requireAdmin, async (req, res) => {
 
   await Promise.all(
     items.map((item: { id: number; order: number }) =>
-      prisma.postcode.update({
-        where: { id: item.id },
-        data: { order: item.order },
-      }),
+      pool.query('UPDATE postcodes SET "order" = $1 WHERE id = $2', [
+        item.order,
+        item.id,
+      ]),
     ),
   );
 

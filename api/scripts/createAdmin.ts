@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { prisma } from "../src/prisma";
+import { pool } from "../db";
 
 async function createAdmin() {
   const email = "admin@quotepilot.com";
@@ -7,12 +7,10 @@ async function createAdmin() {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  await prisma.admin.create({
-    data: {
-      email,
-      password: hashedPassword,
-    },
-  });
+  await pool.query("INSERT INTO admins (email, password) VALUES ($1, $2)", [
+    email,
+    hashedPassword,
+  ]);
 
   console.log("✅ Admin created successfully");
 }
@@ -22,5 +20,5 @@ createAdmin()
     console.error(e);
   })
   .finally(async () => {
-    await prisma.$disconnect();
+    await pool.end();
   });

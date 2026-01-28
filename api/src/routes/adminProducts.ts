@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { prisma } from "../prisma";
+import { pool } from "../../db";
 import { requireAdmin } from "../middleware/auth";
 
 const router = Router();
@@ -8,11 +8,15 @@ const router = Router();
  * Admin only
  */
 router.get("/", requireAdmin, async (req, res) => {
-  const products = await prisma.product.findMany({
-    orderBy: { order: "asc" },
-  });
-
-  res.json(products);
+  try {
+    const result = await pool.query(
+      'SELECT * FROM products ORDER BY "order" ASC',
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ error: "Failed to fetch products" });
+  }
 });
 
 export default router;

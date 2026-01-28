@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { prisma } from "../prisma";
+import { pool } from "../../db";
 import { requireAdmin } from "../middleware/auth";
 
 const router = Router();
@@ -10,11 +10,10 @@ const router = Router();
 
 /** Get ACTIVE panel styles */
 router.get("/", async (_, res) => {
-  const panelStyles = await prisma.panelStyle.findMany({
-    where: { isActive: true },
-    orderBy: { order: "asc" },
-  });
-  res.json(panelStyles);
+  const result = await pool.query(
+    'SELECT * FROM panel_styles WHERE is_active = true ORDER BY "order" ASC',
+  );
+  res.json(result.rows);
 });
 
 /* ===============================
@@ -23,63 +22,65 @@ router.get("/", async (_, res) => {
 
 /** Admin – get ALL panel styles */
 router.get("/admin/all", requireAdmin, async (_, res) => {
-  const panelStyles = await prisma.panelStyle.findMany({
-    orderBy: { order: "asc" },
-  });
-  res.json(panelStyles);
+  const result = await pool.query(
+    'SELECT * FROM panel_styles ORDER BY "order" ASC',
+  );
+  res.json(result.rows);
 });
 
 /** Admin – get panel style by ID */
 router.get("/admin/:id", requireAdmin, async (req, res) => {
-  const panelStyle = await prisma.panelStyle.findUnique({
-    where: { id: Number(req.params.id) },
-  });
+  const result = await pool.query("SELECT * FROM panel_styles WHERE id = $1", [
+    req.params.id,
+  ]);
 
-  if (!panelStyle) {
+  if (result.rows.length === 0) {
     return res.status(404).json({ error: "Panel style not found" });
   }
 
-  res.json(panelStyle);
+  res.json(result.rows[0]);
 });
 
 /** Admin – create panel style */
 router.post("/", requireAdmin, async (req, res) => {
-  const panelStyle = await prisma.panelStyle.create({
-    data: req.body,
-  });
-  res.json(panelStyle);
+  const { name, slug, image, order, isActive } = req.body;
+  const result = await pool.query(
+    `INSERT INTO panel_styles (name, slug, image, "order", is_active) 
+     VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+    [name, slug, image, order || 0, isActive ?? true],
+  );
+  res.json(result.rows[0]);
 });
 
 /** Admin – update panel style */
 router.put("/:id", requireAdmin, async (req, res) => {
-  const panelStyle = await prisma.panelStyle.update({
-    where: { id: Number(req.params.id) },
-    data: req.body,
-  });
-  res.json(panelStyle);
+  const { name, slug, image, order, isActive } = req.body;
+  const result = await pool.query(
+    `UPDATE panel_styles SET name = $1, slug = $2, image = $3, "order" = $4, is_active = $5 
+     WHERE id = $6 RETURNING *`,
+    [name, slug, image, order, isActive, req.params.id],
+  );
+  res.json(result.rows[0]);
 });
 
 /** Admin – delete panel style */
 router.delete("/:id", requireAdmin, async (req, res) => {
-  await prisma.panelStyle.delete({
-    where: { id: Number(req.params.id) },
-  });
+  await pool.query("DELETE FROM panel_styles WHERE id = $1", [req.params.id]);
   res.json({ success: true });
 });
 
 /** Admin – toggle active/inactive */
 router.patch("/:id/toggle", requireAdmin, async (req, res) => {
-  const id = Number(req.params.id);
+  const result = await pool.query(
+    "UPDATE panel_styles SET is_active = NOT is_active WHERE id = $1 RETURNING *",
+    [req.params.id],
+  );
 
-  const panelStyle = await prisma.panelStyle.findUnique({ where: { id } });
-  if (!panelStyle) return res.status(404).json({});
+  if (result.rows.length === 0) {
+    return res.status(404).json({});
+  }
 
-  const updated = await prisma.panelStyle.update({
-    where: { id },
-    data: { isActive: !panelStyle.isActive },
-  });
-
-  res.json(updated);
+  res.json(result.rows[0]);
 });
 
 /** Admin – reorder panel styles */
@@ -88,10 +89,10 @@ router.post("/reorder", requireAdmin, async (req, res) => {
 
   await Promise.all(
     items.map((item: { id: number; order: number }) =>
-      prisma.panelStyle.update({
-        where: { id: item.id },
-        data: { order: item.order },
-      }),
+      pool.query('UPDATE panel_styles SET "order" = $1 WHERE id = $2', [
+        item.order,
+        item.id,
+      ]),
     ),
   );
 

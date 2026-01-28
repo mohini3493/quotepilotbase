@@ -1,29 +1,27 @@
 import { Router } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { prisma } from "../prisma";
+import { pool } from "../../db";
 import { requireAdmin } from "../middleware/auth";
 
 const router = Router();
 
 router.post("/login", async (req, res) => {
-  // console.log("LOGIN BODY:", req.body);
-
   const { email, password } = req.body;
 
-  const admin = await prisma.admin.findUnique({ where: { email } });
+  const result = await pool.query("SELECT * FROM admins WHERE email = $1", [
+    email,
+  ]);
+  const admin = result.rows[0];
+
   if (!admin) {
-    // console.log("ADMIN NOT FOUND");
     return res.status(401).json({ message: "Invalid credentials" });
   }
 
   const valid = await bcrypt.compare(password, admin.password);
   if (!valid) {
-    // console.log("PASSWORD MISMATCH");
     return res.status(401).json({ message: "Invalid credentials" });
   }
-
-  // console.log("LOGIN SUCCESS");
 
   const token = jwt.sign({ adminId: admin.id }, process.env.JWT_SECRET!, {
     expiresIn: "1d",

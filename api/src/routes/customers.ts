@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { prisma } from "../prisma";
+import { pool } from "../../db";
 import { requireAdmin } from "../middleware/auth";
 
 const router = Router();
@@ -11,10 +11,35 @@ const router = Router();
 /** Create customer (quote submission) */
 router.post("/", async (req, res) => {
   try {
-    const customer = await prisma.customer.create({
-      data: req.body,
-    });
-    res.json(customer);
+    const {
+      name,
+      email,
+      phone,
+      doorType,
+      panelStyle,
+      dimension,
+      postcode,
+      externalColor,
+      internalColor,
+      handleColor,
+    } = req.body;
+    const result = await pool.query(
+      `INSERT INTO customers (name, email, phone, door_type, panel_style, dimension, postcode, external_color, internal_color, handle_color) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+      [
+        name,
+        email,
+        phone,
+        doorType,
+        panelStyle,
+        dimension,
+        postcode,
+        externalColor,
+        internalColor,
+        handleColor,
+      ],
+    );
+    res.json(result.rows[0]);
   } catch (error) {
     console.error("Error creating customer:", error);
     res.status(500).json({ error: "Failed to create customer" });
@@ -27,30 +52,28 @@ router.post("/", async (req, res) => {
 
 /** Admin – get ALL customers */
 router.get("/", requireAdmin, async (_, res) => {
-  const customers = await prisma.customer.findMany({
-    orderBy: { createdAt: "desc" },
-  });
-  res.json(customers);
+  const result = await pool.query(
+    "SELECT * FROM customers ORDER BY created_at DESC",
+  );
+  res.json(result.rows);
 });
 
 /** Admin – get customer by ID */
 router.get("/:id", requireAdmin, async (req, res) => {
-  const customer = await prisma.customer.findUnique({
-    where: { id: Number(req.params.id) },
-  });
+  const result = await pool.query("SELECT * FROM customers WHERE id = $1", [
+    req.params.id,
+  ]);
 
-  if (!customer) {
+  if (result.rows.length === 0) {
     return res.status(404).json({ error: "Customer not found" });
   }
 
-  res.json(customer);
+  res.json(result.rows[0]);
 });
 
 /** Admin – delete customer */
 router.delete("/:id", requireAdmin, async (req, res) => {
-  await prisma.customer.delete({
-    where: { id: Number(req.params.id) },
-  });
+  await pool.query("DELETE FROM customers WHERE id = $1", [req.params.id]);
   res.json({ success: true });
 });
 

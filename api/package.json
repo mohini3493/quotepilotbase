@@ -12,7 +12,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^6.6.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^25.0.7",
+    "@types/pg": "^8.15.4",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^1.41.3",
     "cookie-parser": "^1.4.7",
@@ -22,17 +29,10 @@
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.0.2",
     "multer-storage-cloudinary": "^4.0.0",
-    "@types/bcryptjs": "^2.4.6",
-    "@types/cookie-parser": "^1.4.10",
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.6",
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/multer": "^2.0.0",
-    "@types/node": "^25.0.7",
-    "nodemon": "^3.1.11"
+    "nodemon": "^3.1.11",
+    "pg": "^8.17.2"
   },
   "devDependencies": {
-    "prisma": "^6.6.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }

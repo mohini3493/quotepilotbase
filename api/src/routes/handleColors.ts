@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { prisma } from "../prisma";
+import { pool } from "../../db";
 import { requireAdmin } from "../middleware/auth";
 
 const router = Router();
@@ -10,11 +10,10 @@ const router = Router();
 
 /** Get ACTIVE handle colors */
 router.get("/", async (_, res) => {
-  const handleColors = await prisma.handleColor.findMany({
-    where: { isActive: true },
-    orderBy: { order: "asc" },
-  });
-  res.json(handleColors);
+  const result = await pool.query(
+    'SELECT * FROM handle_colors WHERE is_active = true ORDER BY "order" ASC',
+  );
+  res.json(result.rows);
 });
 
 /* ===============================
@@ -23,63 +22,65 @@ router.get("/", async (_, res) => {
 
 /** Admin – get ALL handle colors */
 router.get("/admin/all", requireAdmin, async (_, res) => {
-  const handleColors = await prisma.handleColor.findMany({
-    orderBy: { order: "asc" },
-  });
-  res.json(handleColors);
+  const result = await pool.query(
+    'SELECT * FROM handle_colors ORDER BY "order" ASC',
+  );
+  res.json(result.rows);
 });
 
 /** Admin – get handle color by ID */
 router.get("/admin/:id", requireAdmin, async (req, res) => {
-  const handleColor = await prisma.handleColor.findUnique({
-    where: { id: Number(req.params.id) },
-  });
+  const result = await pool.query("SELECT * FROM handle_colors WHERE id = $1", [
+    req.params.id,
+  ]);
 
-  if (!handleColor) {
+  if (result.rows.length === 0) {
     return res.status(404).json({ error: "Handle color not found" });
   }
 
-  res.json(handleColor);
+  res.json(result.rows[0]);
 });
 
 /** Admin – create handle color */
 router.post("/", requireAdmin, async (req, res) => {
-  const handleColor = await prisma.handleColor.create({
-    data: req.body,
-  });
-  res.json(handleColor);
+  const { name, slug, image, order, isActive } = req.body;
+  const result = await pool.query(
+    `INSERT INTO handle_colors (name, slug, image, "order", is_active) 
+     VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+    [name, slug, image, order || 0, isActive ?? true],
+  );
+  res.json(result.rows[0]);
 });
 
 /** Admin – update handle color */
 router.put("/:id", requireAdmin, async (req, res) => {
-  const handleColor = await prisma.handleColor.update({
-    where: { id: Number(req.params.id) },
-    data: req.body,
-  });
-  res.json(handleColor);
+  const { name, slug, image, order, isActive } = req.body;
+  const result = await pool.query(
+    `UPDATE handle_colors SET name = $1, slug = $2, image = $3, "order" = $4, is_active = $5 
+     WHERE id = $6 RETURNING *`,
+    [name, slug, image, order, isActive, req.params.id],
+  );
+  res.json(result.rows[0]);
 });
 
 /** Admin – delete handle color */
 router.delete("/:id", requireAdmin, async (req, res) => {
-  await prisma.handleColor.delete({
-    where: { id: Number(req.params.id) },
-  });
+  await pool.query("DELETE FROM handle_colors WHERE id = $1", [req.params.id]);
   res.json({ success: true });
 });
 
 /** Admin – toggle active/inactive */
 router.patch("/:id/toggle", requireAdmin, async (req, res) => {
-  const id = Number(req.params.id);
+  const result = await pool.query(
+    "UPDATE handle_colors SET is_active = NOT is_active WHERE id = $1 RETURNING *",
+    [req.params.id],
+  );
 
-  const handleColor = await prisma.handleColor.findUnique({ where: { id } });
-  if (!handleColor) return res.status(404).json({});
+  if (result.rows.length === 0) {
+    return res.status(404).json({});
+  }
 
-  const updated = await prisma.handleColor.update({
-    where: { id },
-    data: { isActive: !handleColor.isActive },
-  });
-
-  res.json(updated);
+  res.json(result.rows[0]);
 });
 
 /** Admin – reorder handle colors */
@@ -88,10 +89,10 @@ router.post("/reorder", requireAdmin, async (req, res) => {
 
   await Promise.all(
     items.map((item: { id: number; order: number }) =>
-      prisma.handleColor.update({
-        where: { id: item.id },
-        data: { order: item.order },
-      }),
+      pool.query('UPDATE handle_colors SET "order" = $1 WHERE id = $2', [
+        item.order,
+        item.id,
+      ]),
     ),
   );
 
