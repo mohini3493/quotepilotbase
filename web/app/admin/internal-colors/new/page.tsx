@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useRouter } from "next/navigation";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 export default function AddInternalColorPage() {
   const router = useRouter();
@@ -48,43 +48,17 @@ export default function AddInternalColorPage() {
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-2 block">Color Code</label>
-          <div className="flex gap-3">
-            <Input
-              type="color"
-              value={form.colorCode || "#FFFFFF"}
-              onChange={(e) => setForm({ ...form, colorCode: e.target.value })}
-              className="w-16 h-10 p-1 cursor-pointer"
-            />
-            <Input
-              placeholder="#FFFFFF"
-              value={form.colorCode || ""}
-              onChange={(e) => setForm({ ...form, colorCode: e.target.value })}
-              className="flex-1 font-mono"
-            />
-          </div>
-        </div>
-
-        <div>
           <label className="text-sm font-medium mb-2 block">
-            Description (Optional)
+            Image (Optional)
           </label>
-          <Textarea
-            placeholder="Description of this color"
-            value={form.description || ""}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-medium mb-2 block">
-            Image URL (Optional)
-          </label>
-          <Input
-            placeholder="Image URL for color swatch"
-            value={form.image || ""}
-            onChange={(e) => setForm({ ...form, image: e.target.value })}
-          />
+          <ImageUpload onUploaded={(url) => setForm({ ...form, image: url })} />
+          {form.image && (
+            <img
+              src={form.image}
+              alt="Preview"
+              className="mt-2 w-32 h-32 object-cover rounded border"
+            />
+          )}
         </div>
 
         <div className="flex items-center gap-3">

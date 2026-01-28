@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useRouter } from "next/navigation";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 export default function AddPanelStylePage() {
   const router = useRouter();
@@ -48,21 +48,15 @@ export default function AddPanelStylePage() {
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-2 block">Description</label>
-          <Textarea
-            placeholder="Description"
-            value={form.description || ""}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-medium mb-2 block">Image URL</label>
-          <Input
-            placeholder="Image URL"
-            value={form.image || ""}
-            onChange={(e) => setForm({ ...form, image: e.target.value })}
-          />
+          <label className="text-sm font-medium mb-2 block">Image</label>
+          <ImageUpload onUploaded={(url) => setForm({ ...form, image: url })} />
+          {form.image && (
+            <img
+              src={form.image}
+              alt="Preview"
+              className="mt-2 w-32 h-32 object-cover rounded border"
+            />
+          )}
         </div>
 
         <div className="flex items-center gap-3">

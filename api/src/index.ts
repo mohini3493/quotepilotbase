@@ -7,6 +7,14 @@ import authRoutes from "./routes/auth";
 import productRoutes from "./routes/product";
 import uploadRoutes from "./routes/upload";
 import adminProductRoutes from "./routes/adminProducts";
+import doorTypesRoutes from "./routes/doorTypes";
+import panelStylesRoutes from "./routes/panelStyles";
+import dimensionsRoutes from "./routes/dimensions";
+import postcodesRoutes from "./routes/postcodes";
+import externalColorsRoutes from "./routes/externalColors";
+import internalColorsRoutes from "./routes/internalColors";
+import handleColorsRoutes from "./routes/handleColors";
+import customersRoutes from "./routes/customers";
 
 const app = express();
 
@@ -17,9 +25,9 @@ app.use(
   cors({
     origin: "https://quotepilot-lz06.onrender.com",
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
-  })
+  }),
 );
 
 // ✅ THIS LINE GOES HERE (after cors, before routes)
@@ -39,6 +47,14 @@ app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/products/admin/all", adminProductRoutes);
+app.use("/api/door-types", doorTypesRoutes);
+app.use("/api/panel-styles", panelStylesRoutes);
+app.use("/api/dimensions", dimensionsRoutes);
+app.use("/api/postcodes", postcodesRoutes);
+app.use("/api/external-colors", externalColorsRoutes);
+app.use("/api/internal-colors", internalColorsRoutes);
+app.use("/api/handle-colors", handleColorsRoutes);
+app.use("/api/customers", customersRoutes);
 
 const PORT = Number(process.env.PORT) || 3000;
 

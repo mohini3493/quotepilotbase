@@ -36,3 +36,89 @@ model Product {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
 }
+
+model DoorType {
+  id        Int      @id @default(autoincrement())
+  name      String
+  slug      String   @unique
+  image     String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model PanelStyle {
+  id        Int      @id @default(autoincrement())
+  name      String
+  slug      String   @unique
+  image     String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Dimension {
+  id        Int      @id @default(autoincrement())
+  name      String
+  slug      String   @unique
+  width     Int?
+  height    Int?
+  image     String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Postcode {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  area      String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model ExternalColor {
+  id        Int      @id @default(autoincrement())
+  name      String
+  slug      String   @unique
+  image     String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model InternalColor {
+  id        Int      @id @default(autoincrement())
+  name      String
+  slug      String   @unique
+  image     String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model HandleColor {
+  id        Int      @id @default(autoincrement())
+  name      String
+  slug      String   @unique
+  image     String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Customer {
+  id             Int      @id @default(autoincrement())
+  name           String
+  email          String
+  phone          String
+  doorType       String?
+  panelStyle     String?
+  dimension      String?
+  postcode       String?
+  externalColor  String?
+  internalColor  String?
+  handleColor    String?
+  createdAt      DateTime @default(now())
+}
