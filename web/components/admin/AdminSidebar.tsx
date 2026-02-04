@@ -1,5 +1,6 @@
 "use client";
 
+import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
 import {
   Calculator,
@@ -18,10 +19,12 @@ import {
   Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { layouts } from "chart.js";
 
 const links = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { name: "Customers", href: "/admin/customers", icon: Users },
+  { name: "Users", href: "/admin/users", icon: Users },
+  { name: "Lead Details", href: "/admin/customers", icon: Calculator },
 ];
 
 const productLinks = [
@@ -78,282 +81,251 @@ export default function AdminSidebar() {
   };
 
   return (
-    <aside className="w-64 border-r border-sidebar-border h-full bg-sidebar flex flex-col">
-      {/* Header */}
-      <div className="p-4 border-b border-sidebar-border">
-        <div className="flex flex-col items-center gap-2">
-          <img src="/quote-logo1.png" alt="QuotePilot Logo" className="h-12" />
-          <span className="text-sm font-semibold text-sidebar-foreground">
-            Admin Panel
-          </span>
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-6 overflow-y-auto">
-        {/* Main Navigation */}
-        <div className="space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-3 mb-2">
-            Main
-          </p>
-          {links.map((link) => {
-            const Icon = link.icon;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-              >
-                <Icon className="w-5 h-5 flex-shrink-0" />
-                <span className="truncate">{link.name}</span>
-              </Link>
-            );
-          })}
+    <ScrollArea className="h-full w-64">
+      <aside className="bg-sidebar flex flex-col">
+        {/* Header */}
+        <div className="p-4 border-sidebar-border">
+          <div className="flex flex-col items-center gap-2">
+            <img
+              src="/quote-logo1.png"
+              alt="QuotePilot Logo"
+              className="h-12"
+            />
+            {/* <span className="text-sm font-semibold text-sidebar-foreground">
+              Admin Panel
+            </span> */}
+          </div>
         </div>
 
-        {/* Products Section */}
-        <div className="space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-3 mb-2">
-            Products
-          </p>
-          <Link
-            href="/admin/products"
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
-          >
-            <ShoppingBag className="w-5 h-5 flex-shrink-0" />
-            <span className="truncate">Products</span>
-          </Link>
-          <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
-            {productLinks.map((link) => {
+        {/* Navigation */}
+        <nav className="flex-1 p-4 space-y-6 overflow-y-auto">
+          {/* Main Navigation */}
+          <div className="space-y-1">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-3 mb-2">
+              Main
+            </p>
+            {links.map((link) => {
               const Icon = link.icon;
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 >
-                  <Icon className="w-4 h-4 flex-shrink-0" />
+                  <Icon className="w-5 h-5 flex-shrink-0" />
                   <span className="truncate">{link.name}</span>
                 </Link>
               );
             })}
           </div>
-        </div>
 
-        {/* Door Types Section */}
-        <div className="space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-3 mb-2">
-            Door Types
-          </p>
-          <Link
-            href="/admin/door-types"
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
+          {/* Products Section */}
+          <div className="space-y-1">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-3 mb-2">
+              Products Details
+            </p>
+            <Link
+              href="/admin/products"
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
+            >
+              <ShoppingBag className="w-5 h-5 flex-shrink-0" />
+              <span className="truncate">Products</span>
+            </Link>
+            <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
+              {productLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">{link.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+            {/* Door Types Section */}
+            <Link
+              href="/admin/door-types"
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
+            >
+              <DoorOpen className="w-5 h-5 flex-shrink-0" />
+              <span className="truncate">Door Types</span>
+            </Link>
+            <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
+              {doorTypeLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">{link.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+            {/* Panel Styles Section */}
+            <Link
+              href="/admin/panel-styles"
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
+            >
+              <PanelTop className="w-5 h-5 flex-shrink-0" />
+              <span className="truncate">Panel Styles</span>
+            </Link>
+            <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
+              {panelStyleLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">{link.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Dimensions Section */}
+            <Link
+              href="/admin/dimensions"
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
+            >
+              <Ruler className="w-5 h-5 flex-shrink-0" />
+              <span className="truncate">Dimensions</span>
+            </Link>
+            <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
+              {dimensionLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">{link.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Postcodes Section */}
+            <Link
+              href="/admin/postcodes"
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
+            >
+              <MapPin className="w-5 h-5 flex-shrink-0" />
+              <span className="truncate">Postcodes</span>
+            </Link>
+            <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
+              {postcodeLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">{link.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* External Colors Section */}
+            <Link
+              href="/admin/external-colors"
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
+            >
+              <Palette className="w-5 h-5 flex-shrink-0" />
+              <span className="truncate">External Colors</span>
+            </Link>
+            <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
+              {externalColorLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">{link.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Internal Colors Section */}
+            <Link
+              href="/admin/internal-colors"
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
+            >
+              <PaintBucket className="w-5 h-5 flex-shrink-0" />
+              <span className="truncate">Internal Colors</span>
+            </Link>
+            <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
+              {internalColorLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">{link.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Handle Colors Section */}
+            <Link
+              href="/admin/handle-colors"
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
+            >
+              <Grip className="w-5 h-5 flex-shrink-0" />
+              <span className="truncate">Handle Colors</span>
+            </Link>
+            <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
+              {handleColorLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">{link.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </nav>
+
+        {/* Logout */}
+        <div className="border-t border-sidebar-border p-4">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-destructive/10 hover:text-destructive w-full"
           >
-            <DoorOpen className="w-5 h-5 flex-shrink-0" />
-            <span className="truncate">Door Types</span>
-          </Link>
-          <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
-            {doorTypeLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                >
-                  <Icon className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate">{link.name}</span>
-                </Link>
-              );
-            })}
-          </div>
+            <LogOut className="w-5 h-5 flex-shrink-0" />
+            <span className="truncate">Logout</span>
+          </button>
         </div>
-
-        {/* Panel Styles Section */}
-        <div className="space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-3 mb-2">
-            Panel Styles
-          </p>
-          <Link
-            href="/admin/panel-styles"
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
-          >
-            <PanelTop className="w-5 h-5 flex-shrink-0" />
-            <span className="truncate">Panel Styles</span>
-          </Link>
-          <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
-            {panelStyleLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                >
-                  <Icon className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate">{link.name}</span>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Dimensions Section */}
-        <div className="space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-3 mb-2">
-            Dimensions
-          </p>
-          <Link
-            href="/admin/dimensions"
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
-          >
-            <Ruler className="w-5 h-5 flex-shrink-0" />
-            <span className="truncate">Dimensions</span>
-          </Link>
-          <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
-            {dimensionLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                >
-                  <Icon className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate">{link.name}</span>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Postcodes Section */}
-        <div className="space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-3 mb-2">
-            Postcodes
-          </p>
-          <Link
-            href="/admin/postcodes"
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
-          >
-            <MapPin className="w-5 h-5 flex-shrink-0" />
-            <span className="truncate">Postcodes</span>
-          </Link>
-          <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
-            {postcodeLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                >
-                  <Icon className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate">{link.name}</span>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* External Colors Section */}
-        <div className="space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-3 mb-2">
-            External Colors
-          </p>
-          <Link
-            href="/admin/external-colors"
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
-          >
-            <Palette className="w-5 h-5 flex-shrink-0" />
-            <span className="truncate">External Colors</span>
-          </Link>
-          <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
-            {externalColorLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                >
-                  <Icon className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate">{link.name}</span>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Internal Colors Section */}
-        <div className="space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-3 mb-2">
-            Internal Colors
-          </p>
-          <Link
-            href="/admin/internal-colors"
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
-          >
-            <PaintBucket className="w-5 h-5 flex-shrink-0" />
-            <span className="truncate">Internal Colors</span>
-          </Link>
-          <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
-            {internalColorLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                >
-                  <Icon className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate">{link.name}</span>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Handle Colors Section */}
-        <div className="space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-3 mb-2">
-            Handle Colors
-          </p>
-          <Link
-            href="/admin/handle-colors"
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
-          >
-            <Grip className="w-5 h-5 flex-shrink-0" />
-            <span className="truncate">Handle Colors</span>
-          </Link>
-          <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
-            {handleColorLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                >
-                  <Icon className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate">{link.name}</span>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </nav>
-
-      {/* Logout */}
-      <div className="border-t border-sidebar-border p-4">
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-destructive/10 hover:text-destructive w-full"
-        >
-          <LogOut className="w-5 h-5 flex-shrink-0" />
-          <span className="truncate">Logout</span>
-        </button>
-      </div>
-    </aside>
+      </aside>
+    </ScrollArea>
   );
 }

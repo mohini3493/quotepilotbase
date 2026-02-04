@@ -5,7 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  DoorOpen,
+  Loader2,
+  MapPin,
+  Palette,
+  Ruler,
+  Grip,
+  PanelTop,
+  PaintBucket,
+  ShoppingBag,
+  Users,
+} from "lucide-react";
 
 type DoorType = {
   id: number;
@@ -389,7 +403,8 @@ export default function ProductConfigurator({
                 className={cn(
                   "flex-1 h-2.5 rounded-full transition-all",
                   step.id <= currentStep ? "bg-primary" : "bg-gray-200",
-                  step.id === currentStep && "bg-primary shadow-sm shadow-primary/50",
+                  step.id === currentStep &&
+                    "bg-primary shadow-sm shadow-primary/50",
                 )}
               />
             ))}
@@ -408,7 +423,7 @@ export default function ProductConfigurator({
                 Select the type of door that best fits your needs
               </p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4">
               {doorTypes.map((doorType) => (
                 <Card
                   key={doorType.id}
@@ -426,7 +441,7 @@ export default function ProductConfigurator({
                     <img
                       src={doorType.image || "/placeholder.jpg"}
                       alt={doorType.name}
-                      className="w-full h-full object-cover min-h-[220px] max-h-[340px]"
+                      className="w-full h-full object-cover"
                     />
                     {selection.doorType?.id === doorType.id && (
                       <div className="absolute top-3 right-3 w-8 h-8 bg-primary rounded-full flex items-center justify-center">
@@ -462,7 +477,7 @@ export default function ProductConfigurator({
                 Choose the panel style that matches your preference
               </p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4">
               {panelStyles.map((panelStyle) => (
                 <Card
                   key={panelStyle.id}
@@ -480,7 +495,7 @@ export default function ProductConfigurator({
                     <img
                       src={panelStyle.image || "/placeholder.jpg"}
                       alt={panelStyle.name}
-                      className="w-full h-full object-cover min-h-[220px] max-h-[340px]"
+                      className="w-full h-full object-cover"
                     />
                     {selection.panelStyle?.id === panelStyle.id && (
                       <div className="absolute top-3 right-3 w-8 h-8 bg-primary rounded-full flex items-center justify-center">
@@ -532,8 +547,18 @@ export default function ProductConfigurator({
                 >
                   <CardContent className="p-6 flex flex-col items-center justify-center text-center">
                     <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
-                      <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                      <svg
+                        className="w-8 h-8 text-primary"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                        />
                       </svg>
                     </div>
                     <h3 className="font-bold text-lg text-foreground">
@@ -580,8 +605,11 @@ export default function ProductConfigurator({
                     setSelection({ ...selection, postcode: postcode })
                   }
                 >
-                  <CardContent className="p-4 flex items-center justify-center gap-2">
-                    <h3 className="font-bold text-lg">{postcode.code}</h3>
+                  <CardContent className="flex items-center justify-center gap-2">
+                    <h3 className="font-bold text-lg flex items-center justify-center gap-2">
+                      <MapPin className="w-5 h-5 flex-shrink-0" />
+                      {postcode.code}
+                    </h3>
                     {selection.postcode?.id === postcode.id && (
                       <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center">
                         <Check className="w-3 h-3 text-primary-foreground" />
@@ -608,7 +636,7 @@ export default function ProductConfigurator({
                 Select the outside finish for your door
               </p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-4">
               {externalColors.map((color) => (
                 <Card
                   key={color.id}
@@ -642,7 +670,9 @@ export default function ProductConfigurator({
                     )}
                   </div>
                   <CardContent className="p-3">
-                    <h3 className="font-medium text-sm text-center">{color.name}</h3>
+                    <h3 className="font-medium text-sm text-center">
+                      {color.name}
+                    </h3>
                   </CardContent>
                 </Card>
               ))}
@@ -664,7 +694,7 @@ export default function ProductConfigurator({
                 Select the inside finish for your door
               </p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-4">
               {internalColors.map((color) => (
                 <Card
                   key={color.id}
@@ -698,7 +728,9 @@ export default function ProductConfigurator({
                     )}
                   </div>
                   <CardContent className="p-3">
-                    <h3 className="font-medium text-sm text-center">{color.name}</h3>
+                    <h3 className="font-medium text-sm text-center">
+                      {color.name}
+                    </h3>
                   </CardContent>
                 </Card>
               ))}
@@ -720,7 +752,7 @@ export default function ProductConfigurator({
                 Select the handle finish for your door
               </p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-4">
               {handleColors.map((color) => (
                 <Card
                   key={color.id}
@@ -754,7 +786,9 @@ export default function ProductConfigurator({
                     )}
                   </div>
                   <CardContent className="p-3">
-                    <h3 className="font-medium text-sm text-center">{color.name}</h3>
+                    <h3 className="font-medium text-sm text-center">
+                      {color.name}
+                    </h3>
                   </CardContent>
                 </Card>
               ))}
@@ -770,274 +804,206 @@ export default function ProductConfigurator({
         {/* Step 8: Summary with Contact Details */}
         {currentStep === 8 && (
           <div className="space-y-4 sm:space-y-6">
-            <div className="text-center px-2">
-              <h2 className="text-xl sm:text-2xl font-bold">Review Your Selection</h2>
-              <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
-                Here's a summary of your configuration
-              </p>
-            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2 sm:gap-3">
+              <div className="px-2">
+                <h2 className="text-xl sm:text-2xl font-bold mb-3">
+                  Review Your Selection
+                </h2>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3">
-              {/* Door Type Summary */}
-              <Card className="overflow-hidden">
-                <div className="bg-primary/10 px-2 py-1.5">
-                  <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate">
-                    Door Type
-                  </h3>
-                </div>
-                {selection.doorType && (
-                  <>
-                    <img
-                      src={selection.doorType.image || "/placeholder.jpg"}
-                      alt={selection.doorType.name}
-                      className="w-full h-16 sm:h-20 object-cover"
-                    />
-                    <CardContent className="p-1.5 sm:p-2">
-                      <p className="font-medium text-[10px] sm:text-xs truncate">
-                        {selection.doorType.name}
-                      </p>
-                    </CardContent>
-                  </>
-                )}
-              </Card>
-
-              {/* Panel Style Summary */}
-              <Card className="overflow-hidden">
-                <div className="bg-primary/10 px-2 py-1.5">
-                  <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate">
-                    Panel Style
-                  </h3>
-                </div>
-                {selection.panelStyle && (
-                  <>
-                    <img
-                      src={selection.panelStyle.image || "/placeholder.jpg"}
-                      alt={selection.panelStyle.name}
-                      className="w-full h-16 sm:h-20 object-cover"
-                    />
-                    <CardContent className="p-1.5 sm:p-2">
-                      <p className="font-medium text-[10px] sm:text-xs truncate">
-                        {selection.panelStyle.name}
-                      </p>
-                    </CardContent>
-                  </>
-                )}
-              </Card>
-
-              {/* Dimension Summary */}
-              <Card className="overflow-hidden">
-                <div className="bg-primary/10 px-2 py-1.5">
-                  <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate">
-                    Dimensions
-                  </h3>
-                </div>
-                {selection.dimension && (
-                  <CardContent className="p-3 flex flex-col items-center justify-center">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2">
-                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                      </svg>
-                    </div>
-                    <p className="font-bold text-sm sm:text-base">
-                      {selection.dimension.width} x {selection.dimension.height}
-                    </p>
-                    <p className="text-[10px] sm:text-xs text-muted-foreground">mm</p>
-                  </CardContent>
-                )}
-              </Card>
-
-              {/* Postcode Summary */}
-              <Card className="overflow-hidden">
-                <div className="bg-primary/10 px-2 py-1.5">
-                  <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate">
-                    Postcode
-                  </h3>
-                </div>
-                {selection.postcode && (
-                  <CardContent className="p-3 flex items-center justify-center">
-                    <p className="font-bold text-lg sm:text-xl">
-                      {selection.postcode.code}
-                    </p>
-                  </CardContent>
-                )}
-              </Card>
-
-              {/* External Color Summary */}
-              <Card className="overflow-hidden">
-                <div className="bg-primary/10 px-2 py-1.5">
-                  <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate">
-                    Ext. Color
-                  </h3>
-                </div>
-                {selection.externalColor && (
-                  <>
-                    <div className="aspect-square">
-                      {selection.externalColor.image ? (
+                <Card>
+                  <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2">
+                    {selection.panelStyle && (
+                      <>
                         <img
-                          src={selection.externalColor.image}
-                          alt={selection.externalColor.name}
+                          src={selection.panelStyle.image || "/placeholder.jpg"}
+                          alt={selection.panelStyle.name}
                           className="w-full h-full object-cover"
                         />
-                      ) : (
-                        <div
-                          className="w-full h-full"
-                          style={{
-                            backgroundColor:
-                              selection.externalColor.colorCode || "#ccc",
-                          }}
-                        />
-                      )}
-                    </div>
-                    <CardContent className="p-1.5 sm:p-2">
-                      <p className="font-medium text-[10px] sm:text-xs text-center truncate">
-                        {selection.externalColor.name}
+                      </>
+                    )}
+                    <div>
+                      <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
+                        Here's a summary of your configuration
                       </p>
-                    </CardContent>
-                  </>
-                )}
-              </Card>
-
-              {/* Internal Color Summary */}
-              <Card className="overflow-hidden">
-                <div className="bg-primary/10 px-2 py-1.5">
-                  <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate">
-                    Int. Color
-                  </h3>
-                </div>
-                {selection.internalColor && (
-                  <>
-                    <div className="aspect-square">
-                      {selection.internalColor.image ? (
-                        <img
-                          src={selection.internalColor.image}
-                          alt={selection.internalColor.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div
-                          className="w-full h-full"
-                          style={{
-                            backgroundColor:
-                              selection.internalColor.colorCode || "#ccc",
-                          }}
-                        />
-                      )}
+                      <ul>
+                        <li className="flex items-center gap-2 mt-3">
+                          <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                            <DoorOpen className="w-5 h-5 flex-shrink-0" />
+                            Door Type
+                          </h3>{" "}
+                          -
+                          {selection.doorType && (
+                            <p className="font-medium text-[10px] sm:text-xs truncate">
+                              {selection.doorType.name}
+                            </p>
+                          )}
+                        </li>
+                        <li className="flex items-center gap-2 mt-3">
+                          <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                            <PanelTop className="w-5 h-5 flex-shrink-0" />
+                            Panel Style
+                          </h3>{" "}
+                          -
+                          {selection.panelStyle && (
+                            <p className="font-medium text-[10px] sm:text-xs truncate">
+                              {selection.panelStyle.name}
+                            </p>
+                          )}
+                        </li>
+                        <li className="flex items-center gap-2 mt-3">
+                          <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                            <Ruler className="w-5 h-5 flex-shrink-0" />
+                            Dimensions
+                          </h3>{" "}
+                          -
+                          {selection.dimension && (
+                            <>
+                              <p className="font-medium text-[10px] sm:text-xs truncate">
+                                {selection.dimension.width} x{" "}
+                                {selection.dimension.height}
+                              </p>
+                              <p className="text-[10px] sm:text-xs text-muted-foreground">
+                                mm
+                              </p>
+                            </>
+                          )}
+                        </li>
+                        <li className="flex items-center gap-2 mt-3">
+                          <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                            <MapPin className="w-5 h-5 flex-shrink-0" />
+                            Postcodes
+                          </h3>{" "}
+                          -
+                          {selection.postcode && (
+                            <p className="font-medium text-[10px] sm:text-xs truncate">
+                              {selection.postcode.code}
+                            </p>
+                          )}
+                        </li>
+                        <li className="flex items-center gap-2 mt-3">
+                          <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                            <Palette className="w-5 h-5 flex-shrink-0" />
+                            External Colors
+                          </h3>{" "}
+                          -
+                          {selection.externalColor && (
+                            <p className="font-medium text-[10px] sm:text-xs text-center truncate">
+                              {selection.externalColor.name}
+                            </p>
+                          )}
+                        </li>
+                        <li className="flex items-center gap-2 mt-3">
+                          <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                            <PaintBucket className="w-5 h-5 flex-shrink-0" />
+                            Internal Colors
+                          </h3>{" "}
+                          -
+                          {selection.internalColor && (
+                            <p className="font-medium text-[10px] sm:text-xs text-center truncate">
+                              {selection.internalColor.name}
+                            </p>
+                          )}
+                        </li>
+                        <li className="flex items-center gap-2 mt-3">
+                          <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                            <Grip className="w-5 h-5 flex-shrink-0" />
+                            Handle Colors
+                          </h3>{" "}
+                          -
+                          {selection.handleColor && (
+                            <p className="font-medium text-[10px] sm:text-xs text-center truncate">
+                              {selection.handleColor.name}
+                            </p>
+                          )}
+                        </li>
+                      </ul>
                     </div>
-                    <CardContent className="p-1.5 sm:p-2">
-                      <p className="font-medium text-[10px] sm:text-xs text-center truncate">
-                        {selection.internalColor.name}
-                      </p>
-                    </CardContent>
-                  </>
-                )}
-              </Card>
-
-              {/* Handle Color Summary */}
-              <Card className="overflow-hidden">
-                <div className="bg-primary/10 px-2 py-1.5">
-                  <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate">Handle</h3>
-                </div>
-                {selection.handleColor && (
-                  <>
-                    <div className="aspect-square">
-                      {selection.handleColor.image ? (
-                        <img
-                          src={selection.handleColor.image}
-                          alt={selection.handleColor.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div
-                          className="w-full h-full"
-                          style={{
-                            backgroundColor:
-                              selection.handleColor.colorCode || "#ccc",
-                          }}
-                        />
-                      )}
-                    </div>
-                    <CardContent className="p-1.5 sm:p-2">
-                      <p className="font-medium text-[10px] sm:text-xs text-center truncate">
-                        {selection.handleColor.name}
-                      </p>
-                    </CardContent>
-                  </>
-                )}
-              </Card>
-            </div>
-
-            {/* Contact Details Form */}
-            {!submitted && (
-              <div className="mt-6 sm:mt-8">
-                <div className="text-center mb-3 sm:mb-4">
-                  <h3 className="text-lg sm:text-xl font-semibold">
-                    Enter Your Contact Details
-                  </h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    Fill in your details to receive your quote
-                  </p>
-                </div>
-                <div className="max-w-md mx-auto space-y-3 sm:space-y-4 px-2 sm:px-0">
-                  <div className="space-y-1.5 sm:space-y-2">
-                    <label htmlFor="name" className="text-xs sm:text-sm font-medium">
-                      Full Name <span className="text-red-500">*</span>
-                    </label>
-                    <Input
-                      id="name"
-                      type="text"
-                      placeholder="Enter your full name"
-                      value={contactDetails.name}
-                      onChange={(e) =>
-                        setContactDetails({
-                          ...contactDetails,
-                          name: e.target.value,
-                        })
-                      }
-                      className="h-9 sm:h-10 text-sm"
-                      required
-                    />
                   </div>
-                  <div className="space-y-1.5 sm:space-y-2">
-                    <label htmlFor="email" className="text-xs sm:text-sm font-medium">
-                      Email Address <span className="text-red-500">*</span>
-                    </label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="Enter your email address"
-                      value={contactDetails.email}
-                      onChange={(e) =>
-                        setContactDetails({
-                          ...contactDetails,
-                          email: e.target.value,
-                        })
-                      }
-                      className="h-9 sm:h-10 text-sm"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-1.5 sm:space-y-2">
-                    <label htmlFor="phone" className="text-xs sm:text-sm font-medium">
-                      Phone Number <span className="text-red-500">*</span>
-                    </label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="Enter your phone number"
-                      value={contactDetails.phone}
-                      onChange={(e) =>
-                        setContactDetails({
-                          ...contactDetails,
-                          phone: e.target.value,
-                        })
-                      }
-                      className="h-9 sm:h-10 text-sm"
-                      required
-                    />
-                  </div>
-                </div>
+                </Card>
               </div>
-            )}
+
+              {/* Contact Details Form */}
+              {!submitted && (
+                <div className="mt-6 sm:mt-8">
+                  <div className="mb-3 sm:mb-4">
+                    <h3 className="text-lg sm:text-xl font-semibold">
+                      Enter Your Contact Details
+                    </h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground">
+                      Fill in your details to receive your quote
+                    </p>
+                  </div>
+                  <div className="mx-auto space-y-3 sm:space-y-4 px-2 sm:px-0">
+                    <div className="space-y-1.5 sm:space-y-2">
+                      <label
+                        htmlFor="name"
+                        className="text-xs sm:text-sm font-medium"
+                      >
+                        Full Name <span className="text-red-500">*</span>
+                      </label>
+                      <Input
+                        id="name"
+                        type="text"
+                        placeholder="Enter your full name"
+                        value={contactDetails.name}
+                        onChange={(e) =>
+                          setContactDetails({
+                            ...contactDetails,
+                            name: e.target.value,
+                          })
+                        }
+                        className="h-9 sm:h-10 text-sm"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-1.5 sm:space-y-2">
+                      <label
+                        htmlFor="email"
+                        className="text-xs sm:text-sm font-medium"
+                      >
+                        Email Address <span className="text-red-500">*</span>
+                      </label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="Enter your email address"
+                        value={contactDetails.email}
+                        onChange={(e) =>
+                          setContactDetails({
+                            ...contactDetails,
+                            email: e.target.value,
+                          })
+                        }
+                        className="h-9 sm:h-10 text-sm"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-1.5 sm:space-y-2">
+                      <label
+                        htmlFor="phone"
+                        className="text-xs sm:text-sm font-medium"
+                      >
+                        Phone Number <span className="text-red-500">*</span>
+                      </label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        placeholder="Enter your phone number"
+                        value={contactDetails.phone}
+                        onChange={(e) =>
+                          setContactDetails({
+                            ...contactDetails,
+                            phone: e.target.value,
+                          })
+                        }
+                        className="h-9 sm:h-10 text-sm"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
             <div className="flex justify-center pt-4 sm:pt-6">
               {submitted ? (

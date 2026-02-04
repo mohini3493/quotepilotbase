@@ -13,7 +13,6 @@ import ScrollReveal from "@/components/motion/ScrollReveal";
 import Hero from "@/components/site/Hero";
 import RunningText from "@/components/site/RunningText";
 import Welcome from "@/components/site/Welcome";
-import StickyButtons from "@/components/site/StickyButtons";
 
 export const metadata = {
   title: "QuotePilot – Smart Quoting Engine",
@@ -25,7 +24,6 @@ export default function HomePage() {
   return (
     <>
       <Header />
-      <StickyButtons />
 
       <main>
         <ScrollReveal>

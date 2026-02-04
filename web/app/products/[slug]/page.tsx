@@ -122,57 +122,6 @@ export default async function ProductPage({
         </div>
       </section>
 
-      {/* Trust Badges */}
-      <section className="py-8 bg-white border-y">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              {
-                icon: Shield,
-                title: "10 Year Warranty",
-                desc: "Full coverage",
-                color: "text-violet-600 bg-violet-100",
-              },
-              {
-                icon: Truck,
-                title: "Free Installation",
-                desc: "Expert fitting",
-                color: "text-blue-600 bg-blue-100",
-              },
-              {
-                icon: Award,
-                title: "Quality Certified",
-                desc: "ISO 9001",
-                color: "text-amber-600 bg-amber-100",
-              },
-              {
-                icon: Clock,
-                title: "Fast Delivery",
-                desc: "2-3 weeks",
-                color: "text-emerald-600 bg-emerald-100",
-              },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors"
-              >
-                <div
-                  className={`w-11 h-11 rounded-xl ${item.color} flex items-center justify-center`}
-                >
-                  <item.icon className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="font-semibold text-sm text-gray-900">
-                    {item.title}
-                  </p>
-                  <p className="text-xs text-gray-500">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Product Configurator Section */}
       <section
         id="configurator"
@@ -201,53 +150,6 @@ export default async function ProductPage({
               productId={product.id}
               productTitle={product.title}
             />
-          </div>
-        </div>
-      </section>
-
-      {/* Help Section */}
-      <section className="py-12 bg-slate-50 border-t">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-xl border hover:shadow-lg transition-shadow">
-              <h3 className="font-bold text-lg text-gray-900 mb-2">
-                Need Help?
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Our experts are ready to assist you.
-              </p>
-              <a
-                href="tel:+441234567890"
-                className="text-primary font-semibold text-sm hover:underline"
-              >
-                Call: 01onal 234 5678
-              </a>
-            </div>
-            <div className="bg-white p-6 rounded-xl border hover:shadow-lg transition-shadow">
-              <h3 className="font-bold text-lg text-gray-900 mb-2">
-                Free Home Survey
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Book a free measurement with our specialists.
-              </p>
-              <Link
-                href="/quote"
-                className="text-primary font-semibold text-sm hover:underline"
-              >
-                Book Now →
-              </Link>
-            </div>
-            <div className="bg-white p-6 rounded-xl border hover:shadow-lg transition-shadow">
-              <h3 className="font-bold text-lg text-gray-900 mb-2">
-                0% Finance Available
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Spread the cost with flexible payments.
-              </p>
-              <span className="text-primary font-semibold text-sm">
-                Learn More →
-              </span>
-            </div>
           </div>
         </div>
       </section>

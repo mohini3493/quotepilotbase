@@ -15,6 +15,7 @@ import {
   Twitter,
   Linkedin,
   Instagram,
+  LogIn,
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -103,7 +104,7 @@ export default function Header() {
           "sticky top-0 z-50 w-full transition-all duration-300",
           scrolled
             ? "bg-background/95 backdrop-blur-md shadow-lg border-b"
-            : "bg-background border-b"
+            : "bg-background border-b",
         )}
       >
         <div className="max-w-7xl mx-auto px-4">
@@ -143,16 +144,19 @@ export default function Header() {
               </Button>
 
               <Link href="/admin-login">
-                <Button variant="outline" className="font-medium">
-                  Admin Login 🫆
+                <Button
+                  variant="outline"
+                  className="font-medium bg-primary text-white"
+                >
+                  Admin Login <LogIn className="w-5 h-5 flex-shrink-0" />
                 </Button>
               </Link>
 
-              <Link href="/quote">
+              {/* <Link href="/quote">
                 <Button className="bg-primary hover:bg-primary/90 font-medium px-6">
                   Get Quote 💼
                 </Button>
-              </Link>
+              </Link> */}
             </div>
 
             {/* MOBILE MENU BUTTON */}
@@ -169,7 +173,7 @@ export default function Header() {
         <div
           className={clsx(
             "lg:hidden overflow-hidden transition-all duration-300 border-t bg-background",
-            open ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+            open ? "max-h-screen opacity-100" : "max-h-0 opacity-0",
           )}
         >
           <div className="max-w-7xl mx-auto px-4 py-6">
@@ -207,16 +211,19 @@ export default function Header() {
               </div>
 
               <Link href="/admin-login" className="w-full">
-                <Button variant="outline" className="w-full font-medium">
-                  Admin Login
+                <Button
+                  variant="outline"
+                  className="font-medium bg-primary text-white"
+                >
+                  Admin Login <LogIn className="w-5 h-5 flex-shrink-0" />
                 </Button>
               </Link>
 
-              <Link href="/quote" className="w-full">
+              {/* <Link href="/quote" className="w-full">
                 <Button className="w-full bg-primary hover:bg-primary/90 font-medium">
                   Get Quote
                 </Button>
-              </Link>
+              </Link> */}
             </div>
 
             {/* Mobile Contact Info */}
