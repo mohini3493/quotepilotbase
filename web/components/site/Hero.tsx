@@ -75,7 +75,7 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="mb-16"
         >
-          <Link href="/quote">
+          <Link href="/">
             <button className="group inline-flex items-center gap-3 bg-primary hover:bg-primary/90 text-white px-10 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl">
               GET YOUR QUOTE
               <ArrowDown className="w-5 h-5 group-hover:translate-y-1 transition-transform duration-300" />
