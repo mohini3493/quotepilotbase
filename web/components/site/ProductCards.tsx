@@ -72,7 +72,7 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
 
 export default async function ProductSection() {
   // For server components, use the API URL directly or a relative URL
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
   console.log("Fetching products from API:", API_URL);
 
