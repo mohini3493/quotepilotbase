@@ -1,7 +1,4 @@
 import Header from "@/components/site/Header";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import FadeUp from "@/components/motion/FadeUp";
 import ProductCards from "@/components/site/ProductCards";
 import Process from "@/components/site/Process";
 import Features from "@/components/site/Features";
@@ -24,40 +21,30 @@ export default function HomePage() {
   return (
     <>
       <Header />
-
       <main>
         <ScrollReveal>
           <Hero />
         </ScrollReveal>
-
         <RunningText />
-
         <ScrollReveal>
           <Welcome />
         </ScrollReveal>
-
         <ScrollReveal>
           <ProductCards />
         </ScrollReveal>
-
         <ScrollReveal>
           <Process />
         </ScrollReveal>
-
         <ScrollReveal>
           <Features />
         </ScrollReveal>
-
         <ScrollReveal>
           <Testimonials />
         </ScrollReveal>
-
         <ScrollReveal>
           <FAQ />
         </ScrollReveal>
-
         <Support />
-
         <Footer />
       </main>
     </>
