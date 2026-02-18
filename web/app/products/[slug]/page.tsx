@@ -18,7 +18,7 @@ export default async function ProductPage({
   const { slug } = await params;
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/products/${slug}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/products/slug/${slug}`,
     {
       cache: "no-store",
     },
