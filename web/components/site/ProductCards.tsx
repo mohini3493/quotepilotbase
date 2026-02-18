@@ -83,6 +83,7 @@ export default async function ProductSection() {
 
     if (!res.ok) {
       console.error("Failed to fetch products:", res.status);
+      console.log("API:", process.env.NEXT_PUBLIC_API_URL);
       return null;
     }
 
