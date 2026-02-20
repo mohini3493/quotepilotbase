@@ -441,7 +441,7 @@ export default function ProductConfigurator({
                     <img
                       src={doorType.image || "/placeholder.jpg"}
                       alt={doorType.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-64 object-contain bg-gray-50"
                     />
                     {selection.doorType?.id === doorType.id && (
                       <div className="absolute top-3 right-3 w-8 h-8 bg-primary rounded-full flex items-center justify-center">
@@ -495,7 +495,7 @@ export default function ProductConfigurator({
                     <img
                       src={panelStyle.image || "/placeholder.jpg"}
                       alt={panelStyle.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-64 object-contain bg-gray-50"
                     />
                     {selection.panelStyle?.id === panelStyle.id && (
                       <div className="absolute top-3 right-3 w-8 h-8 bg-primary rounded-full flex items-center justify-center">
@@ -655,7 +655,7 @@ export default function ProductConfigurator({
                       <img
                         src={color.image}
                         alt={color.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-64 object-contain bg-gray-50"
                       />
                     ) : (
                       <div
@@ -713,7 +713,7 @@ export default function ProductConfigurator({
                       <img
                         src={color.image}
                         alt={color.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-64 object-contain bg-gray-50"
                       />
                     ) : (
                       <div
@@ -771,7 +771,7 @@ export default function ProductConfigurator({
                       <img
                         src={color.image}
                         alt={color.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-64 object-contain bg-gray-50"
                       />
                     ) : (
                       <div
@@ -817,7 +817,7 @@ export default function ProductConfigurator({
                         <img
                           src={selection.panelStyle.image || "/placeholder.jpg"}
                           alt={selection.panelStyle.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-64 object-contain bg-gray-50"
                         />
                       </>
                     )}
