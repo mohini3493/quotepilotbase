@@ -12,9 +12,9 @@ import RunningText from "@/components/site/RunningText";
 import Welcome from "@/components/site/Welcome";
 
 export const metadata = {
-  title: "QuotePilot – Smart Quoting Engine",
+  title: "Infinity Glazing",
   description:
-    "Create dynamic quote forms, pricing rules, and instant results with QuotePilot.",
+    "Create dynamic quote forms, pricing rules, and instant results with Infinity Glazing.",
 };
 
 export default function HomePage() {

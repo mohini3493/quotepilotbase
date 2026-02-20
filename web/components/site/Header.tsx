@@ -272,5 +272,5 @@ export default function Header() {
 
 /* LOGO ICON */
 function LogoIcon() {
-  return <img src="/quote-logo1.png" alt="QuotePilot Logo" className="w-25" />;
+  return <img src="/quote-logo1.png" alt="Infinity Glazing Logo" className="w-25" />;
 }
