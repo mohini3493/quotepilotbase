@@ -39,14 +39,6 @@ const panelStyleLinks = [
   { name: "Add Panel Style", href: "/admin/panel-styles/new", icon: Plus },
 ];
 
-const dimensionLinks = [
-  { name: "Add Dimension", href: "/admin/dimensions/new", icon: Plus },
-];
-
-const postcodeLinks = [
-  { name: "Add Postcode", href: "/admin/postcodes/new", icon: Plus },
-];
-
 const externalColorLinks = [
   {
     name: "Add External Color",
@@ -179,54 +171,6 @@ export default function AdminSidebar() {
             </Link>
             <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
               {panelStyleLinks.map((link) => {
-                const Icon = link.icon;
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                  >
-                    <Icon className="w-4 h-4 flex-shrink-0" />
-                    <span className="truncate">{link.name}</span>
-                  </Link>
-                );
-              })}
-            </div>
-
-            {/* Dimensions Section */}
-            <Link
-              href="/admin/dimensions"
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
-            >
-              <Ruler className="w-5 h-5 flex-shrink-0" />
-              <span className="truncate">Dimensions</span>
-            </Link>
-            <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
-              {dimensionLinks.map((link) => {
-                const Icon = link.icon;
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                  >
-                    <Icon className="w-4 h-4 flex-shrink-0" />
-                    <span className="truncate">{link.name}</span>
-                  </Link>
-                );
-              })}
-            </div>
-
-            {/* Postcodes Section */}
-            <Link
-              href="/admin/postcodes"
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
-            >
-              <MapPin className="w-5 h-5 flex-shrink-0" />
-              <span className="truncate">Postcodes</span>
-            </Link>
-            <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
-              {postcodeLinks.map((link) => {
                 const Icon = link.icon;
                 return (
                   <Link

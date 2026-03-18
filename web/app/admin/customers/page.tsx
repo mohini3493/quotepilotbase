@@ -12,15 +12,14 @@ type Customer = {
   phone: string;
   productId?: number;
   productTitle?: string;
-  doorTypeName?: string;
-  panelStyleName?: string;
-  dimensionName?: string;
-  postcodeCode?: string;
-  postcodeArea?: string;
-  externalColorName?: string;
-  internalColorName?: string;
-  handleColorName?: string;
-  createdAt: string;
+  doorType?: string;
+  panelStyle?: string;
+  dimension?: string;
+  postcode?: string;
+  externalColor?: string;
+  internalColor?: string;
+  handleColor?: string;
+  created_at: string;
 };
 
 export default function CustomersPage() {
@@ -33,15 +32,27 @@ export default function CustomersPage() {
   useEffect(() => {
     async function fetchCustomers() {
       try {
-        const response = await fetch(
-          `/api/customers`,
-          {
-            credentials: "include",
-          },
-        );
+        const response = await fetch(`/api/customers`, {
+          credentials: "include",
+        });
         if (response.ok) {
           const data = await response.json();
-          setCustomers(Array.isArray(data) ? data : data.data || []);
+          // Map backend snake_case fields to camelCase for UI
+          const toCamel = (obj: any) => ({
+            ...obj,
+            productId: obj.product_id,
+            productTitle: obj.product_title,
+            doorType: obj.door_type,
+            panelStyle: obj.panel_style,
+            dimension: obj.dimension,
+            postcode: obj.postcode,
+            externalColor: obj.external_color,
+            internalColor: obj.internal_color,
+            handleColor: obj.handle_color,
+            created_at: obj.created_at,
+          });
+          const arr = Array.isArray(data) ? data : data.data || [];
+          setCustomers(arr.map(toCamel));
         }
       } catch (error) {
         console.error("Error fetching customers:", error);
@@ -83,50 +94,63 @@ export default function CustomersPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4">
-          {/* Customer List */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {customers.map((customer) => (
-              <Card
-                key={customer.id}
-                className="cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={() => setSelectedCustomer(customer)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <h3 className="font-semibold text-lg flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        {customer.name}
-                      </h3>
-                      <p className="text-sm text-muted-foreground flex items-center gap-2">
-                        <Mail className="w-3 h-3" />
-                        {customer.email}
-                      </p>
-                      <p className="text-sm text-muted-foreground flex items-center gap-2">
-                        <Phone className="w-3 h-3" />
-                        {customer.phone}
-                      </p>
-                    </div>
-                    <Button variant="ghost" size="icon">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 bg-white rounded-xl shadow">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Name
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Email
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Phone
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Submitted
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Preview Action
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {customers.map((customer) => (
+                <tr
+                  key={customer.id}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => setSelectedCustomer(customer)}
+                >
+                  <td className="px-4 py-2 whitespace-nowrap font-medium">
+                    {customer.name}
+                  </td>
+                  <td className="px-4 py-2 whitespace-nowrap text-sm">
+                    {customer.email}
+                  </td>
+                  <td className="px-4 py-2 whitespace-nowrap text-sm">
+                    {customer.phone}
+                  </td>
+                  <td className="px-4 py-2 whitespace-nowrap text-xs text-muted-foreground">
+                    {customer.created_at &&
+                      new Date(customer.created_at).toLocaleString()}
+                  </td>
+                  <td className="px-4 py-2 whitespace-nowrap">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedCustomer(customer);
+                      }}
+                    >
                       <Eye className="w-4 h-4" />
                     </Button>
-                  </div>
-                  {customer.productTitle && (
-                    <div className="mt-3 pt-3 border-t">
-                      <p className="text-sm font-medium">
-                        Product: {customer.productTitle}
-                      </p>
-                    </div>
-                  )}
-                  <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
-                    <Calendar className="w-3 h-3" />
-                    {new Date(customer.createdAt).toLocaleDateString()}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
           {/* Customer Detail Modal */}
           {selectedCustomer && (
@@ -182,9 +206,10 @@ export default function CustomersPage() {
                             Submitted
                           </p>
                           <p className="font-medium">
-                            {new Date(
-                              selectedCustomer.createdAt,
-                            ).toLocaleString()}
+                            {selectedCustomer.created_at &&
+                              new Date(
+                                selectedCustomer.created_at,
+                              ).toLocaleString()}
                           </p>
                         </div>
                       </div>
@@ -207,75 +232,73 @@ export default function CustomersPage() {
                           </p>
                         </div>
                       )}
-                      {selectedCustomer.doorTypeName && (
+                      {selectedCustomer.doorType && (
                         <div className="bg-muted/50 rounded-lg p-3">
                           <p className="text-xs text-muted-foreground uppercase">
                             Door Type
                           </p>
                           <p className="font-medium text-sm">
-                            {selectedCustomer.doorTypeName}
+                            {selectedCustomer.doorType}
                           </p>
                         </div>
                       )}
-                      {selectedCustomer.panelStyleName && (
+                      {selectedCustomer.panelStyle && (
                         <div className="bg-muted/50 rounded-lg p-3">
                           <p className="text-xs text-muted-foreground uppercase">
                             Panel Style
                           </p>
                           <p className="font-medium text-sm">
-                            {selectedCustomer.panelStyleName}
+                            {selectedCustomer.panelStyle}
                           </p>
                         </div>
                       )}
-                      {selectedCustomer.dimensionName && (
+                      {selectedCustomer.dimension && (
                         <div className="bg-muted/50 rounded-lg p-3">
                           <p className="text-xs text-muted-foreground uppercase">
                             Dimensions
                           </p>
                           <p className="font-medium text-sm">
-                            {selectedCustomer.dimensionName}
+                            {selectedCustomer.dimension}
                           </p>
                         </div>
                       )}
-                      {selectedCustomer.postcodeCode && (
+                      {selectedCustomer.postcode && (
                         <div className="bg-muted/50 rounded-lg p-3">
                           <p className="text-xs text-muted-foreground uppercase">
                             Postcode
                           </p>
                           <p className="font-medium text-sm">
-                            {selectedCustomer.postcodeCode}
-                            {selectedCustomer.postcodeArea &&
-                              ` - ${selectedCustomer.postcodeArea}`}
+                            {selectedCustomer.postcode}
                           </p>
                         </div>
                       )}
-                      {selectedCustomer.externalColorName && (
+                      {selectedCustomer.externalColor && (
                         <div className="bg-muted/50 rounded-lg p-3">
                           <p className="text-xs text-muted-foreground uppercase">
                             External Color
                           </p>
                           <p className="font-medium text-sm">
-                            {selectedCustomer.externalColorName}
+                            {selectedCustomer.externalColor}
                           </p>
                         </div>
                       )}
-                      {selectedCustomer.internalColorName && (
+                      {selectedCustomer.internalColor && (
                         <div className="bg-muted/50 rounded-lg p-3">
                           <p className="text-xs text-muted-foreground uppercase">
                             Internal Color
                           </p>
                           <p className="font-medium text-sm">
-                            {selectedCustomer.internalColorName}
+                            {selectedCustomer.internalColor}
                           </p>
                         </div>
                       )}
-                      {selectedCustomer.handleColorName && (
+                      {selectedCustomer.handleColor && (
                         <div className="bg-muted/50 rounded-lg p-3">
                           <p className="text-xs text-muted-foreground uppercase">
                             Handle Color
                           </p>
                           <p className="font-medium text-sm">
-                            {selectedCustomer.handleColorName}
+                            {selectedCustomer.handleColor}
                           </p>
                         </div>
                       )}
