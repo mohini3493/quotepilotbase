@@ -389,45 +389,46 @@ export default function ProductConfigurator({
 
       {/* Step 1: Door Type */}
       {currentStep === 1 && (
-        <div className="space-y-6">
-          <div className="text-center">
+        <div>
+          <div className="text-center mb-4">
             <h2 className="text-2xl font-bold">Choose Door Type</h2>
-            <p className="text-muted-foreground mt-2">Select your door type</p>
+            <p className="text-muted-foreground mt-1">Select your door type</p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {doorTypes.map((type) => (
-              <Card
+              <div
                 key={type.id}
                 className={cn(
-                  "cursor-pointer transition-all hover:shadow-lg overflow-hidden",
+                  "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[180px] relative overflow-hidden",
                   selection.doorType?.id === type.id
-                    ? "ring-2 ring-primary shadow-lg"
-                    : "hover:ring-1 hover:ring-primary/50",
+                    ? "ring-2 ring-primary scale-105 shadow-primary/20"
+                    : "hover:ring-1 hover:ring-primary/40",
                 )}
                 onClick={() => setSelection({ ...selection, doorType: type })}
+                style={{ marginTop: 0, marginBottom: 0 }}
               >
-                <div className="relative aspect-square">
+                <div className="w-full flex-1 flex items-center justify-center">
                   {type.image ? (
                     <img
                       src={type.image}
                       alt={type.name}
-                      className="w-full h-40 object-contain bg-gray-50"
+                      className="w-full h-28 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gray-100" />
+                    <div className="w-full h-28 bg-gray-100 rounded-xl" />
                   )}
                   {selection.doorType?.id === type.id && (
-                    <div className="absolute top-2 right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                      <Check className="w-4 h-4 text-primary-foreground" />
+                    <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
+                      <Check className="w-4 h-4 text-white" />
                     </div>
                   )}
                 </div>
-                <CardContent className="p-3">
-                  <h3 className="font-medium text-sm text-center">
+                <div className="w-full mt-2">
+                  <h3 className="font-semibold text-sm text-center text-primary group-hover:text-primary-700 transition-colors">
                     {type.name}
                   </h3>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -435,49 +436,50 @@ export default function ProductConfigurator({
 
       {/* Step 2: Panel Style */}
       {currentStep === 2 && (
-        <div className="space-y-6">
-          <div className="text-center">
+        <div>
+          <div className="text-center mb-4">
             <h2 className="text-2xl font-bold">Choose Panel Style</h2>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-muted-foreground mt-1">
               Select your panel style
             </p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {panelStyles.map((style) => (
-              <Card
+              <div
                 key={style.id}
                 className={cn(
-                  "cursor-pointer transition-all hover:shadow-lg overflow-hidden",
+                  "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[180px] relative overflow-hidden",
                   selection.panelStyle?.id === style.id
-                    ? "ring-2 ring-primary shadow-lg"
-                    : "hover:ring-1 hover:ring-primary/50",
+                    ? "ring-2 ring-primary scale-105 shadow-primary/20"
+                    : "hover:ring-1 hover:ring-primary/40",
                 )}
                 onClick={() =>
                   setSelection({ ...selection, panelStyle: style })
                 }
+                style={{ marginTop: 0, marginBottom: 0 }}
               >
-                <div className="relative aspect-square">
+                <div className="w-full flex-1 flex items-center justify-center">
                   {style.image ? (
                     <img
                       src={style.image}
                       alt={style.name}
-                      className="w-full h-40 object-contain bg-gray-50"
+                      className="w-full h-28 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gray-100" />
+                    <div className="w-full h-28 bg-gray-100 rounded-xl" />
                   )}
                   {selection.panelStyle?.id === style.id && (
-                    <div className="absolute top-2 right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                      <Check className="w-4 h-4 text-primary-foreground" />
+                    <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
+                      <Check className="w-4 h-4 text-white" />
                     </div>
                   )}
                 </div>
-                <CardContent className="p-3">
-                  <h3 className="font-medium text-sm text-center">
+                <div className="w-full mt-2">
+                  <h3 className="font-semibold text-sm text-center text-primary group-hover:text-primary-700 transition-colors">
                     {style.name}
                   </h3>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -552,52 +554,53 @@ export default function ProductConfigurator({
 
       {/* Step 5: External Colors */}
       {currentStep === 5 && (
-        <div className="space-y-6">
-          <div className="text-center">
+        <div>
+          <div className="text-center mb-4">
             <h2 className="text-2xl font-bold">Choose External Color</h2>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-muted-foreground mt-1">
               Select the outside finish for your door
             </p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-3">
             {externalColors.map((color) => (
-              <Card
+              <div
                 key={color.id}
                 className={cn(
-                  "cursor-pointer transition-all hover:shadow-lg overflow-hidden",
+                  "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] relative overflow-hidden",
                   selection.externalColor?.id === color.id
-                    ? "ring-2 ring-primary shadow-lg"
-                    : "hover:ring-1 hover:ring-primary/50",
+                    ? "ring-2 ring-primary scale-105 shadow-primary/20"
+                    : "hover:ring-1 hover:ring-primary/40",
                 )}
                 onClick={() =>
                   setSelection({ ...selection, externalColor: color })
                 }
+                style={{ marginTop: 0, marginBottom: 0 }}
               >
-                <div className="relative aspect-square">
+                <div className="w-full flex-1 flex items-center justify-center">
                   {color.image ? (
                     <img
                       src={color.image}
                       alt={color.name}
-                      className="w-full h-64 object-contain bg-gray-50"
+                      className="w-full h-16 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
                     />
                   ) : (
                     <div
-                      className="w-full h-full"
+                      className="w-full h-16 rounded-xl"
                       style={{ backgroundColor: color.colorCode || "#ccc" }}
                     />
                   )}
                   {selection.externalColor?.id === color.id && (
-                    <div className="absolute top-2 right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                      <Check className="w-4 h-4 text-primary-foreground" />
+                    <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
+                      <Check className="w-4 h-4 text-white" />
                     </div>
                   )}
                 </div>
-                <CardContent className="p-3">
-                  <h3 className="font-medium text-sm text-center">
+                <div className="w-full mt-2">
+                  <h3 className="font-semibold text-xs text-center text-primary group-hover:text-primary-700 transition-colors">
                     {color.name}
                   </h3>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
           {externalColors.length === 0 && (
@@ -610,52 +613,53 @@ export default function ProductConfigurator({
 
       {/* Step 6: Internal Colors */}
       {currentStep === 6 && (
-        <div className="space-y-6">
-          <div className="text-center">
+        <div>
+          <div className="text-center mb-4">
             <h2 className="text-2xl font-bold">Choose Internal Color</h2>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-muted-foreground mt-1">
               Select the inside finish for your door
             </p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-3">
             {internalColors.map((color) => (
-              <Card
+              <div
                 key={color.id}
                 className={cn(
-                  "cursor-pointer transition-all hover:shadow-lg overflow-hidden",
+                  "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] relative overflow-hidden",
                   selection.internalColor?.id === color.id
-                    ? "ring-2 ring-primary shadow-lg"
-                    : "hover:ring-1 hover:ring-primary/50",
+                    ? "ring-2 ring-primary scale-105 shadow-primary/20"
+                    : "hover:ring-1 hover:ring-primary/40",
                 )}
                 onClick={() =>
                   setSelection({ ...selection, internalColor: color })
                 }
+                style={{ marginTop: 0, marginBottom: 0 }}
               >
-                <div className="relative aspect-square">
+                <div className="w-full flex-1 flex items-center justify-center">
                   {color.image ? (
                     <img
                       src={color.image}
                       alt={color.name}
-                      className="w-full h-64 object-contain bg-gray-50"
+                      className="w-full h-16 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
                     />
                   ) : (
                     <div
-                      className="w-full h-full"
+                      className="w-full h-16 rounded-xl"
                       style={{ backgroundColor: color.colorCode || "#ccc" }}
                     />
                   )}
                   {selection.internalColor?.id === color.id && (
-                    <div className="absolute top-2 right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                      <Check className="w-4 h-4 text-primary-foreground" />
+                    <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
+                      <Check className="w-4 h-4 text-white" />
                     </div>
                   )}
                 </div>
-                <CardContent className="p-3">
-                  <h3 className="font-medium text-sm text-center">
+                <div className="w-full mt-2">
+                  <h3 className="font-semibold text-xs text-center text-primary group-hover:text-primary-700 transition-colors">
                     {color.name}
                   </h3>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
           {internalColors.length === 0 && (
@@ -668,52 +672,53 @@ export default function ProductConfigurator({
 
       {/* Step 7: Handle Colors */}
       {currentStep === 7 && (
-        <div className="space-y-6">
-          <div className="text-center">
+        <div>
+          <div className="text-center mb-4">
             <h2 className="text-2xl font-bold">Choose Handle Color</h2>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-muted-foreground mt-1">
               Select the handle finish for your door
             </p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-3">
             {handleColors.map((color) => (
-              <Card
+              <div
                 key={color.id}
                 className={cn(
-                  "cursor-pointer transition-all hover:shadow-lg overflow-hidden",
+                  "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] relative overflow-hidden",
                   selection.handleColor?.id === color.id
-                    ? "ring-2 ring-primary shadow-lg"
-                    : "hover:ring-1 hover:ring-primary/50",
+                    ? "ring-2 ring-primary scale-105 shadow-primary/20"
+                    : "hover:ring-1 hover:ring-primary/40",
                 )}
                 onClick={() =>
                   setSelection({ ...selection, handleColor: color })
                 }
+                style={{ marginTop: 0, marginBottom: 0 }}
               >
-                <div className="relative aspect-square">
+                <div className="w-full flex-1 flex items-center justify-center">
                   {color.image ? (
                     <img
                       src={color.image}
                       alt={color.name}
-                      className="w-full h-64 object-contain bg-gray-50"
+                      className="w-full h-16 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
                     />
                   ) : (
                     <div
-                      className="w-full h-full"
+                      className="w-full h-16 rounded-xl"
                       style={{ backgroundColor: color.colorCode || "#ccc" }}
                     />
                   )}
                   {selection.handleColor?.id === color.id && (
-                    <div className="absolute top-2 right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                      <Check className="w-4 h-4 text-primary-foreground" />
+                    <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
+                      <Check className="w-4 h-4 text-white" />
                     </div>
                   )}
                 </div>
-                <CardContent className="p-3">
-                  <h3 className="font-medium text-sm text-center">
+                <div className="w-full mt-2">
+                  <h3 className="font-semibold text-xs text-center text-primary group-hover:text-primary-700 transition-colors">
                     {color.name}
                   </h3>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
           {handleColors.length === 0 && (
