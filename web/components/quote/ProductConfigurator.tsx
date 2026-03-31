@@ -369,9 +369,6 @@ export default function ProductConfigurator({
                   step.id
                 )}
               </div>
-              <span className="text-xs font-semibold text-center leading-tight">
-                {step.title}
-              </span>
             </button>
           ))}
         </div>

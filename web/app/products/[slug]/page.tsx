@@ -30,7 +30,7 @@ export default async function ProductPage({
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      <section className="py-16 bg-gradient-to-b from-white to-slate-50">
+      <section className="py-4 bg-gradient-to-b from-white to-slate-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="bg-white rounded-2xl shadow-xl border p-6 md:p-8">
             <ProductConfigurator
