@@ -57,54 +57,13 @@ export default function Header() {
 
   return (
     <>
-      {/* TOP BAR */}
-      <div className="bg-primary text-primary-foreground py-2 text-sm hidden md:block">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-between items-center">
-            {/* Left Side - Address & Phone */}
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4" />
-                <span>123 Business Ave, Suite 100, NY 10001</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4" />
-                <span>+1 (555) 123-4567</span>
-              </div>
-            </div>
-
-            {/* Right Side - Email & Social */}
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                <span>info@quotepilot.com</span>
-              </div>
-              <div className="flex items-center gap-2 border-l border-primary-foreground/30 pl-4">
-                <Link href="#" className="hover:opacity-80 transition-opacity">
-                  <Facebook className="w-4 h-4" />
-                </Link>
-                <Link href="#" className="hover:opacity-80 transition-opacity">
-                  <Twitter className="w-4 h-4" />
-                </Link>
-                <Link href="#" className="hover:opacity-80 transition-opacity">
-                  <Linkedin className="w-4 h-4" />
-                </Link>
-                <Link href="#" className="hover:opacity-80 transition-opacity">
-                  <Instagram className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* MAIN HEADER */}
       <header
         className={clsx(
-          "sticky top-0 z-50 w-full transition-all duration-300",
+          "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300",
           scrolled
             ? "bg-background/95 backdrop-blur-md shadow-lg border-b"
-            : "bg-background border-b",
+            : "bg-transparent",
         )}
       >
         <div className="max-w-7xl mx-auto px-4">
@@ -130,19 +89,6 @@ export default function Header() {
 
             {/* DESKTOP ACTIONS */}
             <div className="hidden lg:flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setDark(!dark)}
-                className="hover:bg-accent"
-              >
-                {dark ? (
-                  <Sun className="w-4 h-4" />
-                ) : (
-                  <Moon className="w-4 h-4" />
-                )}
-              </Button>
-
               <Link href="/admin-login">
                 <Button
                   variant="outline"
@@ -191,25 +137,6 @@ export default function Header() {
             </nav>
 
             <div className="flex flex-col gap-3 mt-6 pt-6 border-t">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Theme</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setDark(!dark)}
-                >
-                  {dark ? (
-                    <>
-                      <Sun className="w-4 h-4 mr-2" /> Light
-                    </>
-                  ) : (
-                    <>
-                      <Moon className="w-4 h-4 mr-2" /> Dark
-                    </>
-                  )}
-                </Button>
-              </div>
-
               <Link href="/admin-login" className="w-full">
                 <Button
                   variant="outline"
