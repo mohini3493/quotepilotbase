@@ -10,12 +10,12 @@ import { motion } from "framer-motion";
 
 const faqs = [
   {
-    q: "Is QuotePilot customizable?",
+    q: "Is Infinity Glazing customizable?",
     a: "Yes, all questions and pricing rules are fully admin-configurable from the dashboard. You can customize forms, add or remove questions, and set up complex pricing rules without any coding.",
   },
   {
     q: "Can I use it for any business?",
-    a: "Absolutely. QuotePilot is designed to support multiple industries and pricing models. Whether you're in construction, consulting, software, or any service-based business, you can tailor it to your needs.",
+    a: "Absolutely. Infinity Glazing is designed to support multiple industries and pricing models. Whether you're in construction, consulting, software, or any service-based business, you can tailor it to your needs.",
   },
   {
     q: "Is coding required?",
@@ -27,7 +27,7 @@ const faqs = [
   },
   {
     q: "Does it integrate with my existing tools?",
-    a: "QuotePilot is designed to work seamlessly with your existing workflow. Export quotes to PDF, integrate with your CRM, or use our API to connect with other business tools.",
+    a: "Infinity Glazing is designed to work seamlessly with your existing workflow. Export quotes to PDF, integrate with your CRM, or use our API to connect with other business tools.",
   },
   {
     q: "What kind of pricing models are supported?",
@@ -58,8 +58,8 @@ export default function FAQ() {
             Frequently Asked Questions
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Everything you need to know about QuotePilot. Can't find the answer
-            you're looking for?
+            Everything you need to know about Infinity Glazing. Can't find the
+            answer you're looking for?
             <span className="text-primary hover:opacity-80 cursor-pointer font-medium">
               {" "}
               Contact our team
@@ -82,8 +82,7 @@ export default function FAQ() {
               <div
                 className="w-full h-96 lg:h-[500px] bg-cover bg-center"
                 style={{
-                  backgroundImage:
-                    "url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=2069&auto=format&fit=crop')",
+                  backgroundImage: "url('/faq-glazing.jpg')",
                 }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
@@ -139,8 +138,6 @@ export default function FAQ() {
             </Accordion>
           </motion.div>
         </div>
-
-       
       </div>
     </section>
   );

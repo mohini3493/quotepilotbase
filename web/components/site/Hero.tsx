@@ -96,9 +96,9 @@ export default function Hero() {
               transition={{ duration: 0.7, delay: 0.25 }}
               className="text-lg text-slate-600 max-w-xl mb-8 leading-relaxed"
             >
-              QuotePilot is a powerful platform for Construction, Renovation,
-              Manufacturing & Service Industries to generate accurate quotes
-              with a smart rule engine.
+              Infinity Glazing is a powerful platform for Construction,
+              Renovation, Manufacturing & Service Industries to generate
+              accurate quotes with a smart rule engine.
             </motion.p>
 
             {/* Feature chips */}

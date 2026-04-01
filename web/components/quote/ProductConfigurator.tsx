@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,6 +20,7 @@ import {
   PaintBucket,
   ShoppingBag,
   Users,
+  ClipboardList,
 } from "lucide-react";
 
 type DoorType = {
@@ -84,6 +86,17 @@ type Selection = {
   internalColor: InternalColor | null;
   handleColor: HandleColor | null;
 };
+
+const STEP_ICONS = [
+  DoorOpen,
+  PanelTop,
+  Ruler,
+  MapPin,
+  Palette,
+  PaintBucket,
+  Grip,
+  ClipboardList,
+];
 
 const STEPS = [
   { id: 1, title: "Door Type", description: "Choose your door type" },
@@ -337,662 +350,750 @@ export default function ProductConfigurator({
   return (
     <div className="w-full">
       {/* Step Indicator */}
-      <div className="mb-10">
-        {/* Desktop Step Indicator - Full Width */}
-        <div className="hidden lg:grid grid-cols-8 gap-1 bg-gray-100 rounded-2xl p-2">
-          {STEPS.map((step) => (
-            <button
-              key={step.id}
-              onClick={() => handleStepClick(step.id)}
-              className={cn(
-                "flex flex-col items-center justify-center gap-2 py-4 px-2 rounded-xl transition-all",
-                currentStep === step.id
-                  ? "bg-white shadow-lg text-primary"
-                  : step.id < currentStep
-                    ? "text-primary hover:bg-white/60 cursor-pointer"
-                    : "text-gray-400 hover:bg-white/30",
-              )}
-            >
-              <div
-                className={cn(
-                  "w-10 h-10 rounded-xl flex items-center justify-center text-base font-bold transition-all",
-                  currentStep === step.id
-                    ? "bg-primary text-white shadow-lg shadow-primary/40"
-                    : step.id < currentStep
-                      ? "bg-primary text-white"
-                      : "bg-gray-200 text-gray-400",
-                )}
-              >
-                {step.id < currentStep ? (
-                  <Check className="w-5 h-5" />
-                ) : (
-                  step.id
-                )}
-              </div>
-            </button>
-          ))}
+      <div className="mb-8">
+        {/* Desktop Step Indicator - Connected Progress Line */}
+        <div className="hidden lg:block">
+          <div className="relative flex items-center justify-between">
+            {/* Background line */}
+            <div className="absolute top-5 left-[5%] right-[5%] h-0.5 bg-gray-200 z-0" />
+            {/* Animated progress line */}
+            <motion.div
+              className="absolute top-5 left-[5%] h-0.5 bg-primary z-[1] origin-left"
+              initial={{ width: "0%" }}
+              animate={{
+                width: `${((currentStep - 1) / (STEPS.length - 1)) * 90}%`,
+              }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+            />
+            {STEPS.map((step) => {
+              const StepIcon = STEP_ICONS[step.id - 1];
+              const isActive = currentStep === step.id;
+              const isCompleted = step.id < currentStep;
+              return (
+                <button
+                  key={step.id}
+                  onClick={() => handleStepClick(step.id)}
+                  className="relative z-10 flex flex-col items-center gap-1.5 group"
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={cn(
+                      "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 border-2",
+                      isActive
+                        ? "bg-primary border-primary text-white shadow-lg shadow-primary/40 scale-110"
+                        : isCompleted
+                          ? "bg-primary border-primary text-white"
+                          : "bg-white border-gray-200 text-gray-400 group-hover:border-primary/40",
+                    )}
+                  >
+                    {isCompleted ? (
+                      <Check className="w-4 h-4" />
+                    ) : (
+                      <StepIcon className="w-4 h-4" />
+                    )}
+                  </motion.div>
+                  <span
+                    className={cn(
+                      "text-[10px] font-medium transition-colors whitespace-nowrap",
+                      isActive
+                        ? "text-primary font-semibold"
+                        : isCompleted
+                          ? "text-primary"
+                          : "text-gray-400",
+                    )}
+                  >
+                    {step.title}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
-        {/* Tablet/Mobile Step Indicator */}
+
+        {/* Mobile Step Indicator - Pill bar with icons */}
         <div className="lg:hidden">
-          <div className="flex items-center justify-between mb-3 px-1">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-sm">
-                {currentStep}
-              </div>
+          <div className="flex items-center gap-3 mb-4 px-1">
+            <div className="flex items-center gap-1.5">
+              {STEPS.map((step) => {
+                const isActive = currentStep === step.id;
+                const isCompleted = step.id < currentStep;
+                return (
+                  <button
+                    key={step.id}
+                    onClick={() => handleStepClick(step.id)}
+                    className={cn(
+                      "h-2 rounded-full transition-all duration-300",
+                      isActive
+                        ? "w-8 bg-primary"
+                        : isCompleted
+                          ? "w-4 bg-primary/60"
+                          : "w-2 bg-gray-200",
+                    )}
+                  />
+                );
+              })}
             </div>
+            <span className="text-xs font-semibold text-primary ml-auto">
+              {currentStep}/{STEPS.length}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 px-1">
+            {(() => {
+              const StepIcon = STEP_ICONS[currentStep - 1];
+              return (
+                <>
+                  <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center">
+                    <StepIcon className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-800">
+                      {STEPS[currentStep - 1].title}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">
+                      {STEPS[currentStep - 1].description}
+                    </p>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </div>
       </div>
 
-      {/* Step 1: Door Type */}
-      {currentStep === 1 && (
-        <div>
-          <div className="text-center mb-4">
-            <h2 className="text-2xl font-bold">Choose Door Type</h2>
-            <p className="text-muted-foreground mt-1">Select your door type</p>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {doorTypes.map((type) => (
-              <div
-                key={type.id}
-                className={cn(
-                  "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[180px] relative overflow-hidden",
-                  selection.doorType?.id === type.id
-                    ? "ring-2 ring-primary scale-105 shadow-primary/20"
-                    : "hover:ring-1 hover:ring-primary/40",
-                )}
-                onClick={() => setSelection({ ...selection, doorType: type })}
-                style={{ marginTop: 0, marginBottom: 0 }}
-              >
-                <div className="w-full flex-1 flex items-center justify-center">
-                  {type.image ? (
-                    <img
-                      src={type.image}
-                      alt={type.name}
-                      className="w-full h-28 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="w-full h-28 bg-gray-100 rounded-xl" />
-                  )}
-                  {selection.doorType?.id === type.id && (
-                    <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
-                      <Check className="w-4 h-4 text-white" />
-                    </div>
-                  )}
-                </div>
-                <div className="w-full mt-2">
-                  <h3 className="font-semibold text-sm text-center text-primary group-hover:text-primary-700 transition-colors">
-                    {type.name}
-                  </h3>
-                </div>
+      {/* Step Content with animation */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentStep}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+        >
+          {/* Step 1: Door Type */}
+          {currentStep === 1 && (
+            <div>
+              <div className="text-center mb-4">
+                <h2 className="text-2xl font-bold">Choose Door Type</h2>
+                <p className="text-muted-foreground mt-1">
+                  Select your door type
+                </p>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Step 2: Panel Style */}
-      {currentStep === 2 && (
-        <div>
-          <div className="text-center mb-4">
-            <h2 className="text-2xl font-bold">Choose Panel Style</h2>
-            <p className="text-muted-foreground mt-1">
-              Select your panel style
-            </p>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {panelStyles.map((style) => (
-              <div
-                key={style.id}
-                className={cn(
-                  "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[180px] relative overflow-hidden",
-                  selection.panelStyle?.id === style.id
-                    ? "ring-2 ring-primary scale-105 shadow-primary/20"
-                    : "hover:ring-1 hover:ring-primary/40",
-                )}
-                onClick={() =>
-                  setSelection({ ...selection, panelStyle: style })
-                }
-                style={{ marginTop: 0, marginBottom: 0 }}
-              >
-                <div className="w-full flex-1 flex items-center justify-center">
-                  {style.image ? (
-                    <img
-                      src={style.image}
-                      alt={style.name}
-                      className="w-full h-28 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="w-full h-28 bg-gray-100 rounded-xl" />
-                  )}
-                  {selection.panelStyle?.id === style.id && (
-                    <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
-                      <Check className="w-4 h-4 text-white" />
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                {doorTypes.map((type) => (
+                  <div
+                    key={type.id}
+                    className={cn(
+                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[180px] relative overflow-hidden",
+                      selection.doorType?.id === type.id
+                        ? "ring-2 ring-primary scale-105 shadow-primary/20"
+                        : "hover:ring-1 hover:ring-primary/40",
+                    )}
+                    onClick={() =>
+                      setSelection({ ...selection, doorType: type })
+                    }
+                    style={{ marginTop: 0, marginBottom: 0 }}
+                  >
+                    <div className="w-full flex-1 flex items-center justify-center">
+                      {type.image ? (
+                        <img
+                          src={type.image}
+                          alt={type.name}
+                          className="w-full h-28 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="w-full h-28 bg-gray-100 rounded-xl" />
+                      )}
+                      {selection.doorType?.id === type.id && (
+                        <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
+                          <Check className="w-4 h-4 text-white" />
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-                <div className="w-full mt-2">
-                  <h3 className="font-semibold text-sm text-center text-primary group-hover:text-primary-700 transition-colors">
-                    {style.name}
-                  </h3>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Step 3: Dimensions */}
-      {currentStep === 3 && (
-        <div className="space-y-6 max-w-md mx-auto">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold">Enter Dimensions</h2>
-            <p className="text-muted-foreground mt-2">
-              Enter width and height in mm
-            </p>
-          </div>
-          <div className="flex flex-col gap-4">
-            <Input
-              type="number"
-              placeholder="Width (mm)"
-              value={selection.dimension?.width || ""}
-              onChange={(e) => {
-                const width = parseInt(e.target.value, 10) || 0;
-                setSelection({
-                  ...selection,
-                  dimension: {
-                    id: selection.dimension?.id ?? 0,
-                    width,
-                    height: selection.dimension?.height || 0,
-                  },
-                });
-              }}
-            />
-            <Input
-              type="number"
-              placeholder="Height (mm)"
-              value={selection.dimension?.height || ""}
-              onChange={(e) => {
-                const height = parseInt(e.target.value, 10) || 0;
-                setSelection({
-                  ...selection,
-                  dimension: {
-                    id: selection.dimension?.id ?? 0,
-                    width: selection.dimension?.width || 0,
-                    height,
-                  },
-                });
-              }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Step 4: Postcode */}
-      {currentStep === 4 && (
-        <div className="space-y-6 max-w-md mx-auto">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold">Enter Postcode</h2>
-            <p className="text-muted-foreground mt-2">Enter your postcode</p>
-          </div>
-          <Input
-            type="text"
-            placeholder="Postcode"
-            value={selection.postcode?.code || ""}
-            onChange={(e) => {
-              setSelection({
-                ...selection,
-                postcode: { id: 0, code: e.target.value },
-              });
-            }}
-          />
-        </div>
-      )}
-
-      {/* Step 5: External Colors */}
-      {currentStep === 5 && (
-        <div>
-          <div className="text-center mb-4">
-            <h2 className="text-2xl font-bold">Choose External Color</h2>
-            <p className="text-muted-foreground mt-1">
-              Select the outside finish for your door
-            </p>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-3">
-            {externalColors.map((color) => (
-              <div
-                key={color.id}
-                className={cn(
-                  "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] relative overflow-hidden",
-                  selection.externalColor?.id === color.id
-                    ? "ring-2 ring-primary scale-105 shadow-primary/20"
-                    : "hover:ring-1 hover:ring-primary/40",
-                )}
-                onClick={() =>
-                  setSelection({ ...selection, externalColor: color })
-                }
-                style={{ marginTop: 0, marginBottom: 0 }}
-              >
-                <div className="w-full flex-1 flex items-center justify-center">
-                  {color.image ? (
-                    <img
-                      src={color.image}
-                      alt={color.name}
-                      className="w-full h-16 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
-                    />
-                  ) : (
-                    <div
-                      className="w-full h-16 rounded-xl"
-                      style={{ backgroundColor: color.colorCode || "#ccc" }}
-                    />
-                  )}
-                  {selection.externalColor?.id === color.id && (
-                    <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
-                      <Check className="w-4 h-4 text-white" />
+                    <div className="w-full mt-2">
+                      <h3 className="font-semibold text-sm text-center text-emerald-700 group-hover:text-emerald-900 transition-colors">
+                        {type.name}
+                      </h3>
                     </div>
-                  )}
-                </div>
-                <div className="w-full mt-2">
-                  <h3 className="font-semibold text-xs text-center text-primary group-hover:text-primary-700 transition-colors">
-                    {color.name}
-                  </h3>
-                </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          {externalColors.length === 0 && (
-            <div className="text-center py-12 text-muted-foreground">
-              No external colors available
             </div>
           )}
-        </div>
-      )}
 
-      {/* Step 6: Internal Colors */}
-      {currentStep === 6 && (
-        <div>
-          <div className="text-center mb-4">
-            <h2 className="text-2xl font-bold">Choose Internal Color</h2>
-            <p className="text-muted-foreground mt-1">
-              Select the inside finish for your door
-            </p>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-3">
-            {internalColors.map((color) => (
-              <div
-                key={color.id}
-                className={cn(
-                  "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] relative overflow-hidden",
-                  selection.internalColor?.id === color.id
-                    ? "ring-2 ring-primary scale-105 shadow-primary/20"
-                    : "hover:ring-1 hover:ring-primary/40",
-                )}
-                onClick={() =>
-                  setSelection({ ...selection, internalColor: color })
-                }
-                style={{ marginTop: 0, marginBottom: 0 }}
-              >
-                <div className="w-full flex-1 flex items-center justify-center">
-                  {color.image ? (
-                    <img
-                      src={color.image}
-                      alt={color.name}
-                      className="w-full h-16 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
-                    />
-                  ) : (
-                    <div
-                      className="w-full h-16 rounded-xl"
-                      style={{ backgroundColor: color.colorCode || "#ccc" }}
-                    />
-                  )}
-                  {selection.internalColor?.id === color.id && (
-                    <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
-                      <Check className="w-4 h-4 text-white" />
-                    </div>
-                  )}
-                </div>
-                <div className="w-full mt-2">
-                  <h3 className="font-semibold text-xs text-center text-primary group-hover:text-primary-700 transition-colors">
-                    {color.name}
-                  </h3>
-                </div>
+          {/* Step 2: Panel Style */}
+          {currentStep === 2 && (
+            <div>
+              <div className="text-center mb-4">
+                <h2 className="text-2xl font-bold">Choose Panel Style</h2>
+                <p className="text-muted-foreground mt-1">
+                  Select your panel style
+                </p>
               </div>
-            ))}
-          </div>
-          {internalColors.length === 0 && (
-            <div className="text-center py-12 text-muted-foreground">
-              No internal colors available
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                {panelStyles.map((style) => (
+                  <div
+                    key={style.id}
+                    className={cn(
+                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[180px] relative overflow-hidden",
+                      selection.panelStyle?.id === style.id
+                        ? "ring-2 ring-primary scale-105 shadow-primary/20"
+                        : "hover:ring-1 hover:ring-primary/40",
+                    )}
+                    onClick={() =>
+                      setSelection({ ...selection, panelStyle: style })
+                    }
+                    style={{ marginTop: 0, marginBottom: 0 }}
+                  >
+                    <div className="w-full flex-1 flex items-center justify-center">
+                      {style.image ? (
+                        <img
+                          src={style.image}
+                          alt={style.name}
+                          className="w-full h-28 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="w-full h-28 bg-gray-100 rounded-xl" />
+                      )}
+                      {selection.panelStyle?.id === style.id && (
+                        <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
+                          <Check className="w-4 h-4 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="w-full mt-2">
+                      <h3 className="font-semibold text-sm text-center text-emerald-700 group-hover:text-emerald-900 transition-colors">
+                        {style.name}
+                      </h3>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
-        </div>
-      )}
 
-      {/* Step 7: Handle Colors */}
-      {currentStep === 7 && (
-        <div>
-          <div className="text-center mb-4">
-            <h2 className="text-2xl font-bold">Choose Handle Color</h2>
-            <p className="text-muted-foreground mt-1">
-              Select the handle finish for your door
-            </p>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-3">
-            {handleColors.map((color) => (
-              <div
-                key={color.id}
-                className={cn(
-                  "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] relative overflow-hidden",
-                  selection.handleColor?.id === color.id
-                    ? "ring-2 ring-primary scale-105 shadow-primary/20"
-                    : "hover:ring-1 hover:ring-primary/40",
-                )}
-                onClick={() =>
-                  setSelection({ ...selection, handleColor: color })
-                }
-                style={{ marginTop: 0, marginBottom: 0 }}
-              >
-                <div className="w-full flex-1 flex items-center justify-center">
-                  {color.image ? (
-                    <img
-                      src={color.image}
-                      alt={color.name}
-                      className="w-full h-16 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
-                    />
-                  ) : (
-                    <div
-                      className="w-full h-16 rounded-xl"
-                      style={{ backgroundColor: color.colorCode || "#ccc" }}
-                    />
-                  )}
-                  {selection.handleColor?.id === color.id && (
-                    <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
-                      <Check className="w-4 h-4 text-white" />
-                    </div>
-                  )}
-                </div>
-                <div className="w-full mt-2">
-                  <h3 className="font-semibold text-xs text-center text-primary group-hover:text-primary-700 transition-colors">
-                    {color.name}
-                  </h3>
-                </div>
+          {/* Step 3: Dimensions */}
+          {currentStep === 3 && (
+            <div className="space-y-6 max-w-md mx-auto">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold">Enter Dimensions</h2>
+                <p className="text-muted-foreground mt-2">
+                  Enter width and height in mm
+                </p>
               </div>
-            ))}
-          </div>
-          {handleColors.length === 0 && (
-            <div className="text-center py-12 text-muted-foreground">
-              No handle colors available
+              <div className="flex flex-col gap-4">
+                <Input
+                  type="number"
+                  placeholder="Width (mm)"
+                  value={selection.dimension?.width || ""}
+                  onChange={(e) => {
+                    const width = parseInt(e.target.value, 10) || 0;
+                    setSelection({
+                      ...selection,
+                      dimension: {
+                        id: selection.dimension?.id ?? 0,
+                        width,
+                        height: selection.dimension?.height || 0,
+                      },
+                    });
+                  }}
+                />
+                <Input
+                  type="number"
+                  placeholder="Height (mm)"
+                  value={selection.dimension?.height || ""}
+                  onChange={(e) => {
+                    const height = parseInt(e.target.value, 10) || 0;
+                    setSelection({
+                      ...selection,
+                      dimension: {
+                        id: selection.dimension?.id ?? 0,
+                        width: selection.dimension?.width || 0,
+                        height,
+                      },
+                    });
+                  }}
+                />
+              </div>
             </div>
           )}
-        </div>
-      )}
 
-      {/* Step 8: Summary with Contact Details */}
-      {currentStep === 8 && (
-        <div>
-          <div>
-            {!submitted && (
-              <>
-                <div className="space-y-4 sm:space-y-6">
-                  <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2 sm:gap-3">
-                    <div className="px-2">
-                      <h2 className="text-xl sm:text-2xl font-bold mb-3">
-                        Review Your Selection
-                      </h2>
-                      <Card>
-                        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2">
-                          {selection.panelStyle && (
-                            <img
-                              src={
-                                selection.panelStyle.image || "/placeholder.jpg"
-                              }
-                              alt={selection.panelStyle.name}
-                              className="w-full h-64 object-contain bg-gray-50"
-                            />
-                          )}
-                          <div>
-                            <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
-                              Here's a summary of your configuration
+          {/* Step 4: Postcode */}
+          {currentStep === 4 && (
+            <div className="space-y-6 max-w-md mx-auto">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold">Enter Postcode</h2>
+                <p className="text-muted-foreground mt-2">
+                  Enter your postcode
+                </p>
+              </div>
+              <Input
+                type="text"
+                placeholder="Postcode"
+                value={selection.postcode?.code || ""}
+                onChange={(e) => {
+                  setSelection({
+                    ...selection,
+                    postcode: { id: 0, code: e.target.value },
+                  });
+                }}
+              />
+            </div>
+          )}
+
+          {/* Step 5: External Colors */}
+          {currentStep === 5 && (
+            <div>
+              <div className="text-center mb-4">
+                <h2 className="text-2xl font-bold">Choose External Color</h2>
+                <p className="text-muted-foreground mt-1">
+                  Select the outside finish for your door
+                </p>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-3">
+                {externalColors.map((color) => (
+                  <div
+                    key={color.id}
+                    className={cn(
+                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] relative overflow-hidden",
+                      selection.externalColor?.id === color.id
+                        ? "ring-2 ring-primary scale-105 shadow-primary/20"
+                        : "hover:ring-1 hover:ring-primary/40",
+                    )}
+                    onClick={() =>
+                      setSelection({ ...selection, externalColor: color })
+                    }
+                    style={{ marginTop: 0, marginBottom: 0 }}
+                  >
+                    <div className="w-full flex-1 flex items-center justify-center">
+                      {color.image ? (
+                        <img
+                          src={color.image}
+                          alt={color.name}
+                          className="w-full h-16 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
+                        />
+                      ) : (
+                        <div
+                          className="w-full h-16 rounded-xl"
+                          style={{ backgroundColor: color.colorCode || "#ccc" }}
+                        />
+                      )}
+                      {selection.externalColor?.id === color.id && (
+                        <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
+                          <Check className="w-4 h-4 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="w-full mt-2">
+                      <h3 className="font-semibold text-xs text-center text-emerald-700 group-hover:text-emerald-900 transition-colors">
+                        {color.name}
+                      </h3>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {externalColors.length === 0 && (
+                <div className="text-center py-12 text-muted-foreground">
+                  No external colors available
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Step 6: Internal Colors */}
+          {currentStep === 6 && (
+            <div>
+              <div className="text-center mb-4">
+                <h2 className="text-2xl font-bold">Choose Internal Color</h2>
+                <p className="text-muted-foreground mt-1">
+                  Select the inside finish for your door
+                </p>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-3">
+                {internalColors.map((color) => (
+                  <div
+                    key={color.id}
+                    className={cn(
+                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] relative overflow-hidden",
+                      selection.internalColor?.id === color.id
+                        ? "ring-2 ring-primary scale-105 shadow-primary/20"
+                        : "hover:ring-1 hover:ring-primary/40",
+                    )}
+                    onClick={() =>
+                      setSelection({ ...selection, internalColor: color })
+                    }
+                    style={{ marginTop: 0, marginBottom: 0 }}
+                  >
+                    <div className="w-full flex-1 flex items-center justify-center">
+                      {color.image ? (
+                        <img
+                          src={color.image}
+                          alt={color.name}
+                          className="w-full h-16 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
+                        />
+                      ) : (
+                        <div
+                          className="w-full h-16 rounded-xl"
+                          style={{ backgroundColor: color.colorCode || "#ccc" }}
+                        />
+                      )}
+                      {selection.internalColor?.id === color.id && (
+                        <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
+                          <Check className="w-4 h-4 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="w-full mt-2">
+                      <h3 className="font-semibold text-xs text-center text-emerald-700 group-hover:text-emerald-900 transition-colors">
+                        {color.name}
+                      </h3>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {internalColors.length === 0 && (
+                <div className="text-center py-12 text-muted-foreground">
+                  No internal colors available
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Step 7: Handle Colors */}
+          {currentStep === 7 && (
+            <div>
+              <div className="text-center mb-4">
+                <h2 className="text-2xl font-bold">Choose Handle Color</h2>
+                <p className="text-muted-foreground mt-1">
+                  Select the handle finish for your door
+                </p>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-3">
+                {handleColors.map((color) => (
+                  <div
+                    key={color.id}
+                    className={cn(
+                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] relative overflow-hidden",
+                      selection.handleColor?.id === color.id
+                        ? "ring-2 ring-primary scale-105 shadow-primary/20"
+                        : "hover:ring-1 hover:ring-primary/40",
+                    )}
+                    onClick={() =>
+                      setSelection({ ...selection, handleColor: color })
+                    }
+                    style={{ marginTop: 0, marginBottom: 0 }}
+                  >
+                    <div className="w-full flex-1 flex items-center justify-center">
+                      {color.image ? (
+                        <img
+                          src={color.image}
+                          alt={color.name}
+                          className="w-full h-16 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
+                        />
+                      ) : (
+                        <div
+                          className="w-full h-16 rounded-xl"
+                          style={{ backgroundColor: color.colorCode || "#ccc" }}
+                        />
+                      )}
+                      {selection.handleColor?.id === color.id && (
+                        <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
+                          <Check className="w-4 h-4 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="w-full mt-2">
+                      <h3 className="font-semibold text-xs text-center text-emerald-700 group-hover:text-emerald-900 transition-colors">
+                        {color.name}
+                      </h3>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {handleColors.length === 0 && (
+                <div className="text-center py-12 text-muted-foreground">
+                  No handle colors available
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Step 8: Summary with Contact Details */}
+          {currentStep === 8 && (
+            <div>
+              <div>
+                {!submitted && (
+                  <>
+                    <div className="space-y-4 sm:space-y-6">
+                      <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2 sm:gap-3">
+                        <div className="px-2">
+                          <h2 className="text-xl sm:text-2xl font-bold mb-3">
+                            Review Your Selection
+                          </h2>
+                          <Card>
+                            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2">
+                              {selection.panelStyle && (
+                                <img
+                                  src={
+                                    selection.panelStyle.image ||
+                                    "/placeholder.jpg"
+                                  }
+                                  alt={selection.panelStyle.name}
+                                  className="w-full h-64 object-contain bg-gray-50"
+                                />
+                              )}
+                              <div>
+                                <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
+                                  Here's a summary of your configuration
+                                </p>
+                                <ul>
+                                  <li className="flex items-center gap-2 mt-3">
+                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                                      <DoorOpen className="w-5 h-5 flex-shrink-0" />{" "}
+                                      Door Type
+                                    </h3>{" "}
+                                    -
+                                    {selection.doorType && (
+                                      <p className="font-medium text-[10px] sm:text-xs truncate">
+                                        {selection.doorType.name}
+                                      </p>
+                                    )}
+                                  </li>
+                                  <li className="flex items-center gap-2 mt-3">
+                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                                      <PanelTop className="w-5 h-5 flex-shrink-0" />{" "}
+                                      Panel Style
+                                    </h3>{" "}
+                                    -
+                                    {selection.panelStyle && (
+                                      <p className="font-medium text-[10px] sm:text-xs truncate">
+                                        {selection.panelStyle.name}
+                                      </p>
+                                    )}
+                                  </li>
+                                  <li className="flex items-center gap-2 mt-3">
+                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                                      <Ruler className="w-5 h-5 flex-shrink-0" />{" "}
+                                      Dimensions
+                                    </h3>{" "}
+                                    -
+                                    {selection.dimension && (
+                                      <>
+                                        <p className="font-medium text-[10px] sm:text-xs truncate">
+                                          {selection.dimension.width} x{" "}
+                                          {selection.dimension.height}
+                                        </p>
+                                        <p className="text-[10px] sm:text-xs text-muted-foreground">
+                                          mm
+                                        </p>
+                                      </>
+                                    )}
+                                  </li>
+                                  <li className="flex items-center gap-2 mt-3">
+                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                                      <MapPin className="w-5 h-5 flex-shrink-0" />{" "}
+                                      Postcode
+                                    </h3>{" "}
+                                    -
+                                    {selection.postcode && (
+                                      <p className="font-medium text-[10px] sm:text-xs truncate">
+                                        {selection.postcode.code}
+                                      </p>
+                                    )}
+                                  </li>
+                                  <li className="flex items-center gap-2 mt-3">
+                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                                      <Palette className="w-5 h-5 flex-shrink-0" />{" "}
+                                      External Color
+                                    </h3>{" "}
+                                    -
+                                    {selection.externalColor && (
+                                      <p className="font-medium text-[10px] sm:text-xs text-center truncate">
+                                        {selection.externalColor.name}
+                                      </p>
+                                    )}
+                                  </li>
+                                  <li className="flex items-center gap-2 mt-3">
+                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                                      <PaintBucket className="w-5 h-5 flex-shrink-0" />{" "}
+                                      Internal Color
+                                    </h3>{" "}
+                                    -
+                                    {selection.internalColor && (
+                                      <p className="font-medium text-[10px] sm:text-xs text-center truncate">
+                                        {selection.internalColor.name}
+                                      </p>
+                                    )}
+                                  </li>
+                                  <li className="flex items-center gap-2 mt-3">
+                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                                      <Grip className="w-5 h-5 flex-shrink-0" />{" "}
+                                      Handle Color
+                                    </h3>{" "}
+                                    -
+                                    {selection.handleColor && (
+                                      <p className="font-medium text-[10px] sm:text-xs text-center truncate">
+                                        {selection.handleColor.name}
+                                      </p>
+                                    )}
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+                          </Card>
+                        </div>
+                        {/* Contact Details Form */}
+                        <div className="mt-6 sm:mt-8">
+                          <div className="mb-3 sm:mb-4">
+                            <h3 className="text-lg sm:text-xl font-semibold">
+                              Enter Your Contact Details
+                            </h3>
+                            <p className="text-xs sm:text-sm text-muted-foreground">
+                              Fill in your details to receive your quote
                             </p>
-                            <ul>
-                              <li className="flex items-center gap-2 mt-3">
-                                <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
-                                  <DoorOpen className="w-5 h-5 flex-shrink-0" />{" "}
-                                  Door Type
-                                </h3>{" "}
-                                -
-                                {selection.doorType && (
-                                  <p className="font-medium text-[10px] sm:text-xs truncate">
-                                    {selection.doorType.name}
-                                  </p>
-                                )}
-                              </li>
-                              <li className="flex items-center gap-2 mt-3">
-                                <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
-                                  <PanelTop className="w-5 h-5 flex-shrink-0" />{" "}
-                                  Panel Style
-                                </h3>{" "}
-                                -
-                                {selection.panelStyle && (
-                                  <p className="font-medium text-[10px] sm:text-xs truncate">
-                                    {selection.panelStyle.name}
-                                  </p>
-                                )}
-                              </li>
-                              <li className="flex items-center gap-2 mt-3">
-                                <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
-                                  <Ruler className="w-5 h-5 flex-shrink-0" />{" "}
-                                  Dimensions
-                                </h3>{" "}
-                                -
-                                {selection.dimension && (
-                                  <>
-                                    <p className="font-medium text-[10px] sm:text-xs truncate">
-                                      {selection.dimension.width} x{" "}
-                                      {selection.dimension.height}
-                                    </p>
-                                    <p className="text-[10px] sm:text-xs text-muted-foreground">
-                                      mm
-                                    </p>
-                                  </>
-                                )}
-                              </li>
-                              <li className="flex items-center gap-2 mt-3">
-                                <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
-                                  <MapPin className="w-5 h-5 flex-shrink-0" />{" "}
-                                  Postcode
-                                </h3>{" "}
-                                -
-                                {selection.postcode && (
-                                  <p className="font-medium text-[10px] sm:text-xs truncate">
-                                    {selection.postcode.code}
-                                  </p>
-                                )}
-                              </li>
-                              <li className="flex items-center gap-2 mt-3">
-                                <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
-                                  <Palette className="w-5 h-5 flex-shrink-0" />{" "}
-                                  External Color
-                                </h3>{" "}
-                                -
-                                {selection.externalColor && (
-                                  <p className="font-medium text-[10px] sm:text-xs text-center truncate">
-                                    {selection.externalColor.name}
-                                  </p>
-                                )}
-                              </li>
-                              <li className="flex items-center gap-2 mt-3">
-                                <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
-                                  <PaintBucket className="w-5 h-5 flex-shrink-0" />{" "}
-                                  Internal Color
-                                </h3>{" "}
-                                -
-                                {selection.internalColor && (
-                                  <p className="font-medium text-[10px] sm:text-xs text-center truncate">
-                                    {selection.internalColor.name}
-                                  </p>
-                                )}
-                              </li>
-                              <li className="flex items-center gap-2 mt-3">
-                                <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
-                                  <Grip className="w-5 h-5 flex-shrink-0" />{" "}
-                                  Handle Color
-                                </h3>{" "}
-                                -
-                                {selection.handleColor && (
-                                  <p className="font-medium text-[10px] sm:text-xs text-center truncate">
-                                    {selection.handleColor.name}
-                                  </p>
-                                )}
-                              </li>
-                            </ul>
+                          </div>
+                          <div className="mx-auto space-y-3 sm:space-y-4 px-2 sm:px-0">
+                            <div className="space-y-1.5 sm:space-y-2">
+                              <label
+                                htmlFor="name"
+                                className="text-xs sm:text-sm font-medium"
+                              >
+                                Full Name{" "}
+                                <span className="text-red-500">*</span>
+                              </label>
+                              <Input
+                                id="name"
+                                type="text"
+                                placeholder="Enter your full name"
+                                value={contactDetails.name}
+                                onChange={(e) =>
+                                  setContactDetails({
+                                    ...contactDetails,
+                                    name: e.target.value,
+                                  })
+                                }
+                                className="h-9 sm:h-10 text-sm"
+                                required
+                              />
+                            </div>
+                            <div className="space-y-1.5 sm:space-y-2">
+                              <label
+                                htmlFor="email"
+                                className="text-xs sm:text-sm font-medium"
+                              >
+                                Email Address{" "}
+                                <span className="text-red-500">*</span>
+                              </label>
+                              <Input
+                                id="email"
+                                type="email"
+                                placeholder="Enter your email address"
+                                value={contactDetails.email}
+                                onChange={(e) =>
+                                  setContactDetails({
+                                    ...contactDetails,
+                                    email: e.target.value,
+                                  })
+                                }
+                                className="h-9 sm:h-10 text-sm"
+                                required
+                              />
+                            </div>
+                            <div className="space-y-1.5 sm:space-y-2">
+                              <label
+                                htmlFor="phone"
+                                className="text-xs sm:text-sm font-medium"
+                              >
+                                Phone Number{" "}
+                                <span className="text-red-500">*</span>
+                              </label>
+                              <Input
+                                id="phone"
+                                type="tel"
+                                placeholder="Enter your phone number"
+                                value={contactDetails.phone}
+                                onChange={(e) =>
+                                  setContactDetails({
+                                    ...contactDetails,
+                                    phone: e.target.value,
+                                  })
+                                }
+                                className="h-9 sm:h-10 text-sm"
+                                required
+                              />
+                            </div>
                           </div>
                         </div>
-                      </Card>
+                      </div>
                     </div>
-                    {/* Contact Details Form */}
-                    <div className="mt-6 sm:mt-8">
-                      <div className="mb-3 sm:mb-4">
-                        <h3 className="text-lg sm:text-xl font-semibold">
-                          Enter Your Contact Details
+                    <div className="flex justify-center pt-4 sm:pt-6">
+                      <Button
+                        size="lg"
+                        className="px-6 sm:px-8 h-10 sm:h-11"
+                        onClick={handleSubmitQuote}
+                        disabled={
+                          submitting ||
+                          !contactDetails.name.trim() ||
+                          !contactDetails.email.trim() ||
+                          !contactDetails.phone.trim()
+                        }
+                      >
+                        {submitting ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Submitting...
+                          </>
+                        ) : (
+                          "Get Quote"
+                        )}
+                      </Button>
+                    </div>
+                  </>
+                )}
+                {submitted && (
+                  <div className="flex justify-center pt-4 sm:pt-6">
+                    <div className="text-center space-y-3 sm:space-y-4 px-4">
+                      <div className="w-12 sm:w-16 h-12 sm:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                        <Check className="w-6 sm:w-8 h-6 sm:h-8 text-green-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-semibold text-green-600">
+                          Quote Submitted!
                         </h3>
-                        <p className="text-xs sm:text-sm text-muted-foreground">
-                          Fill in your details to receive your quote
+                        <p className="text-sm sm:text-base text-muted-foreground mt-2">
+                          Thank you, {contactDetails.name}! We'll contact you
+                          soon at {contactDetails.email}.
                         </p>
                       </div>
-                      <div className="mx-auto space-y-3 sm:space-y-4 px-2 sm:px-0">
-                        <div className="space-y-1.5 sm:space-y-2">
-                          <label
-                            htmlFor="name"
-                            className="text-xs sm:text-sm font-medium"
-                          >
-                            Full Name <span className="text-red-500">*</span>
-                          </label>
-                          <Input
-                            id="name"
-                            type="text"
-                            placeholder="Enter your full name"
-                            value={contactDetails.name}
-                            onChange={(e) =>
-                              setContactDetails({
-                                ...contactDetails,
-                                name: e.target.value,
-                              })
-                            }
-                            className="h-9 sm:h-10 text-sm"
-                            required
-                          />
-                        </div>
-                        <div className="space-y-1.5 sm:space-y-2">
-                          <label
-                            htmlFor="email"
-                            className="text-xs sm:text-sm font-medium"
-                          >
-                            Email Address{" "}
-                            <span className="text-red-500">*</span>
-                          </label>
-                          <Input
-                            id="email"
-                            type="email"
-                            placeholder="Enter your email address"
-                            value={contactDetails.email}
-                            onChange={(e) =>
-                              setContactDetails({
-                                ...contactDetails,
-                                email: e.target.value,
-                              })
-                            }
-                            className="h-9 sm:h-10 text-sm"
-                            required
-                          />
-                        </div>
-                        <div className="space-y-1.5 sm:space-y-2">
-                          <label
-                            htmlFor="phone"
-                            className="text-xs sm:text-sm font-medium"
-                          >
-                            Phone Number <span className="text-red-500">*</span>
-                          </label>
-                          <Input
-                            id="phone"
-                            type="tel"
-                            placeholder="Enter your phone number"
-                            value={contactDetails.phone}
-                            onChange={(e) =>
-                              setContactDetails({
-                                ...contactDetails,
-                                phone: e.target.value,
-                              })
-                            }
-                            className="h-9 sm:h-10 text-sm"
-                            required
-                          />
-                        </div>
-                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="flex justify-center pt-4 sm:pt-6">
-                  <Button
-                    size="lg"
-                    className="px-6 sm:px-8 h-10 sm:h-11"
-                    onClick={handleSubmitQuote}
-                    disabled={
-                      submitting ||
-                      !contactDetails.name.trim() ||
-                      !contactDetails.email.trim() ||
-                      !contactDetails.phone.trim()
-                    }
-                  >
-                    {submitting ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Submitting...
-                      </>
-                    ) : (
-                      "Get Quote"
-                    )}
-                  </Button>
-                </div>
-              </>
-            )}
-            {submitted && (
-              <div className="flex justify-center pt-4 sm:pt-6">
-                <div className="text-center space-y-3 sm:space-y-4 px-4">
-                  <div className="w-12 sm:w-16 h-12 sm:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                    <Check className="w-6 sm:w-8 h-6 sm:h-8 text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-semibold text-green-600">
-                      Quote Submitted!
-                    </h3>
-                    <p className="text-sm sm:text-base text-muted-foreground mt-2">
-                      Thank you, {contactDetails.name}! We'll contact you soon
-                      at {contactDetails.email}.
-                    </p>
-                  </div>
-                </div>
+                )}
               </div>
-            )}
-          </div>
-        </div>
-      )}
+            </div>
+          )}
+        </motion.div>
+      </AnimatePresence>
+
       {/* Navigation Buttons */}
       <div className="flex items-center justify-between mt-6 sm:mt-8 pt-4 sm:pt-6 border-t">
         <Button
           variant="outline"
           onClick={handleBack}
           disabled={currentStep === 1 || submitted}
-          className="gap-1 sm:gap-2 h-9 sm:h-10 px-3 sm:px-4"
+          className="gap-1.5 sm:gap-2 h-10 sm:h-11 px-4 sm:px-5 rounded-xl border-gray-200 hover:bg-gray-50 transition-all"
         >
           <ChevronLeft className="w-4 h-4" />
           <span className="hidden sm:inline">Back</span>
         </Button>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-muted-foreground hidden sm:inline">
+            Step {currentStep} of {STEPS.length}
+          </span>
           {currentStep < 8 && (
             <Button
               onClick={handleNext}
               disabled={!canProceed()}
-              className="gap-1 sm:gap-2 h-9 sm:h-10 px-3 sm:px-4"
+              className="gap-1.5 sm:gap-2 h-10 sm:h-11 px-5 sm:px-6 rounded-xl bg-primary hover:bg-primary/90 shadow-md shadow-primary/20 transition-all hover:shadow-lg hover:shadow-primary/30"
             >
               <span className="hidden sm:inline">Next</span>
               <ChevronRight className="w-4 h-4" />

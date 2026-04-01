@@ -70,7 +70,7 @@ export default function AdminLogin() {
             <Calculator className="w-8 h-8 text-primary-foreground" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">
-            QuotePilot Admin
+            Infinity Glazing Admin
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Enter your credentials to access the admin panel
@@ -90,7 +90,7 @@ export default function AdminLogin() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="admin@quotepilot.com"
+                    placeholder="admin@infinityglazing.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10 h-11"

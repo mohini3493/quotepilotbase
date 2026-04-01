@@ -80,7 +80,7 @@ export default function AdminSidebar() {
           <div className="flex flex-col items-center gap-2">
             <img
               src="/quote-logo1.png"
-              alt="QuotePilot Logo"
+              alt="Infinity Glazing Logo"
               className="h-12"
             />
             {/* <span className="text-sm font-semibold text-sidebar-foreground">

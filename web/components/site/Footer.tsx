@@ -16,8 +16,14 @@ import {
 
 export default function Footer() {
   return (
-    <footer className="bg-gradient-to-br from-background via-muted/20 to-primary/5 border-t font-sans">
-      <div className="max-w-7xl mx-auto px-6 py-16">
+    <footer className="relative bg-gradient-to-b from-slate-50 via-white to-slate-100 border-t font-sans overflow-hidden">
+      {/* Clean light background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-100/30 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-sky-100/25 rounded-full blur-[100px]" />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-16 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Logo & Company Info */}
           <motion.div
@@ -31,8 +37,8 @@ export default function Footer() {
             <div className="flex items-center">
               <img
                 src="/quote-logo1.png"
-                alt="QuotePilot Logo"
-                className="w-25"
+                alt="Infinity Glazing Logo"
+                className="w-48"
               />
             </div>
 
@@ -50,7 +56,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center space-x-3 text-muted-foreground">
                 <Mail className="w-4 h-4 text-primary flex-shrink-0" />
-                <span className="text-sm">hello@quotepilot.com</span>
+                <span className="text-sm">hello@infinityglazing.com</span>
               </div>
             </div>
           </motion.div>
@@ -141,7 +147,7 @@ export default function Footer() {
           transition={{ duration: 0.6, delay: 0.6 }}
         >
           <div className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} QuotePilot. All rights reserved.
+            © {new Date().getFullYear()} Infinity Glazing. All rights reserved.
           </div>
           <div className="flex space-x-6 text-sm text-muted-foreground">
             <Link href="#" className="hover:text-primary transition-colors">

@@ -8,9 +8,9 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "QuotePilot – Smart Quoting Engine",
+  title: "Infinity Glazing – Smart Quoting Engine",
   description:
-    "QuotePilot is a rule-based quoting engine that helps businesses generate instant, accurate quotes using dynamic questions and pricing logic.",
+    "Infinity Glazing is a rule-based quoting engine that helps businesses generate instant, accurate quotes using dynamic questions and pricing logic.",
   keywords: [
     "quoting engine",
     "price calculator",
@@ -19,16 +19,17 @@ export const metadata = {
     "saas quoting tool",
   ],
   openGraph: {
-    title: "QuotePilot – Smart Quoting Engine",
-    description: "Build dynamic quote flows and pricing rules with QuotePilot.",
-    url: "https://quotepilot.app",
-    siteName: "QuotePilot",
+    title: "Infinity Glazing – Smart Quoting Engine",
+    description:
+      "Build dynamic quote flows and pricing rules with Infinity Glazing.",
+    url: "https://infinityglazing.com",
+    siteName: "Infinity Glazing",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "QuotePilot",
+        alt: "Infinity Glazing",
       },
     ],
     locale: "en_US",

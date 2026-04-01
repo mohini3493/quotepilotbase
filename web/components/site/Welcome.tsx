@@ -14,7 +14,10 @@ const stats = [
 
 export default function Welcome() {
   return (
-    <section className="py-24 bg-gradient-to-br from-background via-primary/5 to-secondary/10 relative overflow-hidden font-sans">
+    <section
+      id="welcome"
+      className="py-24 bg-gradient-to-br from-background via-primary/5 to-secondary/10 relative overflow-hidden font-sans"
+    >
       {/* Background Elements */}
       <div className="absolute inset-0">
         <motion.div
@@ -64,8 +67,7 @@ export default function Welcome() {
                 <div
                   className="w-full h-full bg-cover bg-center"
                   style={{
-                    backgroundImage:
-                      "url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?q=80&w=2070&auto=format&fit=crop')",
+                    backgroundImage: "url('/welcome-glazing.jpg')",
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent" />
@@ -184,7 +186,9 @@ export default function Welcome() {
               transition={{ duration: 0.8, delay: 0.5 }}
             >
               <p className="text-xl text-muted-foreground leading-relaxed">
-                <span className="font-semibold text-primary">QuotePilot</span>{" "}
+                <span className="font-semibold text-primary">
+                  Infinity Glazing
+                </span>{" "}
                 transforms how construction and renovation professionals create
                 accurate, detailed quotes. Our intelligent platform combines
                 cutting-edge technology with industry expertise.

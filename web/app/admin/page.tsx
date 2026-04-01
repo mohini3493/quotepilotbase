@@ -137,7 +137,7 @@ export default function AdminDashboard() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">
-            Welcome back! Here's what's happening with QuotePilot.
+            Welcome back! Here's what's happening with Infinity Glazing.
           </p>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -152,18 +152,18 @@ export default function AdminDashboard() {
           <CardContent className="p-6 flex flex-colgap-4">
             <div>
               <h2 className="text-2xl font-bold mb-2">
-                Hi, QuotePilot Admin 👋
+                Hi, Infinity Glazing Admin 👋
               </h2>
               <p className="text-muted-foreground">
                 Manage your products, view analytics, and oversee customer
                 interactions all in one place.
               </p>
               <Link
-                href="mailto:admin@quotepilot.com"
+                href="mailto:admin@infinityglazing.com"
                 className="flex items-center gap-3 rounded-lg py-3 font-medium group"
               >
                 <Briefcase className="w-5 h-5 flex-shrink-0 text-primary" />
-                <span className="truncate">admin@quotepilot.com</span>
+                <span className="truncate">admin@infinityglazing.com</span>
               </Link>
             </div>
             <img

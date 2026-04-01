@@ -21,9 +21,9 @@ import clsx from "clsx";
 
 const menuItems = [
   { label: "Home", href: "/" },
+  { label: "Welcome", href: "#welcome" },
   { label: "Features", href: "#features" },
-  { label: "Products", href: "/products" },
-  { label: "Quote", href: "/quote" },
+  { label: "Products", href: "#products" },
   { label: "Testimonials", href: "#testimonials" },
   { label: "FAQ", href: "#faq" },
 ];
@@ -161,7 +161,7 @@ export default function Header() {
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Mail className="w-4 h-4" />
-                <span>info@quotepilot.com</span>
+                <span>info@infinityglazing.com</span>
               </div>
               <div className="flex items-center gap-3 pt-2">
                 <Link

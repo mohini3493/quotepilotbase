@@ -50,7 +50,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.get("/", (req, res) => {
-  res.json({ message: "QuotePilot API running 🚀" });
+  res.json({ message: "Infinity Glazing API running 🚀" });
 });
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });

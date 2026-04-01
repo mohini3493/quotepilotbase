@@ -36,7 +36,7 @@ const testimonials = [
     name: "Sarah Johnson",
     role: "Project Manager",
     quote:
-      "QuotePilot completely transformed our workflow with its innovative approach to project estimation",
+      "Infinity Glazing completely transformed our workflow with its innovative approach to project estimation",
     rating: 5,
     image:
       "https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=150&h=150&fit=crop&crop=face&auto=format",
@@ -119,7 +119,10 @@ export default function Testimonials() {
   };
 
   return (
-    <section className="py-24 bg-gradient-to-br from-background via-muted/20 to-primary/5 relative overflow-hidden font-sans">
+    <section
+      className="py-24 bg-gradient-to-br from-background via-muted/20 to-primary/5 relative overflow-hidden font-sans"
+      id="testimonials"
+    >
       {/* Background Decorations */}
       <div className="absolute inset-0 pointer-events-none">
         <motion.div
