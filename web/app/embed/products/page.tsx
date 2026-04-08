@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 type Product = {
   id: number;
@@ -10,22 +11,9 @@ type Product = {
   slug: string;
 };
 
-function ProductCard({
-  product,
-  baseUrl,
-}: {
-  product: Product;
-  baseUrl: string;
-}) {
-  const productUrl = `${baseUrl}/products/${product.slug}`;
-
+function ProductCard({ product }: { product: Product }) {
   return (
-    <a
-      href={productUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block h-full"
-    >
+    <Link href={`/embed/products/${product.slug}`} className="block h-full">
       <div className="group relative h-full rounded-3xl overflow-hidden cursor-pointer">
         <div className="relative h-[420px] sm:h-[440px] overflow-hidden">
           <img
@@ -59,7 +47,7 @@ function ProductCard({
           </div>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }
 
@@ -70,9 +58,6 @@ export default async function EmbedProductsPage({
 }) {
   const params = await searchParams;
   const API_URL = process.env.NEXT_PUBLIC_API_URL!;
-  const SITE_URL =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    API_URL.replace("/api", "").replace(":4000", ":3000");
 
   // Allow overriding columns via query param (default: 3)
   const cols = Number(params.cols) || 3;
@@ -125,7 +110,7 @@ export default async function EmbedProductsPage({
                   animationFillMode: "both",
                 }}
               >
-                <ProductCard product={product} baseUrl={SITE_URL} />
+                <ProductCard product={product} />
               </div>
             ))}
           </div>
