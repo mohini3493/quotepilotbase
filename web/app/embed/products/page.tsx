@@ -1,4 +1,4 @@
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 type Product = {
   id: number;
@@ -70,7 +70,9 @@ export default async function EmbedProductsPage({
 }) {
   const params = await searchParams;
   const API_URL = process.env.NEXT_PUBLIC_API_URL!;
-  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || API_URL.replace("/api", "").replace(":4000", ":3000");
+  const SITE_URL =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    API_URL.replace("/api", "").replace(":4000", ":3000");
 
   // Allow overriding columns via query param (default: 3)
   const cols = Number(params.cols) || 3;
@@ -110,37 +112,8 @@ export default async function EmbedProductsPage({
     if (!activeProducts.length) return <p>No products available.</p>;
 
     return (
-      <section className="py-24 relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-50/80">
-        {/* Background decoration */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-200/40 rounded-full blur-[120px]" />
-          <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-emerald-100/50 rounded-full blur-[100px]" />
-          <div
-            className="absolute inset-0 opacity-[0.04]"
-            style={{
-              backgroundImage:
-                "linear-gradient(to right, #10b981 1px, transparent 1px), linear-gradient(to bottom, #10b981 1px, transparent 1px)",
-              backgroundSize: "80px 80px",
-            }}
-          />
-        </div>
-
+      <section className="py-6 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          {/* Header */}
-          <div className="text-center mb-16 space-y-4">
-            <div className="inline-flex items-center gap-2 bg-emerald-500/10 text-emerald-600 px-4 py-2 rounded-full text-sm font-medium border border-emerald-500/20 mb-4">
-              <Sparkles className="w-4 h-4" />
-              Discover Our Solutions
-            </div>
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900">
-              Our <span className="text-emerald-500">Products</span>
-            </h2>
-            <p className="text-lg text-slate-500 max-w-2xl mx-auto">
-              Explore our range of premium glazing solutions designed to
-              transform your space with style and efficiency.
-            </p>
-          </div>
-
           {/* Grid */}
           <div className={`grid ${colsClass} gap-5 lg:gap-6`}>
             {activeProducts.map((product, index) => (

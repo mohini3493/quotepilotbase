@@ -42,14 +42,18 @@ You can embed the product cards widget on any external website using one of the 
 
 ### Option 2 — With Custom Options
 
-| Attribute | Description | Default |
-|-----------|-------------|---------|
-| `data-cols` | Number of columns (`1`, `2`, or `3`) | `3` |
-| `data-target` | Custom container element ID | `quotepilot-products` |
+| Attribute     | Description                          | Default               |
+| ------------- | ------------------------------------ | --------------------- |
+| `data-cols`   | Number of columns (`1`, `2`, or `3`) | `3`                   |
+| `data-target` | Custom container element ID          | `quotepilot-products` |
 
 ```html
 <div id="my-container"></div>
-<script src="https://your-domain.com/embed.js" data-cols="2" data-target="my-container"></script>
+<script
+  src="https://your-domain.com/embed.js"
+  data-cols="2"
+  data-target="my-container"
+></script>
 ```
 
 ### Option 3 — Direct Iframe

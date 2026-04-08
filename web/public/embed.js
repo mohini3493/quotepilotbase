@@ -18,8 +18,7 @@
 
   // Find the current script tag to read data attributes
   var scripts = document.getElementsByTagName("script");
-  var currentScript =
-    document.currentScript || scripts[scripts.length - 1];
+  var currentScript = document.currentScript || scripts[scripts.length - 1];
 
   var cols = currentScript.getAttribute("data-cols") || "3";
   var targetId =
@@ -56,7 +55,7 @@
   iframe.setAttribute("frameborder", "0");
   iframe.setAttribute(
     "allow",
-    "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
+    "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope",
   );
   iframe.title = "QuotePilot Products";
 
