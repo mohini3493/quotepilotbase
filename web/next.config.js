@@ -15,6 +15,19 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
+  // Allow embed pages to be loaded in iframes from any origin
+  async headers() {
+    return [
+      {
+        source: "/embed/:path*",
+        headers: [
+          { key: "X-Frame-Options", value: "ALLOWALL" },
+          { key: "Content-Security-Policy", value: "frame-ancestors *" },
+        ],
+      },
+    ];
+  },
+
   // 🔥 VERY IMPORTANT: API PROXY (FIXES COOKIE + CORS ISSUE)
   // Note: Some routes are handled by Next.js API routes for proper cookie handling
   async rewrites() {

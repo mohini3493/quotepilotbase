@@ -29,6 +29,48 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Embed Product Cards on Any Website
+
+You can embed the product cards widget on any external website using one of the methods below. Replace `your-domain.com` with your actual deployed domain (e.g. `infinityglazing.com`).
+
+### Option 1 — Script Embed (Recommended)
+
+```html
+<div id="quotepilot-products"></div>
+<script src="https://your-domain.com/embed.js"></script>
+```
+
+### Option 2 — With Custom Options
+
+| Attribute | Description | Default |
+|-----------|-------------|---------|
+| `data-cols` | Number of columns (`1`, `2`, or `3`) | `3` |
+| `data-target` | Custom container element ID | `quotepilot-products` |
+
+```html
+<div id="my-container"></div>
+<script src="https://your-domain.com/embed.js" data-cols="2" data-target="my-container"></script>
+```
+
+### Option 3 — Direct Iframe
+
+```html
+<iframe
+  src="https://your-domain.com/embed/products?cols=3"
+  style="width:100%; min-height:600px; border:none;"
+  scrolling="no"
+></iframe>
+```
+
+### Notes
+
+- Clicking **Get Quote** opens the product page in a new tab.
+- The iframe auto-resizes to fit content (no scrollbars).
+- All styles are self-contained — no CSS conflicts with the host site.
+- Set `NEXT_PUBLIC_SITE_URL` in your environment if the auto-detected URL is incorrect.
+
+---
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
