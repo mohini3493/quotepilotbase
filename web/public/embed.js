@@ -48,10 +48,11 @@
   iframe.src = embedUrl;
   iframe.style.width = "100%";
   iframe.style.border = "none";
-  iframe.style.overflow = "hidden";
+  iframe.style.overflow = "auto";
   iframe.style.minHeight = "600px";
+  iframe.style.maxHeight = "90vh";
   iframe.style.colorScheme = "normal";
-  iframe.setAttribute("scrolling", "no");
+  iframe.setAttribute("scrolling", "auto");
   iframe.setAttribute("frameborder", "0");
   iframe.setAttribute(
     "allow",
