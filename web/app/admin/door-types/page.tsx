@@ -248,7 +248,7 @@ export default function DoorTypesPage() {
       <div className="p-4">
         <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
           <p className="text-destructive font-medium">
-            Error loading door types
+            Error loading product types
           </p>
           <p className="text-sm text-muted-foreground mt-1">{error}</p>
           <Button
@@ -268,15 +268,15 @@ export default function DoorTypesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Door Types</h1>
+          <h1 className="text-2xl font-semibold">Product Types</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Manage door types for your products
+            Manage product types for your products
           </p>
         </div>
         <Button asChild>
           <Link href="/admin/door-types/new">
             <Plus className="w-4 h-4 mr-2" />
-            Add Door Type
+            Add Product Type
           </Link>
         </Button>
       </div>
@@ -284,11 +284,11 @@ export default function DoorTypesPage() {
       {doorTypes.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <p className="text-muted-foreground mb-4">No door types found</p>
+            <p className="text-muted-foreground mb-4">No product types found</p>
             <Button asChild>
               <Link href="/admin/door-types/new">
                 <Plus className="w-4 h-4 mr-2" />
-                Add Your First Door Type
+                Add Your First Product Type
               </Link>
             </Button>
           </CardContent>

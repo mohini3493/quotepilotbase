@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useRouter } from "next/navigation";
 import ImageUpload from "@/components/admin/ImageUpload";
+
+type DoorType = { id: number; name: string };
 
 export default function AddPanelStylePage() {
   const router = useRouter();
@@ -13,8 +15,20 @@ export default function AddPanelStylePage() {
     name: "",
     image: "",
     isActive: true,
+    doorTypeId: "",
   });
   const [saving, setSaving] = useState(false);
+  const [doorTypes, setDoorTypes] = useState<DoorType[]>([]);
+
+  useEffect(() => {
+    fetch(`/api/door-types/admin/all`, { credentials: "include" })
+      .then((res) => res.json())
+      .then((data) => {
+        const arr = Array.isArray(data) ? data : data.data || [];
+        setDoorTypes(arr.filter((d: any) => d.is_active ?? d.isActive));
+      })
+      .catch(() => {});
+  }, []);
 
   async function savePanelStyle() {
     setSaving(true);
@@ -42,6 +56,29 @@ export default function AddPanelStylePage() {
       <h1 className="text-2xl font-semibold">Add New Panel Style</h1>
 
       <div className="space-y-4">
+        <div>
+          <label className="text-sm font-medium mb-2 block">
+            Select Product Type
+          </label>
+          <select
+            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            value={form.doorTypeId || ""}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                doorTypeId: e.target.value ? Number(e.target.value) : "",
+              })
+            }
+          >
+            <option value="">-- Select a Product Type --</option>
+            {doorTypes.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div>
           <label className="text-sm font-medium mb-2 block">Name</label>
           <Input

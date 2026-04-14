@@ -99,7 +99,7 @@ const STEP_ICONS = [
 ];
 
 const STEPS = [
-  { id: 1, title: "Door Type", description: "Choose your door type" },
+  { id: 1, title: "Product Type", description: "Choose your product type" },
   { id: 2, title: "Panel Style", description: "Select panel style" },
   { id: 3, title: "Dimensions", description: "Pick dimensions" },
   { id: 4, title: "Postcode", description: "Your location" },
@@ -158,7 +158,9 @@ export default function ProductConfigurator({
           internalColorsRes,
           handleColorsRes,
         ] = await Promise.all([
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/door-types`),
+          fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/door-types${productId ? `?product_id=${productId}` : ""}`,
+          ),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/panel-styles`),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dimensions`),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/postcodes`),
@@ -205,12 +207,41 @@ export default function ProductConfigurator({
     loadData();
   }, []);
 
+  // Reload panel styles when door type changes
+  useEffect(() => {
+    if (!selection.doorType) return;
+    const doorTypeId = selection.doorType.id;
+    fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/panel-styles?door_type_id=${doorTypeId}`,
+    )
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        const arr = Array.isArray(data) ? data : data.data || [];
+        setPanelStyles(arr);
+        // Clear panel style selection if it no longer matches
+        if (
+          selection.panelStyle &&
+          !arr.some((s: PanelStyle) => s.id === selection.panelStyle?.id)
+        ) {
+          setSelection((prev) => ({ ...prev, panelStyle: null }));
+        }
+        // Auto-advance: skip to Step 3 if no panel styles, otherwise go to Step 2
+        setCurrentStep((s) => {
+          if (s <= 2) return arr.length === 0 ? 3 : 2;
+          return s;
+        });
+      })
+      .catch(() => {});
+  }, [selection.doorType]);
+
+  const skipPanelStep = panelStyles.length === 0 && selection.doorType !== null;
+
   const canProceed = () => {
     switch (currentStep) {
       case 1:
         return selection.doorType !== null;
       case 2:
-        return selection.panelStyle !== null;
+        return skipPanelStep || selection.panelStyle !== null;
       case 3:
         return selection.dimension !== null;
       case 4:
@@ -271,37 +302,44 @@ export default function ProductConfigurator({
 
   const handleNext = () => {
     if (currentStep < STEPS.length && canProceed()) {
-      setCurrentStep(currentStep + 1);
+      let next = currentStep + 1;
+      if (next === 2 && skipPanelStep) next = 3;
+      setCurrentStep(next);
     }
   };
 
   const handleBack = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+      let prev = currentStep - 1;
+      if (prev === 2 && skipPanelStep) prev = 1;
+      setCurrentStep(prev);
     }
   };
+
+  const panelStepOk = skipPanelStep || selection.panelStyle;
 
   const handleStepClick = (step: number) => {
     // Allow going back to previous steps or current step
     if (step <= currentStep) {
+      if (step === 2 && skipPanelStep) return;
       setCurrentStep(step);
     }
     // Allow going forward only if all previous steps are complete
-    else if (step === 2 && selection.doorType) {
+    else if (step === 2 && selection.doorType && !skipPanelStep) {
       setCurrentStep(step);
-    } else if (step === 3 && selection.doorType && selection.panelStyle) {
+    } else if (step === 3 && selection.doorType && panelStepOk) {
       setCurrentStep(step);
     } else if (
       step === 4 &&
       selection.doorType &&
-      selection.panelStyle &&
+      panelStepOk &&
       selection.dimension
     ) {
       setCurrentStep(step);
     } else if (
       step === 5 &&
       selection.doorType &&
-      selection.panelStyle &&
+      panelStepOk &&
       selection.dimension &&
       selection.postcode
     ) {
@@ -309,7 +347,7 @@ export default function ProductConfigurator({
     } else if (
       step === 6 &&
       selection.doorType &&
-      selection.panelStyle &&
+      panelStepOk &&
       selection.dimension &&
       selection.postcode &&
       selection.externalColor
@@ -318,7 +356,7 @@ export default function ProductConfigurator({
     } else if (
       step === 7 &&
       selection.doorType &&
-      selection.panelStyle &&
+      panelStepOk &&
       selection.dimension &&
       selection.postcode &&
       selection.externalColor &&
@@ -328,7 +366,7 @@ export default function ProductConfigurator({
     } else if (
       step === 8 &&
       selection.doorType &&
-      selection.panelStyle &&
+      panelStepOk &&
       selection.dimension &&
       selection.postcode &&
       selection.externalColor &&
@@ -470,13 +508,13 @@ export default function ProductConfigurator({
           exit={{ opacity: 0, x: -20 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
         >
-          {/* Step 1: Door Type */}
+          {/* Step 1: Product Type */}
           {currentStep === 1 && (
             <div>
               <div className="text-center mb-4">
-                <h2 className="text-2xl font-bold">Choose Door Type</h2>
+                <h2 className="text-2xl font-bold">Choose Product Type</h2>
                 <p className="text-muted-foreground mt-1">
-                  Select your door type
+                  Select your product type
                 </p>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -489,9 +527,9 @@ export default function ProductConfigurator({
                         ? "ring-2 ring-primary scale-105 shadow-primary/20"
                         : "hover:ring-1 hover:ring-primary/40",
                     )}
-                    onClick={() =>
-                      setSelection({ ...selection, doorType: type })
-                    }
+                    onClick={() => {
+                      setSelection({ ...selection, doorType: type });
+                    }}
                     style={{ marginTop: 0, marginBottom: 0 }}
                   >
                     <div className="w-full flex-1 flex items-center justify-center">
@@ -540,9 +578,14 @@ export default function ProductConfigurator({
                         ? "ring-2 ring-primary scale-105 shadow-primary/20"
                         : "hover:ring-1 hover:ring-primary/40",
                     )}
-                    onClick={() =>
-                      setSelection({ ...selection, panelStyle: style })
-                    }
+                    onClick={() => {
+                      setSelection({ ...selection, panelStyle: style });
+                      setTimeout(
+                        () =>
+                          setCurrentStep((s) => Math.min(s + 1, STEPS.length)),
+                        300,
+                      );
+                    }}
                     style={{ marginTop: 0, marginBottom: 0 }}
                   >
                     <div className="w-full flex-1 flex items-center justify-center">
@@ -660,9 +703,14 @@ export default function ProductConfigurator({
                         ? "ring-2 ring-primary scale-105 shadow-primary/20"
                         : "hover:ring-1 hover:ring-primary/40",
                     )}
-                    onClick={() =>
-                      setSelection({ ...selection, externalColor: color })
-                    }
+                    onClick={() => {
+                      setSelection({ ...selection, externalColor: color });
+                      setTimeout(
+                        () =>
+                          setCurrentStep((s) => Math.min(s + 1, STEPS.length)),
+                        300,
+                      );
+                    }}
                     style={{ marginTop: 0, marginBottom: 0 }}
                   >
                     <div className="w-full flex-1 flex items-center justify-center">
@@ -719,9 +767,14 @@ export default function ProductConfigurator({
                         ? "ring-2 ring-primary scale-105 shadow-primary/20"
                         : "hover:ring-1 hover:ring-primary/40",
                     )}
-                    onClick={() =>
-                      setSelection({ ...selection, internalColor: color })
-                    }
+                    onClick={() => {
+                      setSelection({ ...selection, internalColor: color });
+                      setTimeout(
+                        () =>
+                          setCurrentStep((s) => Math.min(s + 1, STEPS.length)),
+                        300,
+                      );
+                    }}
                     style={{ marginTop: 0, marginBottom: 0 }}
                   >
                     <div className="w-full flex-1 flex items-center justify-center">
@@ -778,9 +831,14 @@ export default function ProductConfigurator({
                         ? "ring-2 ring-primary scale-105 shadow-primary/20"
                         : "hover:ring-1 hover:ring-primary/40",
                     )}
-                    onClick={() =>
-                      setSelection({ ...selection, handleColor: color })
-                    }
+                    onClick={() => {
+                      setSelection({ ...selection, handleColor: color });
+                      setTimeout(
+                        () =>
+                          setCurrentStep((s) => Math.min(s + 1, STEPS.length)),
+                        300,
+                      );
+                    }}
                     style={{ marginTop: 0, marginBottom: 0 }}
                   >
                     <div className="w-full flex-1 flex items-center justify-center">
@@ -832,13 +890,13 @@ export default function ProductConfigurator({
                           </h2>
                           <Card>
                             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2">
-                              {selection.panelStyle && (
+                              {selection.doorType && (
                                 <img
                                   src={
-                                    selection.panelStyle.image ||
+                                    selection.doorType.image ||
                                     "/placeholder.jpg"
                                   }
-                                  alt={selection.panelStyle.name}
+                                  alt={selection.doorType.name}
                                   className="w-full h-64 object-contain bg-gray-50"
                                 />
                               )}
@@ -848,38 +906,40 @@ export default function ProductConfigurator({
                                 </p>
                                 <ul>
                                   <li className="flex items-center gap-2 mt-3">
-                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">
                                       <DoorOpen className="w-5 h-5 flex-shrink-0" />{" "}
-                                      Door Type
+                                      Product Type
                                     </h3>{" "}
                                     -
                                     {selection.doorType && (
-                                      <p className="font-medium text-[10px] sm:text-xs truncate">
+                                      <p className="font-medium text-[10px] sm:text-xs">
                                         {selection.doorType.name}
                                       </p>
                                     )}
                                   </li>
+                                  {!skipPanelStep && (
+                                    <li className="flex items-center gap-2 mt-3">
+                                      <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">
+                                        <PanelTop className="w-5 h-5 flex-shrink-0" />{" "}
+                                        Panel Style
+                                      </h3>{" "}
+                                      -
+                                      {selection.panelStyle && (
+                                        <p className="font-medium text-[10px] sm:text-xs">
+                                          {selection.panelStyle.name}
+                                        </p>
+                                      )}
+                                    </li>
+                                  )}
                                   <li className="flex items-center gap-2 mt-3">
-                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
-                                      <PanelTop className="w-5 h-5 flex-shrink-0" />{" "}
-                                      Panel Style
-                                    </h3>{" "}
-                                    -
-                                    {selection.panelStyle && (
-                                      <p className="font-medium text-[10px] sm:text-xs truncate">
-                                        {selection.panelStyle.name}
-                                      </p>
-                                    )}
-                                  </li>
-                                  <li className="flex items-center gap-2 mt-3">
-                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">
                                       <Ruler className="w-5 h-5 flex-shrink-0" />{" "}
                                       Dimensions
                                     </h3>{" "}
                                     -
                                     {selection.dimension && (
                                       <>
-                                        <p className="font-medium text-[10px] sm:text-xs truncate">
+                                        <p className="font-medium text-[10px] sm:text-xs">
                                           {selection.dimension.width} x{" "}
                                           {selection.dimension.height}
                                         </p>
@@ -890,49 +950,49 @@ export default function ProductConfigurator({
                                     )}
                                   </li>
                                   <li className="flex items-center gap-2 mt-3">
-                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">
                                       <MapPin className="w-5 h-5 flex-shrink-0" />{" "}
                                       Postcode
                                     </h3>{" "}
                                     -
                                     {selection.postcode && (
-                                      <p className="font-medium text-[10px] sm:text-xs truncate">
+                                      <p className="font-medium text-[10px] sm:text-xs">
                                         {selection.postcode.code}
                                       </p>
                                     )}
                                   </li>
                                   <li className="flex items-center gap-2 mt-3">
-                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">
                                       <Palette className="w-5 h-5 flex-shrink-0" />{" "}
                                       External Color
                                     </h3>{" "}
                                     -
                                     {selection.externalColor && (
-                                      <p className="font-medium text-[10px] sm:text-xs text-center truncate">
+                                      <p className="font-medium text-[10px] sm:text-xs">
                                         {selection.externalColor.name}
                                       </p>
                                     )}
                                   </li>
                                   <li className="flex items-center gap-2 mt-3">
-                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">
                                       <PaintBucket className="w-5 h-5 flex-shrink-0" />{" "}
                                       Internal Color
                                     </h3>{" "}
                                     -
                                     {selection.internalColor && (
-                                      <p className="font-medium text-[10px] sm:text-xs text-center truncate">
+                                      <p className="font-medium text-[10px] sm:text-xs">
                                         {selection.internalColor.name}
                                       </p>
                                     )}
                                   </li>
                                   <li className="flex items-center gap-2 mt-3">
-                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs truncate flex items-center gap-1">
+                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">
                                       <Grip className="w-5 h-5 flex-shrink-0" />{" "}
                                       Handle Color
                                     </h3>{" "}
                                     -
                                     {selection.handleColor && (
-                                      <p className="font-medium text-[10px] sm:text-xs text-center truncate">
+                                      <p className="font-medium text-[10px] sm:text-xs">
                                         {selection.handleColor.name}
                                       </p>
                                     )}

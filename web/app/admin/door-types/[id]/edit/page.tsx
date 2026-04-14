@@ -4,16 +4,17 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import ImageUpload from "@/components/admin/ImageUpload";
 
 type DoorType = {
   name: string;
-  description: string;
   image: string;
   isActive: boolean;
+  productId: number | string;
 };
+
+type Product = { id: number; title: string };
 
 export default function EditDoorTypePage() {
   const { id } = useParams<{ id: string }>();
@@ -21,6 +22,17 @@ export default function EditDoorTypePage() {
   const [form, setForm] = useState<DoorType | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    fetch(`/api/products/admin/all`, { credentials: "include" })
+      .then((res) => res.json())
+      .then((data) => {
+        const arr = Array.isArray(data) ? data : data.data || [];
+        setProducts(arr.filter((p: any) => p.is_active ?? p.isActive));
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!id) return;
@@ -36,6 +48,7 @@ export default function EditDoorTypePage() {
         setForm({
           ...data,
           isActive: data.is_active ?? data.isActive ?? true,
+          productId: data.product_id ?? data.productId ?? "",
         });
       })
       .catch(() => setError("Failed to load door type"));
@@ -64,22 +77,37 @@ export default function EditDoorTypePage() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <h1 className="text-2xl font-semibold">Edit Door Type</h1>
+      <h1 className="text-2xl font-semibold">Edit Product Type</h1>
 
       <div className="space-y-4">
+        <div>
+          <label className="text-sm font-medium mb-2 block">
+            Select Product
+          </label>
+          <select
+            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            value={form.productId || ""}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                productId: e.target.value ? Number(e.target.value) : "",
+              })
+            }
+          >
+            <option value="">-- Select a Product --</option>
+            {products.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.title}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div>
           <label className="text-sm font-medium mb-2 block">Name</label>
           <Input
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-medium mb-2 block">Description</label>
-          <Textarea
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
           />
         </div>
 

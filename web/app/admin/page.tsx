@@ -176,7 +176,7 @@ export default function AdminDashboard() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <StatsCard
-            title="Total Door Types"
+            title="Total Product Types"
             value="1,234"
             change="+12%"
             changeType="positive"

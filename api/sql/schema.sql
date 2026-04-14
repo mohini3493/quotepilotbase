@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS door_types (
   name TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
   image TEXT,
+  product_id INT REFERENCES products(id) ON DELETE SET NULL,
   "order" INT DEFAULT 0,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP DEFAULT now()
@@ -43,6 +44,7 @@ CREATE TABLE IF NOT EXISTS panel_styles (
   name TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
   image TEXT,
+  door_type_id INT REFERENCES door_types(id) ON DELETE SET NULL,
   "order" INT DEFAULT 0,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP DEFAULT now()

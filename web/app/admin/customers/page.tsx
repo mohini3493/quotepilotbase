@@ -235,7 +235,7 @@ export default function CustomersPage() {
                       {selectedCustomer.doorType && (
                         <div className="bg-muted/50 rounded-lg p-3">
                           <p className="text-xs text-muted-foreground uppercase">
-                            Door Type
+                            Product Type
                           </p>
                           <p className="font-medium text-sm">
                             {selectedCustomer.doorType}

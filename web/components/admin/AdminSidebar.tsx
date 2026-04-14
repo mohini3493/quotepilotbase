@@ -32,7 +32,7 @@ const productLinks = [
 ];
 
 const doorTypeLinks = [
-  { name: "Add Door Type", href: "/admin/door-types/new", icon: Plus },
+  { name: "Add Product Type", href: "/admin/door-types/new", icon: Plus },
 ];
 
 const panelStyleLinks = [
@@ -138,13 +138,13 @@ export default function AdminSidebar() {
                 );
               })}
             </div>
-            {/* Door Types Section */}
+            {/* Product Types Section */}
             <Link
               href="/admin/door-types"
               className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
             >
               <DoorOpen className="w-5 h-5 flex-shrink-0" />
-              <span className="truncate">Door Types</span>
+              <span className="truncate">Product Types</span>
             </Link>
             <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
               {doorTypeLinks.map((link) => {

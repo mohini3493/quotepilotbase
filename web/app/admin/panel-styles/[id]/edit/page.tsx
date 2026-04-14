@@ -4,16 +4,17 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import ImageUpload from "@/components/admin/ImageUpload";
 
 type PanelStyle = {
   name: string;
-  description: string;
   image: string;
   isActive: boolean;
+  doorTypeId: number | string;
 };
+
+type DoorType = { id: number; name: string };
 
 export default function EditPanelStylePage() {
   const { id } = useParams<{ id: string }>();
@@ -21,6 +22,17 @@ export default function EditPanelStylePage() {
   const [form, setForm] = useState<PanelStyle | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [doorTypes, setDoorTypes] = useState<DoorType[]>([]);
+
+  useEffect(() => {
+    fetch(`/api/door-types/admin/all`, { credentials: "include" })
+      .then((res) => res.json())
+      .then((data) => {
+        const arr = Array.isArray(data) ? data : data.data || [];
+        setDoorTypes(arr.filter((d: any) => d.is_active ?? d.isActive));
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!id) return;
@@ -36,6 +48,7 @@ export default function EditPanelStylePage() {
         setForm({
           ...data,
           isActive: data.is_active ?? data.isActive ?? true,
+          doorTypeId: data.door_type_id ?? data.doorTypeId ?? "",
         });
       })
       .catch(() => setError("Failed to load panel style"));
@@ -68,18 +81,33 @@ export default function EditPanelStylePage() {
 
       <div className="space-y-4">
         <div>
+          <label className="text-sm font-medium mb-2 block">
+            Select Product Type
+          </label>
+          <select
+            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            value={form.doorTypeId || ""}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                doorTypeId: e.target.value ? Number(e.target.value) : "",
+              })
+            }
+          >
+            <option value="">-- Select a Product Type --</option>
+            {doorTypes.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
           <label className="text-sm font-medium mb-2 block">Name</label>
           <Input
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-medium mb-2 block">Description</label>
-          <Textarea
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
           />
         </div>
 

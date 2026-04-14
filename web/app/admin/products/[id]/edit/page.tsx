@@ -12,8 +12,6 @@ type Product = {
   title: string;
   description: string;
   image: string;
-  buttonText: string;
-  buttonLink: string;
   isActive: boolean;
 };
 
@@ -22,6 +20,7 @@ export default function EditProductPage() {
   const router = useRouter();
   const [form, setForm] = useState<Product | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -47,59 +46,76 @@ export default function EditProductPage() {
   if (!form) return <p>Loading...</p>;
 
   async function save() {
-    await fetch(`/api/products/${id}`, {
-      method: "PUT",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    setSaving(true);
+    try {
+      await fetch(`/api/products/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-    router.push("/admin/products");
+      router.push("/admin/products");
+    } catch (error) {
+      console.error("Error saving product:", error);
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
     <div className="max-w-2xl space-y-6">
       <h1 className="text-2xl font-semibold">Edit Product</h1>
 
-      <Input
-        value={form.title}
-        onChange={(e) => setForm({ ...form, title: e.target.value })}
-      />
-      <Textarea
-        value={form.description}
-        onChange={(e) => setForm({ ...form, description: e.target.value })}
-      />
-
-      <div>
-        <label className="text-sm font-medium mb-2 block">Image</label>
-        <ImageUpload onUploaded={(url) => setForm({ ...form, image: url })} />
-        {form.image && (
-          <img
-            src={form.image}
-            alt="Preview"
-            className="mt-2 w-32 h-32 object-cover rounded border"
+      <div className="space-y-4">
+        <div>
+          <label className="text-sm font-medium mb-2 block">Title</label>
+          <Input
+            value={form.title}
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
           />
-        )}
+        </div>
+
+        <div>
+          <label className="text-sm font-medium mb-2 block">Description</label>
+          <Textarea
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+          />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium mb-2 block">Image</label>
+          <ImageUpload onUploaded={(url) => setForm({ ...form, image: url })} />
+          {form.image && (
+            <img
+              src={form.image}
+              alt="Preview"
+              className="mt-2 w-32 h-32 object-cover rounded border"
+            />
+          )}
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Switch
+            checked={form.isActive}
+            onCheckedChange={(v) => setForm({ ...form, isActive: v })}
+          />
+          <span>Active</span>
+        </div>
       </div>
 
-      <Input
-        value={form.buttonText}
-        onChange={(e) => setForm({ ...form, buttonText: e.target.value })}
-      />
-      <Input
-        value={form.buttonLink}
-        onChange={(e) => setForm({ ...form, buttonLink: e.target.value })}
-      />
-
-      <div className="flex items-center gap-3">
-        <Switch
-          checked={form.isActive}
-          onCheckedChange={(v) => setForm({ ...form, isActive: v })}
-        />
-        <span>Active</span>
+      <div className="flex gap-3">
+        <Button onClick={save} disabled={saving}>
+          {saving ? "Saving..." : "Save Changes"}
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => router.push("/admin/products")}
+        >
+          Cancel
+        </Button>
       </div>
-
-      <Button onClick={save}>Save Changes</Button>
     </div>
   );
 }

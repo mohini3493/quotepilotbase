@@ -4,14 +4,11 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import ImageUpload from "@/components/admin/ImageUpload";
 
 type InternalColor = {
   name: string;
-  colorCode: string;
-  description: string;
   image: string;
   isActive: boolean;
 };
@@ -73,33 +70,6 @@ export default function EditInternalColorPage() {
           <Input
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-medium mb-2 block">Color Code</label>
-          <div className="flex gap-3">
-            <Input
-              type="color"
-              value={form.colorCode || "#FFFFFF"}
-              onChange={(e) => setForm({ ...form, colorCode: e.target.value })}
-              className="w-16 h-10 p-1 cursor-pointer"
-            />
-            <Input
-              value={form.colorCode}
-              onChange={(e) => setForm({ ...form, colorCode: e.target.value })}
-              className="flex-1 font-mono"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="text-sm font-medium mb-2 block">
-            Description (Optional)
-          </label>
-          <Textarea
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
           />
         </div>
 

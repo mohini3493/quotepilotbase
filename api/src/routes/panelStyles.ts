@@ -8,11 +8,17 @@ const router = Router();
    PUBLIC ROUTES (FRONTEND)
 ================================ */
 
-/** Get ACTIVE panel styles */
-router.get("/", async (_, res) => {
-  const result = await pool.query(
-    'SELECT * FROM panel_styles WHERE is_active = true ORDER BY "order" ASC',
-  );
+/** Get ACTIVE panel styles (optionally filtered by door_type_id) */
+router.get("/", async (req, res) => {
+  const { door_type_id } = req.query;
+  let query = "SELECT * FROM panel_styles WHERE is_active = true";
+  const params: any[] = [];
+  if (door_type_id) {
+    params.push(door_type_id);
+    query += ` AND door_type_id = $${params.length}`;
+  }
+  query += ' ORDER BY "order" ASC';
+  const result = await pool.query(query, params);
   res.json(result.rows);
 });
 
@@ -43,22 +49,22 @@ router.get("/admin/:id", requireAdmin, async (req, res) => {
 
 /** Admin – create panel style */
 router.post("/", requireAdmin, async (req, res) => {
-  const { name, slug, image, order, isActive } = req.body;
+  const { name, slug, image, order, isActive, doorTypeId } = req.body;
   const result = await pool.query(
-    `INSERT INTO panel_styles (name, slug, image, "order", is_active) 
-     VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-    [name, slug, image, order || 0, isActive ?? true],
+    `INSERT INTO panel_styles (name, slug, image, "order", is_active, door_type_id) 
+     VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+    [name, slug, image, order || 0, isActive ?? true, doorTypeId || null],
   );
   res.json(result.rows[0]);
 });
 
 /** Admin – update panel style */
 router.put("/:id", requireAdmin, async (req, res) => {
-  const { name, slug, image, order, isActive } = req.body;
+  const { name, slug, image, order, isActive, doorTypeId } = req.body;
   const result = await pool.query(
-    `UPDATE panel_styles SET name = $1, slug = $2, image = $3, "order" = $4, is_active = $5 
-     WHERE id = $6 RETURNING *`,
-    [name, slug, image, order, isActive, req.params.id],
+    `UPDATE panel_styles SET name = $1, slug = $2, image = $3, "order" = $4, is_active = $5, door_type_id = $6 
+     WHERE id = $7 RETURNING *`,
+    [name, slug, image, order, isActive, doorTypeId || null, req.params.id],
   );
   res.json(result.rows[0]);
 });

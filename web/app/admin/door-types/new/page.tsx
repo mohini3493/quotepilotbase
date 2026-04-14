@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useRouter } from "next/navigation";
 import ImageUpload from "@/components/admin/ImageUpload";
+
+type Product = { id: number; title: string };
 
 export default function AddDoorTypePage() {
   const router = useRouter();
@@ -13,8 +15,20 @@ export default function AddDoorTypePage() {
     name: "",
     image: "",
     isActive: true,
+    productId: "",
   });
   const [saving, setSaving] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    fetch(`/api/products/admin/all`, { credentials: "include" })
+      .then((res) => res.json())
+      .then((data) => {
+        const arr = Array.isArray(data) ? data : data.data || [];
+        setProducts(arr.filter((p: any) => p.is_active ?? p.isActive));
+      })
+      .catch(() => {});
+  }, []);
 
   async function saveDoorType() {
     setSaving(true);
@@ -39,13 +53,36 @@ export default function AddDoorTypePage() {
 
   return (
     <div className="max-w-xl space-y-6">
-      <h1 className="text-2xl font-semibold">Add New Door Type</h1>
+      <h1 className="text-2xl font-semibold">Add New Product Type</h1>
 
       <div className="space-y-4">
         <div>
+          <label className="text-sm font-medium mb-2 block">
+            Select Product
+          </label>
+          <select
+            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            value={form.productId || ""}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                productId: e.target.value ? Number(e.target.value) : "",
+              })
+            }
+          >
+            <option value="">-- Select a Product --</option>
+            {products.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.title}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
           <label className="text-sm font-medium mb-2 block">Name</label>
           <Input
-            placeholder="Door Type Name"
+            placeholder="Product Type Name"
             value={form.name || ""}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
@@ -74,7 +111,7 @@ export default function AddDoorTypePage() {
 
       <div className="flex gap-3">
         <Button onClick={saveDoorType} disabled={saving}>
-          {saving ? "Saving..." : "Save Door Type"}
+          {saving ? "Saving..." : "Save Product Type"}
         </Button>
         <Button
           variant="outline"
