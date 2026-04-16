@@ -511,18 +511,20 @@ export default function ProductConfigurator({
           {/* Step 1: Product Type */}
           {currentStep === 1 && (
             <div>
-              <div className="text-center mb-4">
-                <h2 className="text-2xl font-bold">Choose Product Type</h2>
+              <div className="text-center mb-3 sm:mb-4">
+                <h2 className="text-xl sm:text-2xl font-bold">
+                  Choose Product Type
+                </h2>
                 <p className="text-muted-foreground mt-1">
                   Select your product type
                 </p>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
                 {doorTypes.map((type) => (
                   <div
                     key={type.id}
                     className={cn(
-                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[180px] relative overflow-hidden",
+                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] sm:min-h-[180px] relative overflow-hidden",
                       selection.doorType?.id === type.id
                         ? "ring-2 ring-primary scale-105 shadow-primary/20"
                         : "hover:ring-1 hover:ring-primary/40",
@@ -537,10 +539,10 @@ export default function ProductConfigurator({
                         <img
                           src={type.image}
                           alt={type.name}
-                          className="w-full h-28 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
+                          className="w-full h-20 sm:h-28 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
                         />
                       ) : (
-                        <div className="w-full h-28 bg-gray-100 rounded-xl" />
+                        <div className="w-full h-20 sm:h-28 bg-gray-100 rounded-xl" />
                       )}
                       {selection.doorType?.id === type.id && (
                         <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
@@ -562,18 +564,20 @@ export default function ProductConfigurator({
           {/* Step 2: Panel Style */}
           {currentStep === 2 && (
             <div>
-              <div className="text-center mb-4">
-                <h2 className="text-2xl font-bold">Choose Panel Style</h2>
+              <div className="text-center mb-3 sm:mb-4">
+                <h2 className="text-xl sm:text-2xl font-bold">
+                  Choose Panel Style
+                </h2>
                 <p className="text-muted-foreground mt-1">
                   Select your panel style
                 </p>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
                 {panelStyles.map((style) => (
                   <div
                     key={style.id}
                     className={cn(
-                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[180px] relative overflow-hidden",
+                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] sm:min-h-[180px] relative overflow-hidden",
                       selection.panelStyle?.id === style.id
                         ? "ring-2 ring-primary scale-105 shadow-primary/20"
                         : "hover:ring-1 hover:ring-primary/40",
@@ -593,10 +597,10 @@ export default function ProductConfigurator({
                         <img
                           src={style.image}
                           alt={style.name}
-                          className="w-full h-28 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
+                          className="w-full h-20 sm:h-28 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
                         />
                       ) : (
-                        <div className="w-full h-28 bg-gray-100 rounded-xl" />
+                        <div className="w-full h-20 sm:h-28 bg-gray-100 rounded-xl" />
                       )}
                       {selection.panelStyle?.id === style.id && (
                         <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
@@ -617,9 +621,11 @@ export default function ProductConfigurator({
 
           {/* Step 3: Dimensions */}
           {currentStep === 3 && (
-            <div className="space-y-6 max-w-md mx-auto">
+            <div className="space-y-4 sm:space-y-6 max-w-md mx-auto px-1">
               <div className="text-center">
-                <h2 className="text-2xl font-bold">Enter Dimensions</h2>
+                <h2 className="text-xl sm:text-2xl font-bold">
+                  Enter Dimensions
+                </h2>
                 <p className="text-muted-foreground mt-2">
                   Enter width and height in mm
                 </p>
@@ -663,9 +669,11 @@ export default function ProductConfigurator({
 
           {/* Step 4: Postcode */}
           {currentStep === 4 && (
-            <div className="space-y-6 max-w-md mx-auto">
+            <div className="space-y-4 sm:space-y-6 max-w-md mx-auto px-1">
               <div className="text-center">
-                <h2 className="text-2xl font-bold">Enter Postcode</h2>
+                <h2 className="text-xl sm:text-2xl font-bold">
+                  Enter Postcode
+                </h2>
                 <p className="text-muted-foreground mt-2">
                   Enter your postcode
                 </p>
@@ -687,18 +695,20 @@ export default function ProductConfigurator({
           {/* Step 5: External Colors */}
           {currentStep === 5 && (
             <div>
-              <div className="text-center mb-4">
-                <h2 className="text-2xl font-bold">Choose External Color</h2>
+              <div className="text-center mb-3 sm:mb-4">
+                <h2 className="text-xl sm:text-2xl font-bold">
+                  Choose External Color
+                </h2>
                 <p className="text-muted-foreground mt-1">
                   Select the outside finish for your door
                 </p>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-3">
+              <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-2 sm:gap-3">
                 {externalColors.map((color) => (
                   <div
                     key={color.id}
                     className={cn(
-                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] relative overflow-hidden",
+                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-1.5 sm:p-2 min-h-[100px] sm:min-h-[140px] relative overflow-hidden",
                       selection.externalColor?.id === color.id
                         ? "ring-2 ring-primary scale-105 shadow-primary/20"
                         : "hover:ring-1 hover:ring-primary/40",
@@ -751,18 +761,20 @@ export default function ProductConfigurator({
           {/* Step 6: Internal Colors */}
           {currentStep === 6 && (
             <div>
-              <div className="text-center mb-4">
-                <h2 className="text-2xl font-bold">Choose Internal Color</h2>
+              <div className="text-center mb-3 sm:mb-4">
+                <h2 className="text-xl sm:text-2xl font-bold">
+                  Choose Internal Color
+                </h2>
                 <p className="text-muted-foreground mt-1">
                   Select the inside finish for your door
                 </p>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-3">
+              <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-2 sm:gap-3">
                 {internalColors.map((color) => (
                   <div
                     key={color.id}
                     className={cn(
-                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] relative overflow-hidden",
+                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-1.5 sm:p-2 min-h-[100px] sm:min-h-[140px] relative overflow-hidden",
                       selection.internalColor?.id === color.id
                         ? "ring-2 ring-primary scale-105 shadow-primary/20"
                         : "hover:ring-1 hover:ring-primary/40",
@@ -815,18 +827,20 @@ export default function ProductConfigurator({
           {/* Step 7: Handle Colors */}
           {currentStep === 7 && (
             <div>
-              <div className="text-center mb-4">
-                <h2 className="text-2xl font-bold">Choose Handle Color</h2>
+              <div className="text-center mb-3 sm:mb-4">
+                <h2 className="text-xl sm:text-2xl font-bold">
+                  Choose Handle Color
+                </h2>
                 <p className="text-muted-foreground mt-1">
                   Select the handle finish for your door
                 </p>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-3">
+              <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-2 sm:gap-3">
                 {handleColors.map((color) => (
                   <div
                     key={color.id}
                     className={cn(
-                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] relative overflow-hidden",
+                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-1.5 sm:p-2 min-h-[100px] sm:min-h-[140px] relative overflow-hidden",
                       selection.handleColor?.id === color.id
                         ? "ring-2 ring-primary scale-105 shadow-primary/20"
                         : "hover:ring-1 hover:ring-primary/40",
@@ -883,13 +897,13 @@ export default function ProductConfigurator({
                 {!submitted && (
                   <>
                     <div className="space-y-4 sm:space-y-6">
-                      <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2 sm:gap-3">
-                        <div className="px-2">
-                          <h2 className="text-xl sm:text-2xl font-bold mb-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
+                        <div className="px-1 sm:px-2">
+                          <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-3">
                             Review Your Selection
                           </h2>
                           <Card>
-                            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-3 sm:p-4">
                               {selection.doorType && (
                                 <img
                                   src={
@@ -897,17 +911,17 @@ export default function ProductConfigurator({
                                     "/placeholder.jpg"
                                   }
                                   alt={selection.doorType.name}
-                                  className="w-full h-64 object-contain bg-gray-50"
+                                  className="w-full h-40 sm:h-52 md:h-64 object-contain bg-gray-50"
                                 />
                               )}
                               <div>
-                                <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
+                                <p className="text-xs sm:text-sm md:text-base text-muted-foreground mt-1 sm:mt-2">
                                   Here's a summary of your configuration
                                 </p>
                                 <ul>
-                                  <li className="flex items-center gap-2 mt-3">
+                                  <li className="flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3">
                                     <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">
-                                      <DoorOpen className="w-5 h-5 flex-shrink-0" />{" "}
+                                      <DoorOpen className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />{" "}
                                       Product Type
                                     </h3>{" "}
                                     -
@@ -918,9 +932,9 @@ export default function ProductConfigurator({
                                     )}
                                   </li>
                                   {!skipPanelStep && (
-                                    <li className="flex items-center gap-2 mt-3">
+                                    <li className="flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3">
                                       <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">
-                                        <PanelTop className="w-5 h-5 flex-shrink-0" />{" "}
+                                        <PanelTop className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />{" "}
                                         Panel Style
                                       </h3>{" "}
                                       -
@@ -931,9 +945,9 @@ export default function ProductConfigurator({
                                       )}
                                     </li>
                                   )}
-                                  <li className="flex items-center gap-2 mt-3">
+                                  <li className="flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3">
                                     <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">
-                                      <Ruler className="w-5 h-5 flex-shrink-0" />{" "}
+                                      <Ruler className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />{" "}
                                       Dimensions
                                     </h3>{" "}
                                     -
@@ -949,9 +963,9 @@ export default function ProductConfigurator({
                                       </>
                                     )}
                                   </li>
-                                  <li className="flex items-center gap-2 mt-3">
+                                  <li className="flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3">
                                     <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">
-                                      <MapPin className="w-5 h-5 flex-shrink-0" />{" "}
+                                      <MapPin className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />{" "}
                                       Postcode
                                     </h3>{" "}
                                     -
@@ -961,9 +975,9 @@ export default function ProductConfigurator({
                                       </p>
                                     )}
                                   </li>
-                                  <li className="flex items-center gap-2 mt-3">
+                                  <li className="flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3">
                                     <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">
-                                      <Palette className="w-5 h-5 flex-shrink-0" />{" "}
+                                      <Palette className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />{" "}
                                       External Color
                                     </h3>{" "}
                                     -
@@ -973,9 +987,9 @@ export default function ProductConfigurator({
                                       </p>
                                     )}
                                   </li>
-                                  <li className="flex items-center gap-2 mt-3">
+                                  <li className="flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3">
                                     <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">
-                                      <PaintBucket className="w-5 h-5 flex-shrink-0" />{" "}
+                                      <PaintBucket className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />{" "}
                                       Internal Color
                                     </h3>{" "}
                                     -
@@ -985,9 +999,9 @@ export default function ProductConfigurator({
                                       </p>
                                     )}
                                   </li>
-                                  <li className="flex items-center gap-2 mt-3">
+                                  <li className="flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3">
                                     <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">
-                                      <Grip className="w-5 h-5 flex-shrink-0" />{" "}
+                                      <Grip className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />{" "}
                                       Handle Color
                                     </h3>{" "}
                                     -
@@ -1003,7 +1017,7 @@ export default function ProductConfigurator({
                           </Card>
                         </div>
                         {/* Contact Details Form */}
-                        <div className="mt-6 sm:mt-8">
+                        <div className="mt-4 sm:mt-6 md:mt-8">
                           <div className="mb-3 sm:mb-4">
                             <h3 className="text-lg sm:text-xl font-semibold">
                               Enter Your Contact Details

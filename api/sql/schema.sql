@@ -50,6 +50,13 @@ CREATE TABLE IF NOT EXISTS panel_styles (
   created_at TIMESTAMP DEFAULT now()
 );
 
+-- Panel Style ↔ Door Types junction table (many-to-many)
+CREATE TABLE IF NOT EXISTS panel_style_door_types (
+  panel_style_id INT NOT NULL REFERENCES panel_styles(id) ON DELETE CASCADE,
+  door_type_id INT NOT NULL REFERENCES door_types(id) ON DELETE CASCADE,
+  PRIMARY KEY (panel_style_id, door_type_id)
+);
+
 -- Dimensions table
 CREATE TABLE IF NOT EXISTS dimensions (
   id SERIAL PRIMARY KEY,

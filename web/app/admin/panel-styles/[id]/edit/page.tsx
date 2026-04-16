@@ -11,7 +11,7 @@ type PanelStyle = {
   name: string;
   image: string;
   isActive: boolean;
-  doorTypeId: number | string;
+  doorTypeIds: number[];
 };
 
 type DoorType = { id: number; name: string };
@@ -48,7 +48,12 @@ export default function EditPanelStylePage() {
         setForm({
           ...data,
           isActive: data.is_active ?? data.isActive ?? true,
-          doorTypeId: data.door_type_id ?? data.doorTypeId ?? "",
+          doorTypeIds:
+            Array.isArray(data.door_type_ids) && data.door_type_ids.length > 0
+              ? data.door_type_ids
+              : data.door_type_id
+                ? [data.door_type_id]
+                : [],
         });
       })
       .catch(() => setError("Failed to load panel style"));
@@ -82,25 +87,43 @@ export default function EditPanelStylePage() {
       <div className="space-y-4">
         <div>
           <label className="text-sm font-medium mb-2 block">
-            Select Product Type
+            Select Product Types
           </label>
-          <select
-            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            value={form.doorTypeId || ""}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                doorTypeId: e.target.value ? Number(e.target.value) : "",
-              })
-            }
-          >
-            <option value="">-- Select a Product Type --</option>
+          <div className="space-y-2 max-h-48 overflow-y-auto border rounded-md p-3">
             {doorTypes.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name}
-              </option>
+              <label
+                key={d.id}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={form.doorTypeIds.includes(d.id)}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setForm((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            doorTypeIds: checked
+                              ? [...prev.doorTypeIds, d.id]
+                              : prev.doorTypeIds.filter(
+                                  (id: number) => id !== d.id,
+                                ),
+                          }
+                        : prev,
+                    );
+                  }}
+                  className="rounded border-gray-300"
+                />
+                <span className="text-sm">{d.name}</span>
+              </label>
             ))}
-          </select>
+            {doorTypes.length === 0 && (
+              <p className="text-sm text-muted-foreground">
+                No product types available
+              </p>
+            )}
+          </div>
         </div>
 
         <div>

@@ -11,13 +11,18 @@ const router = Router();
 /** Get ACTIVE panel styles (optionally filtered by door_type_id) */
 router.get("/", async (req, res) => {
   const { door_type_id } = req.query;
-  let query = "SELECT * FROM panel_styles WHERE is_active = true";
+  let query: string;
   const params: any[] = [];
   if (door_type_id) {
     params.push(door_type_id);
-    query += ` AND door_type_id = $${params.length}`;
+    query = `SELECT DISTINCT ps.* FROM panel_styles ps
+             LEFT JOIN panel_style_door_types psdt ON psdt.panel_style_id = ps.id
+             WHERE ps.is_active = true AND (psdt.door_type_id = $1 OR ps.door_type_id = $1)
+             ORDER BY ps."order" ASC`;
+  } else {
+    query =
+      'SELECT * FROM panel_styles WHERE is_active = true ORDER BY "order" ASC';
   }
-  query += ' ORDER BY "order" ASC';
   const result = await pool.query(query, params);
   res.json(result.rows);
 });
@@ -44,28 +49,76 @@ router.get("/admin/:id", requireAdmin, async (req, res) => {
     return res.status(404).json({ error: "Panel style not found" });
   }
 
-  res.json(result.rows[0]);
+  const panelStyle = result.rows[0];
+
+  // Fetch associated door type IDs from junction table
+  const junctionResult = await pool.query(
+    "SELECT door_type_id FROM panel_style_door_types WHERE panel_style_id = $1",
+    [req.params.id],
+  );
+  panelStyle.door_type_ids = junctionResult.rows.map(
+    (r: any) => r.door_type_id,
+  );
+
+  res.json(panelStyle);
 });
 
 /** Admin – create panel style */
 router.post("/", requireAdmin, async (req, res) => {
-  const { name, slug, image, order, isActive, doorTypeId } = req.body;
+  const { name, slug, image, order, isActive, doorTypeId, doorTypeIds } =
+    req.body;
   const result = await pool.query(
     `INSERT INTO panel_styles (name, slug, image, "order", is_active, door_type_id) 
      VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
     [name, slug, image, order || 0, isActive ?? true, doorTypeId || null],
   );
-  res.json(result.rows[0]);
+  const panelStyle = result.rows[0];
+
+  // Insert into junction table
+  const ids: number[] =
+    Array.isArray(doorTypeIds) && doorTypeIds.length > 0
+      ? doorTypeIds
+      : doorTypeId
+        ? [doorTypeId]
+        : [];
+  for (const dtId of ids) {
+    await pool.query(
+      "INSERT INTO panel_style_door_types (panel_style_id, door_type_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+      [panelStyle.id, dtId],
+    );
+  }
+
+  res.json(panelStyle);
 });
 
 /** Admin – update panel style */
 router.put("/:id", requireAdmin, async (req, res) => {
-  const { name, slug, image, order, isActive, doorTypeId } = req.body;
+  const { name, slug, image, order, isActive, doorTypeId, doorTypeIds } =
+    req.body;
   const result = await pool.query(
     `UPDATE panel_styles SET name = $1, slug = $2, image = $3, "order" = $4, is_active = $5, door_type_id = $6 
      WHERE id = $7 RETURNING *`,
     [name, slug, image, order, isActive, doorTypeId || null, req.params.id],
   );
+
+  // Sync junction table
+  const ids: number[] =
+    Array.isArray(doorTypeIds) && doorTypeIds.length > 0
+      ? doorTypeIds
+      : doorTypeId
+        ? [doorTypeId]
+        : [];
+  await pool.query(
+    "DELETE FROM panel_style_door_types WHERE panel_style_id = $1",
+    [req.params.id],
+  );
+  for (const dtId of ids) {
+    await pool.query(
+      "INSERT INTO panel_style_door_types (panel_style_id, door_type_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+      [req.params.id, dtId],
+    );
+  }
+
   res.json(result.rows[0]);
 });
 

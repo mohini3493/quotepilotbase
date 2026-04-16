@@ -47,8 +47,8 @@ export default async function ProductPage({
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-primary/5 blur-3xl pointer-events-none" />
 
       <section className="relative z-10 py-4">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border p-6 md:p-8">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border p-3 sm:p-6 md:p-8">
             <ProductConfigurator
               productId={product.id}
               productTitle={product.title}
