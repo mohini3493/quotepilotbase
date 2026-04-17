@@ -23,7 +23,7 @@ router.get("/", async (_, res) => {
 /** Admin – get ALL dimensions */
 router.get("/admin/all", requireAdmin, async (_, res) => {
   const result = await pool.query(
-    'SELECT * FROM dimensions ORDER BY "order" ASC',
+    "SELECT * FROM dimensions ORDER BY created_at DESC",
   );
   res.json(result.rows);
 });

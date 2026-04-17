@@ -31,12 +31,35 @@ router.get("/", async (req, res) => {
    ADMIN ROUTES
 ================================ */
 
-/** Admin – get ALL panel styles */
+/** Admin – get ALL panel styles (with associated door types) */
 router.get("/admin/all", requireAdmin, async (_, res) => {
+  // Get all panel styles
   const result = await pool.query(
-    'SELECT * FROM panel_styles ORDER BY "order" ASC',
+    "SELECT * FROM panel_styles ORDER BY created_at DESC",
   );
-  res.json(result.rows);
+  const panelStyles = result.rows;
+
+  // Get all associations in one query
+  const assocResult = await pool.query(
+    `SELECT psdt.panel_style_id, dt.id as door_type_id, dt.name as door_type_name
+     FROM panel_style_door_types psdt
+     JOIN door_types dt ON dt.id = psdt.door_type_id`
+  );
+
+  // Map panelStyleId -> [{id, name}]
+  const assocMap = {};
+  for (const row of assocResult.rows) {
+    if (!assocMap[row.panel_style_id]) assocMap[row.panel_style_id] = [];
+    assocMap[row.panel_style_id].push({ id: row.door_type_id, name: row.door_type_name });
+  }
+
+  // Attach to each panel style
+  const withDoorTypes = panelStyles.map(ps => ({
+    ...ps,
+    door_types: assocMap[ps.id] || [],
+  }));
+
+  res.json(withDoorTypes);
 });
 
 /** Admin – get panel style by ID */

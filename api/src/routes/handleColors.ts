@@ -23,7 +23,7 @@ router.get("/", async (_, res) => {
 /** Admin – get ALL handle colors */
 router.get("/admin/all", requireAdmin, async (_, res) => {
   const result = await pool.query(
-    'SELECT * FROM handle_colors ORDER BY "order" ASC',
+    "SELECT * FROM handle_colors ORDER BY created_at DESC",
   );
   res.json(result.rows);
 });

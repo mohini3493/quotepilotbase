@@ -16,13 +16,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 
+type PanelStyle = { id: number; name: string };
 type DoorType = {
   id: number;
   name: string;
-  slug: string;
   image: string;
   isActive: boolean;
   order: number;
+  product?: { id: number; title: string } | null;
 };
 
 function SortableRow({
@@ -88,7 +89,30 @@ function SortableRow({
           </div>
         </div>
         <p className="text-xs text-muted-foreground">/{doorType.slug}</p>
+        {doorType.product && (
+          <div className="mt-1">
+            <span className="bg-amber-50 text-amber-700 text-xs px-2 py-0.5 rounded-full border border-amber-100">
+              {doorType.product.title}
+            </span>
+          </div>
+        )}
       </div>
+        {doorType.panel_styles && doorType.panel_styles.length > 0 && (
+          <div className="mt-1 flex flex-wrap gap-1">
+            {doorType.panel_styles.map((ps) => (
+              <span key={ps.id} className="bg-blue-50 text-blue-700 text-xs px-2 py-0.5 rounded-full border border-blue-100">
+        {doorType.product && (
+          <div className="mt-1">
+            <span className="bg-amber-50 text-amber-700 text-xs px-2 py-0.5 rounded-full border border-amber-100">
+              {doorType.product.title}
+            </span>
+          </div>
+        )}
+                {ps.name}
+              </span>
+            ))}
+          </div>
+        )}
 
       <div className="flex items-center gap-2">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -117,9 +141,9 @@ function SortableRow({
 
 export default function DoorTypesPage() {
   const [doorTypes, setDoorTypes] = useState<DoorType[]>([]);
+  const [productFilter, setProductFilter] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   async function loadDoorTypes() {
     try {
       setLoading(true);

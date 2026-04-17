@@ -37,7 +37,7 @@ router.get("/slug/:slug", async (req, res) => {
 /** ✅ Admin – get ALL products (active + inactive) */
 router.get("/admin/all", requireAdmin, async (_, res) => {
   const result = await pool.query(
-    'SELECT * FROM products ORDER BY "order" ASC',
+    "SELECT * FROM products ORDER BY created_at DESC",
   );
   res.json(result.rows);
 });

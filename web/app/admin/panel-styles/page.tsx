@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 
+type DoorType = { id: number; name: string };
 type PanelStyle = {
   id: number;
   name: string;
@@ -23,6 +24,7 @@ type PanelStyle = {
   image: string;
   isActive: boolean;
   order: number;
+  door_types?: DoorType[];
 };
 
 function SortableRow({
@@ -88,6 +90,15 @@ function SortableRow({
           </div>
         </div>
         <p className="text-xs text-muted-foreground">/{panelStyle.slug}</p>
+        {panelStyle.door_types && panelStyle.door_types.length > 0 && (
+          <div className="mt-1 flex flex-wrap gap-1">
+            {panelStyle.door_types.map((dt) => (
+              <span key={dt.id} className="bg-emerald-50 text-emerald-700 text-xs px-2 py-0.5 rounded-full border border-emerald-100">
+                {dt.name}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-2">
@@ -119,6 +130,7 @@ export default function PanelStylesPage() {
   const [panelStyles, setPanelStyles] = useState<PanelStyle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [doorTypeFilter, setDoorTypeFilter] = useState<number | null>(null);
 
   async function loadPanelStyles() {
     try {

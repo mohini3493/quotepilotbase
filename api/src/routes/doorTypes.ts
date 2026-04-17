@@ -26,12 +26,20 @@ router.get("/", async (req, res) => {
    ADMIN ROUTES
 ================================ */
 
-/** Admin – get ALL product types */
+/** Admin – get ALL product types (with associated product info) */
 router.get("/admin/all", requireAdmin, async (_, res) => {
+  // Get all door types with product info
   const result = await pool.query(
-    'SELECT * FROM door_types ORDER BY "order" ASC',
+    `SELECT dt.*, p.id as product_id, p.title as product_title
+     FROM door_types dt
+     LEFT JOIN products p ON dt.product_id = p.id
+     ORDER BY dt.created_at DESC`
   );
-  res.json(result.rows);
+  const doorTypes = result.rows.map(dt => ({
+    ...dt,
+    product: dt.product_id ? { id: dt.product_id, title: dt.product_title } : null,
+  }));
+  res.json(doorTypes);
 });
 
 /** Admin – get product type by ID */

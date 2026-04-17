@@ -23,7 +23,7 @@ router.get("/", async (_, res) => {
 /** Admin – get ALL postcodes */
 router.get("/admin/all", requireAdmin, async (_, res) => {
   const result = await pool.query(
-    'SELECT * FROM postcodes ORDER BY "order" ASC',
+    "SELECT * FROM postcodes ORDER BY created_at DESC",
   );
   res.json(result.rows);
 });
