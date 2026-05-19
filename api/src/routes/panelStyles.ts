@@ -47,7 +47,7 @@ router.get("/admin/all", requireAdmin, async (_, res) => {
   );
 
   // Map panelStyleId -> [{id, name}]
-  const assocMap = {};
+  const assocMap: Record<string, { id: any; name: any }[]> = {};
   for (const row of assocResult.rows) {
     if (!assocMap[row.panel_style_id]) assocMap[row.panel_style_id] = [];
     assocMap[row.panel_style_id].push({ id: row.door_type_id, name: row.door_type_name });
