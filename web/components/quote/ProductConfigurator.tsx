@@ -118,6 +118,13 @@ export default function ProductConfigurator({
   productId,
   productTitle,
 }: ProductConfiguratorProps) {
+  // Pagination state for each paginated step
+  const [doorTypePage, setDoorTypePage] = useState(1);
+  const [panelStylePage, setPanelStylePage] = useState(1);
+  const [externalColorPage, setExternalColorPage] = useState(1);
+  const [internalColorPage, setInternalColorPage] = useState(1);
+  const [handleColorPage, setHandleColorPage] = useState(1);
+  const CARDS_PER_PAGE = 12;
   const [currentStep, setCurrentStep] = useState(1);
   const [selection, setSelection] = useState<Selection>({
     doorType: null,
@@ -300,6 +307,15 @@ export default function ProductConfigurator({
     }
   };
 
+  // Reset pagination when step changes
+  useEffect(() => {
+    if (currentStep === 1) setDoorTypePage(1);
+    if (currentStep === 2) setPanelStylePage(1);
+    if (currentStep === 5) setExternalColorPage(1);
+    if (currentStep === 6) setInternalColorPage(1);
+    if (currentStep === 7) setHandleColorPage(1);
+  }, [currentStep]);
+
   const handleNext = () => {
     if (currentStep < STEPS.length && canProceed()) {
       let next = currentStep + 1;
@@ -472,9 +488,7 @@ export default function ProductConfigurator({
                 );
               })}
             </div>
-            <span className="text-xs font-semibold text-primary ml-auto">
-              {currentStep}/{STEPS.length}
-            </span>
+            {/* Removed step count display */}
           </div>
           <div className="flex items-center gap-2 px-1">
             {(() => {
@@ -520,44 +534,81 @@ export default function ProductConfigurator({
                 </p>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
-                {doorTypes.map((type) => (
-                  <div
-                    key={type.id}
-                    className={cn(
-                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] sm:min-h-[180px] relative overflow-hidden",
-                      selection.doorType?.id === type.id
-                        ? "ring-2 ring-primary scale-105 shadow-primary/20"
-                        : "hover:ring-1 hover:ring-primary/40",
-                    )}
-                    onClick={() => {
-                      setSelection({ ...selection, doorType: type });
-                    }}
-                    style={{ marginTop: 0, marginBottom: 0 }}
-                  >
-                    <div className="w-full flex-1 flex items-center justify-center">
-                      {type.image ? (
-                        <img
-                          src={type.image}
-                          alt={type.name}
-                          className="w-full h-20 sm:h-28 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="w-full h-20 sm:h-28 bg-gray-100 rounded-xl" />
+                {doorTypes
+                  .slice(
+                    (doorTypePage - 1) * CARDS_PER_PAGE,
+                    doorTypePage * CARDS_PER_PAGE,
+                  )
+                  .map((type) => (
+                    <div
+                      key={type.id}
+                      className={cn(
+                        "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] sm:min-h-[180px] relative overflow-hidden",
+                        selection.doorType?.id === type.id
+                          ? "ring-2 ring-primary scale-105 shadow-primary/20"
+                          : "hover:ring-1 hover:ring-primary/40",
                       )}
-                      {selection.doorType?.id === type.id && (
-                        <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
-                          <Check className="w-4 h-4 text-white" />
-                        </div>
-                      )}
+                      onClick={() => {
+                        setSelection({ ...selection, doorType: type });
+                      }}
+                      style={{ marginTop: 0, marginBottom: 0 }}
+                    >
+                      <div className="w-full flex-1 flex items-center justify-center">
+                        {type.image ? (
+                          <img
+                            src={type.image}
+                            alt={type.name}
+                            className="w-full h-20 sm:h-28 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="w-full h-20 sm:h-28 bg-gray-100 rounded-xl" />
+                        )}
+                        {selection.doorType?.id === type.id && (
+                          <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
+                            <Check className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="w-full mt-2">
+                        <h3 className="font-semibold text-sm text-center text-emerald-700 group-hover:text-emerald-900 transition-colors">
+                          {type.name}
+                        </h3>
+                      </div>
                     </div>
-                    <div className="w-full mt-2">
-                      <h3 className="font-semibold text-sm text-center text-emerald-700 group-hover:text-emerald-900 transition-colors">
-                        {type.name}
-                      </h3>
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </div>
+              {/* Pagination for Product Type */}
+              {doorTypes.length > CARDS_PER_PAGE && (
+                <div className="flex justify-center gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setDoorTypePage((p) => Math.max(1, p - 1))}
+                    disabled={doorTypePage === 1}
+                  >
+                    Prev
+                  </Button>
+                  {/* Removed pagination text */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setDoorTypePage((p) =>
+                        Math.min(
+                          Math.ceil(doorTypes.length / CARDS_PER_PAGE),
+                          p + 1,
+                        ),
+                      )
+                    }
+                    disabled={
+                      doorTypePage ===
+                      Math.ceil(doorTypes.length / CARDS_PER_PAGE)
+                    }
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
             </div>
           )}
 
@@ -573,49 +624,88 @@ export default function ProductConfigurator({
                 </p>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
-                {panelStyles.map((style) => (
-                  <div
-                    key={style.id}
-                    className={cn(
-                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] sm:min-h-[180px] relative overflow-hidden",
-                      selection.panelStyle?.id === style.id
-                        ? "ring-2 ring-primary scale-105 shadow-primary/20"
-                        : "hover:ring-1 hover:ring-primary/40",
-                    )}
-                    onClick={() => {
-                      setSelection({ ...selection, panelStyle: style });
-                      setTimeout(
-                        () =>
-                          setCurrentStep((s) => Math.min(s + 1, STEPS.length)),
-                        300,
-                      );
-                    }}
-                    style={{ marginTop: 0, marginBottom: 0 }}
-                  >
-                    <div className="w-full flex-1 flex items-center justify-center">
-                      {style.image ? (
-                        <img
-                          src={style.image}
-                          alt={style.name}
-                          className="w-full h-20 sm:h-28 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="w-full h-20 sm:h-28 bg-gray-100 rounded-xl" />
+                {panelStyles
+                  .slice(
+                    (panelStylePage - 1) * CARDS_PER_PAGE,
+                    panelStylePage * CARDS_PER_PAGE,
+                  )
+                  .map((style) => (
+                    <div
+                      key={style.id}
+                      className={cn(
+                        "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] sm:min-h-[180px] relative overflow-hidden",
+                        selection.panelStyle?.id === style.id
+                          ? "ring-2 ring-primary scale-105 shadow-primary/20"
+                          : "hover:ring-1 hover:ring-primary/40",
                       )}
-                      {selection.panelStyle?.id === style.id && (
-                        <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
-                          <Check className="w-4 h-4 text-white" />
-                        </div>
-                      )}
+                      onClick={() => {
+                        setSelection({ ...selection, panelStyle: style });
+                        setTimeout(
+                          () =>
+                            setCurrentStep((s) =>
+                              Math.min(s + 1, STEPS.length),
+                            ),
+                          300,
+                        );
+                      }}
+                      style={{ marginTop: 0, marginBottom: 0 }}
+                    >
+                      <div className="w-full flex-1 flex items-center justify-center">
+                        {style.image ? (
+                          <img
+                            src={style.image}
+                            alt={style.name}
+                            className="w-full h-20 sm:h-28 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="w-full h-20 sm:h-28 bg-gray-100 rounded-xl" />
+                        )}
+                        {selection.panelStyle?.id === style.id && (
+                          <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
+                            <Check className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="w-full mt-2">
+                        <h3 className="font-semibold text-sm text-center text-emerald-700 group-hover:text-emerald-900 transition-colors">
+                          {style.name}
+                        </h3>
+                      </div>
                     </div>
-                    <div className="w-full mt-2">
-                      <h3 className="font-semibold text-sm text-center text-emerald-700 group-hover:text-emerald-900 transition-colors">
-                        {style.name}
-                      </h3>
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </div>
+              {/* Pagination for Panel Style */}
+              {panelStyles.length > CARDS_PER_PAGE && (
+                <div className="flex justify-center gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPanelStylePage((p) => Math.max(1, p - 1))}
+                    disabled={panelStylePage === 1}
+                  >
+                    Prev
+                  </Button>
+                  {/* Removed pagination text */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setPanelStylePage((p) =>
+                        Math.min(
+                          Math.ceil(panelStyles.length / CARDS_PER_PAGE),
+                          p + 1,
+                        ),
+                      )
+                    }
+                    disabled={
+                      panelStylePage ===
+                      Math.ceil(panelStyles.length / CARDS_PER_PAGE)
+                    }
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
             </div>
           )}
 
@@ -704,52 +794,95 @@ export default function ProductConfigurator({
                 </p>
               </div>
               <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-2 sm:gap-3">
-                {externalColors.map((color) => (
-                  <div
-                    key={color.id}
-                    className={cn(
-                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-1.5 sm:p-2 min-h-[100px] sm:min-h-[140px] relative overflow-hidden",
-                      selection.externalColor?.id === color.id
-                        ? "ring-2 ring-primary scale-105 shadow-primary/20"
-                        : "hover:ring-1 hover:ring-primary/40",
-                    )}
-                    onClick={() => {
-                      setSelection({ ...selection, externalColor: color });
-                      setTimeout(
-                        () =>
-                          setCurrentStep((s) => Math.min(s + 1, STEPS.length)),
-                        300,
-                      );
-                    }}
-                    style={{ marginTop: 0, marginBottom: 0 }}
-                  >
-                    <div className="w-full flex-1 flex items-center justify-center">
-                      {color.image ? (
-                        <img
-                          src={color.image}
-                          alt={color.name}
-                          className="w-full h-16 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
-                        />
-                      ) : (
-                        <div
-                          className="w-full h-16 rounded-xl"
-                          style={{ backgroundColor: color.colorCode || "#ccc" }}
-                        />
+                {externalColors
+                  .slice(
+                    (externalColorPage - 1) * CARDS_PER_PAGE,
+                    externalColorPage * CARDS_PER_PAGE,
+                  )
+                  .map((color) => (
+                    <div
+                      key={color.id}
+                      className={cn(
+                        "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-1.5 sm:p-2 min-h-[100px] sm:min-h-[140px] relative overflow-hidden",
+                        selection.externalColor?.id === color.id
+                          ? "ring-2 ring-primary scale-105 shadow-primary/20"
+                          : "hover:ring-1 hover:ring-primary/40",
                       )}
-                      {selection.externalColor?.id === color.id && (
-                        <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
-                          <Check className="w-4 h-4 text-white" />
-                        </div>
-                      )}
+                      onClick={() => {
+                        setSelection({ ...selection, externalColor: color });
+                        setTimeout(
+                          () =>
+                            setCurrentStep((s) =>
+                              Math.min(s + 1, STEPS.length),
+                            ),
+                          300,
+                        );
+                      }}
+                      style={{ marginTop: 0, marginBottom: 0 }}
+                    >
+                      <div className="w-full flex-1 flex items-center justify-center">
+                        {color.image ? (
+                          <img
+                            src={color.image}
+                            alt={color.name}
+                            className="w-full h-16 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
+                          />
+                        ) : (
+                          <div
+                            className="w-full h-16 rounded-xl"
+                            style={{
+                              backgroundColor: color.colorCode || "#ccc",
+                            }}
+                          />
+                        )}
+                        {selection.externalColor?.id === color.id && (
+                          <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
+                            <Check className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="w-full mt-2">
+                        <h3 className="font-semibold text-xs text-center text-emerald-700 group-hover:text-emerald-900 transition-colors">
+                          {color.name}
+                        </h3>
+                      </div>
                     </div>
-                    <div className="w-full mt-2">
-                      <h3 className="font-semibold text-xs text-center text-emerald-700 group-hover:text-emerald-900 transition-colors">
-                        {color.name}
-                      </h3>
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </div>
+              {/* Pagination for External Colors */}
+              {externalColors.length > CARDS_PER_PAGE && (
+                <div className="flex justify-center gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setExternalColorPage((p) => Math.max(1, p - 1))
+                    }
+                    disabled={externalColorPage === 1}
+                  >
+                    Prev
+                  </Button>
+                  {/* Removed pagination text */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setExternalColorPage((p) =>
+                        Math.min(
+                          Math.ceil(externalColors.length / CARDS_PER_PAGE),
+                          p + 1,
+                        ),
+                      )
+                    }
+                    disabled={
+                      externalColorPage ===
+                      Math.ceil(externalColors.length / CARDS_PER_PAGE)
+                    }
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
               {externalColors.length === 0 && (
                 <div className="text-center py-12 text-muted-foreground">
                   No external colors available
@@ -770,52 +903,95 @@ export default function ProductConfigurator({
                 </p>
               </div>
               <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-2 sm:gap-3">
-                {internalColors.map((color) => (
-                  <div
-                    key={color.id}
-                    className={cn(
-                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-1.5 sm:p-2 min-h-[100px] sm:min-h-[140px] relative overflow-hidden",
-                      selection.internalColor?.id === color.id
-                        ? "ring-2 ring-primary scale-105 shadow-primary/20"
-                        : "hover:ring-1 hover:ring-primary/40",
-                    )}
-                    onClick={() => {
-                      setSelection({ ...selection, internalColor: color });
-                      setTimeout(
-                        () =>
-                          setCurrentStep((s) => Math.min(s + 1, STEPS.length)),
-                        300,
-                      );
-                    }}
-                    style={{ marginTop: 0, marginBottom: 0 }}
-                  >
-                    <div className="w-full flex-1 flex items-center justify-center">
-                      {color.image ? (
-                        <img
-                          src={color.image}
-                          alt={color.name}
-                          className="w-full h-16 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
-                        />
-                      ) : (
-                        <div
-                          className="w-full h-16 rounded-xl"
-                          style={{ backgroundColor: color.colorCode || "#ccc" }}
-                        />
+                {internalColors
+                  .slice(
+                    (internalColorPage - 1) * CARDS_PER_PAGE,
+                    internalColorPage * CARDS_PER_PAGE,
+                  )
+                  .map((color) => (
+                    <div
+                      key={color.id}
+                      className={cn(
+                        "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-1.5 sm:p-2 min-h-[100px] sm:min-h-[140px] relative overflow-hidden",
+                        selection.internalColor?.id === color.id
+                          ? "ring-2 ring-primary scale-105 shadow-primary/20"
+                          : "hover:ring-1 hover:ring-primary/40",
                       )}
-                      {selection.internalColor?.id === color.id && (
-                        <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
-                          <Check className="w-4 h-4 text-white" />
-                        </div>
-                      )}
+                      onClick={() => {
+                        setSelection({ ...selection, internalColor: color });
+                        setTimeout(
+                          () =>
+                            setCurrentStep((s) =>
+                              Math.min(s + 1, STEPS.length),
+                            ),
+                          300,
+                        );
+                      }}
+                      style={{ marginTop: 0, marginBottom: 0 }}
+                    >
+                      <div className="w-full flex-1 flex items-center justify-center">
+                        {color.image ? (
+                          <img
+                            src={color.image}
+                            alt={color.name}
+                            className="w-full h-16 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
+                          />
+                        ) : (
+                          <div
+                            className="w-full h-16 rounded-xl"
+                            style={{
+                              backgroundColor: color.colorCode || "#ccc",
+                            }}
+                          />
+                        )}
+                        {selection.internalColor?.id === color.id && (
+                          <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
+                            <Check className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="w-full mt-2">
+                        <h3 className="font-semibold text-xs text-center text-emerald-700 group-hover:text-emerald-900 transition-colors">
+                          {color.name}
+                        </h3>
+                      </div>
                     </div>
-                    <div className="w-full mt-2">
-                      <h3 className="font-semibold text-xs text-center text-emerald-700 group-hover:text-emerald-900 transition-colors">
-                        {color.name}
-                      </h3>
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </div>
+              {/* Pagination for Internal Colors */}
+              {internalColors.length > CARDS_PER_PAGE && (
+                <div className="flex justify-center gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setInternalColorPage((p) => Math.max(1, p - 1))
+                    }
+                    disabled={internalColorPage === 1}
+                  >
+                    Prev
+                  </Button>
+                  {/* Removed pagination text */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setInternalColorPage((p) =>
+                        Math.min(
+                          Math.ceil(internalColors.length / CARDS_PER_PAGE),
+                          p + 1,
+                        ),
+                      )
+                    }
+                    disabled={
+                      internalColorPage ===
+                      Math.ceil(internalColors.length / CARDS_PER_PAGE)
+                    }
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
               {internalColors.length === 0 && (
                 <div className="text-center py-12 text-muted-foreground">
                   No internal colors available
@@ -836,52 +1012,95 @@ export default function ProductConfigurator({
                 </p>
               </div>
               <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-2 sm:gap-3">
-                {handleColors.map((color) => (
-                  <div
-                    key={color.id}
-                    className={cn(
-                      "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-1.5 sm:p-2 min-h-[100px] sm:min-h-[140px] relative overflow-hidden",
-                      selection.handleColor?.id === color.id
-                        ? "ring-2 ring-primary scale-105 shadow-primary/20"
-                        : "hover:ring-1 hover:ring-primary/40",
-                    )}
-                    onClick={() => {
-                      setSelection({ ...selection, handleColor: color });
-                      setTimeout(
-                        () =>
-                          setCurrentStep((s) => Math.min(s + 1, STEPS.length)),
-                        300,
-                      );
-                    }}
-                    style={{ marginTop: 0, marginBottom: 0 }}
-                  >
-                    <div className="w-full flex-1 flex items-center justify-center">
-                      {color.image ? (
-                        <img
-                          src={color.image}
-                          alt={color.name}
-                          className="w-full h-16 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
-                        />
-                      ) : (
-                        <div
-                          className="w-full h-16 rounded-xl"
-                          style={{ backgroundColor: color.colorCode || "#ccc" }}
-                        />
+                {handleColors
+                  .slice(
+                    (handleColorPage - 1) * CARDS_PER_PAGE,
+                    handleColorPage * CARDS_PER_PAGE,
+                  )
+                  .map((color) => (
+                    <div
+                      key={color.id}
+                      className={cn(
+                        "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-1.5 sm:p-2 min-h-[100px] sm:min-h-[140px] relative overflow-hidden",
+                        selection.handleColor?.id === color.id
+                          ? "ring-2 ring-primary scale-105 shadow-primary/20"
+                          : "hover:ring-1 hover:ring-primary/40",
                       )}
-                      {selection.handleColor?.id === color.id && (
-                        <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
-                          <Check className="w-4 h-4 text-white" />
-                        </div>
-                      )}
+                      onClick={() => {
+                        setSelection({ ...selection, handleColor: color });
+                        setTimeout(
+                          () =>
+                            setCurrentStep((s) =>
+                              Math.min(s + 1, STEPS.length),
+                            ),
+                          300,
+                        );
+                      }}
+                      style={{ marginTop: 0, marginBottom: 0 }}
+                    >
+                      <div className="w-full flex-1 flex items-center justify-center">
+                        {color.image ? (
+                          <img
+                            src={color.image}
+                            alt={color.name}
+                            className="w-full h-16 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
+                          />
+                        ) : (
+                          <div
+                            className="w-full h-16 rounded-xl"
+                            style={{
+                              backgroundColor: color.colorCode || "#ccc",
+                            }}
+                          />
+                        )}
+                        {selection.handleColor?.id === color.id && (
+                          <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
+                            <Check className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="w-full mt-2">
+                        <h3 className="font-semibold text-xs text-center text-emerald-700 group-hover:text-emerald-900 transition-colors">
+                          {color.name}
+                        </h3>
+                      </div>
                     </div>
-                    <div className="w-full mt-2">
-                      <h3 className="font-semibold text-xs text-center text-emerald-700 group-hover:text-emerald-900 transition-colors">
-                        {color.name}
-                      </h3>
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </div>
+              {/* Pagination for Handle Colors */}
+              {handleColors.length > CARDS_PER_PAGE && (
+                <div className="flex justify-center gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setHandleColorPage((p) => Math.max(1, p - 1))
+                    }
+                    disabled={handleColorPage === 1}
+                  >
+                    Prev
+                  </Button>
+                  {/* Removed pagination text */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setHandleColorPage((p) =>
+                        Math.min(
+                          Math.ceil(handleColors.length / CARDS_PER_PAGE),
+                          p + 1,
+                        ),
+                      )
+                    }
+                    disabled={
+                      handleColorPage ===
+                      Math.ceil(handleColors.length / CARDS_PER_PAGE)
+                    }
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
               {handleColors.length === 0 && (
                 <div className="text-center py-12 text-muted-foreground">
                   No handle colors available

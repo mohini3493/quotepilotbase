@@ -23,6 +23,14 @@ import {
   User,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+
+type Customer = {
+  id: string | number;
+  name?: string;
+  email?: string;
+  phone?: string;
+  created_at?: string;
+};
 import {
   ChartContainer,
   ChartTooltip,
@@ -44,91 +52,90 @@ import {
 export default function AdminDashboard() {
   const [mounted, setMounted] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [productTypes, setProductTypes] = useState<any[]>([]);
+  const [panelStyles, setPanelStyles] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setMounted(true);
-
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-
+    // Fetch dashboard data
+    async function fetchData() {
+      setLoading(true);
+      try {
+        // These endpoints require admin auth (cookie/session)
+        const [doorTypesRes, panelStylesRes, customersRes] = await Promise.all([
+          fetch("/api/door-types/admin/all"),
+          fetch("/api/panel-styles/admin/all"),
+          fetch("/api/customers", { credentials: "include" }),
+        ]);
+        setProductTypes(doorTypesRes.ok ? await doorTypesRes.json() : []);
+        setPanelStyles(panelStylesRes.ok ? await panelStylesRes.json() : []);
+        const customersData: Customer[] = customersRes.ok
+          ? await customersRes.json()
+          : [];
+        setCustomers(customersData);
+      } catch (e) {
+        setProductTypes([]);
+        setPanelStyles([]);
+        setCustomers([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
     return () => clearInterval(timer);
   }, []);
 
-  const chartData = [
-    { month: "January", desktop: 186, mobile: 80 },
-    { month: "February", desktop: 305, mobile: 200 },
-    { month: "March", desktop: 237, mobile: 120 },
-    { month: "April", desktop: 73, mobile: 190 },
-    { month: "May", desktop: 209, mobile: 130 },
-    { month: "June", desktop: 214, mobile: 140 },
-  ];
+  // Example chart data: show leads per month (from customers)
+  const chartData = React.useMemo(() => {
+    // Group customers by month
+    const map = new Map();
+    customers.forEach((c) => {
+      if (!c.created_at) return;
+      const date = new Date(c.created_at);
+      const key = `${date.getFullYear()}-${date.getMonth() + 1}`;
+      if (!map.has(key)) map.set(key, 0);
+      map.set(key, map.get(key) + 1);
+    });
+    // Sort by month
+    const arr = Array.from(map.entries())
+      .sort(([a], [b]) => (a > b ? 1 : -1))
+      .map(([key, count]) => {
+        const [year, month] = key.split("-");
+        return {
+          month: `${year}-${month.padStart(2, "0")}`,
+          leads: count,
+        };
+      });
+    return arr;
+  }, [customers]);
 
   const chartConfig = {
-    desktop: {
-      label: "Desktop",
+    leads: {
+      label: "Leads",
       color: "var(--primary)",
-    },
-    mobile: {
-      label: "Mobile",
-      color: "var(--secondary)",
     },
   } satisfies ChartConfig;
 
-  const [activeChart, setActiveChart] =
-    React.useState<keyof typeof chartConfig>("desktop");
+  const [activeChart, setActiveChart] = React.useState<"leads">("leads");
   const total = React.useMemo(
     () => ({
-      desktop: chartData.reduce((acc, curr) => acc + curr.desktop, 0),
-      mobile: chartData.reduce((acc, curr) => acc + curr.mobile, 0),
+      leads: customers.length,
     }),
-    [],
+    [customers],
   );
 
-  const invoices = [
-    {
-      invoice: "INV001",
-      paymentStatus: "Paid",
-      totalAmount: "$250.00",
-      paymentMethod: "Credit Card",
-    },
-    {
-      invoice: "INV002",
-      paymentStatus: "Pending",
-      totalAmount: "$150.00",
-      paymentMethod: "PayPal",
-    },
-    {
-      invoice: "INV003",
-      paymentStatus: "Unpaid",
-      totalAmount: "$350.00",
-      paymentMethod: "Bank Transfer",
-    },
-    {
-      invoice: "INV004",
-      paymentStatus: "Paid",
-      totalAmount: "$450.00",
-      paymentMethod: "Credit Card",
-    },
-    {
-      invoice: "INV005",
-      paymentStatus: "Paid",
-      totalAmount: "$550.00",
-      paymentMethod: "PayPal",
-    },
-    {
-      invoice: "INV006",
-      paymentStatus: "Pending",
-      totalAmount: "$200.00",
-      paymentMethod: "Bank Transfer",
-    },
-    {
-      invoice: "INV007",
-      paymentStatus: "Unpaid",
-      totalAmount: "$300.00",
-      paymentMethod: "Credit Card",
-    },
-  ];
+  // Show latest 7 leads as 'invoices' for table
+  const invoices = customers.slice(0, 7).map((c, i) => ({
+    invoice: c.id ?? `LEAD${i + 1}`,
+    paymentStatus: c.email ? "Contacted" : "New",
+    totalAmount: c.phone ?? "-",
+    paymentMethod: c.name ?? "-",
+  }));
 
   return (
     <div className="space-y-8 animate-in fade-in-0 duration-500">
@@ -177,17 +184,17 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <StatsCard
             title="Total Product Types"
-            value="1,234"
-            change="+12%"
-            changeType="positive"
+            value={loading ? "-" : productTypes.length.toLocaleString()}
+            change=""
+            changeType="neutral"
             icon={FileText}
             gradient="from-primary/20 via-primary/10 to-transparent"
           />
           <StatsCard
             title="Total Panel Styles"
-            value="24"
-            change="+3"
-            changeType="positive"
+            value={loading ? "-" : panelStyles.length.toLocaleString()}
+            change=""
+            changeType="neutral"
             icon={Settings}
             gradient="from-secondary/20 via-secondary/10 to-transparent"
           />
@@ -203,7 +210,7 @@ export default function AdminDashboard() {
               <CardTitle>Interactive Bar Chart</CardTitle>
             </div>
             <div className="flex">
-              {["desktop", "mobile"].map((key) => {
+              {["leads"].map((key) => {
                 const chart = key as keyof typeof chartConfig;
                 return (
                   <button
@@ -234,11 +241,10 @@ export default function AdminDashboard() {
                   tickLine={false}
                   tickMargin={10}
                   axisLine={false}
-                  tickFormatter={(value) => value.slice(0, 3)}
+                  tickFormatter={(value) => value.slice(5)}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-                <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+                <Bar dataKey="leads" fill="var(--color-primary)" radius={4} />
               </BarChart>
             </ChartContainer>
           </CardContent>
@@ -254,13 +260,12 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <Table>
-              <TableCaption>A list of your recent invoices.</TableCaption>
+              <TableCaption>A list of your recent leads.</TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px]">Invoice</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Method</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead className="w-[100px]">Lead ID</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead className="text-right">Phone</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -269,7 +274,6 @@ export default function AdminDashboard() {
                     <TableCell className="font-medium">
                       {invoice.invoice}
                     </TableCell>
-                    <TableCell>{invoice.paymentStatus}</TableCell>
                     <TableCell>{invoice.paymentMethod}</TableCell>
                     <TableCell className="text-right">
                       {invoice.totalAmount}
@@ -280,7 +284,9 @@ export default function AdminDashboard() {
               <TableFooter>
                 <TableRow>
                   <TableCell colSpan={3}>Total</TableCell>
-                  <TableCell className="text-right">$2,500.00</TableCell>
+                  <TableCell className="text-right">
+                    {customers.length}
+                  </TableCell>
                 </TableRow>
               </TableFooter>
             </Table>
