@@ -21,6 +21,7 @@ import {
   ShoppingBag,
   Users,
   ClipboardList,
+  Layers,
 } from "lucide-react";
 
 type DoorType = {
@@ -77,6 +78,14 @@ type HandleColor = {
   description?: string;
 };
 
+type GlazingOption = {
+  id: number;
+  name: string;
+  slug: string;
+  image: string;
+  description?: string;
+};
+
 type Selection = {
   doorType: DoorType | null;
   panelStyle: PanelStyle | null;
@@ -84,6 +93,7 @@ type Selection = {
   postcode: Postcode | null;
   externalColor: ExternalColor | null;
   internalColor: InternalColor | null;
+  glazingOption: GlazingOption | null;
   handleColor: HandleColor | null;
 };
 
@@ -94,6 +104,7 @@ const STEP_ICONS = [
   MapPin,
   Palette,
   PaintBucket,
+  Layers,
   Grip,
   ClipboardList,
 ];
@@ -105,8 +116,9 @@ const STEPS = [
   { id: 4, title: "Postcode", description: "Your location" },
   { id: 5, title: "External Color", description: "Outside finish" },
   { id: 6, title: "Internal Color", description: "Inside finish" },
-  { id: 7, title: "Handle Color", description: "Handle finish" },
-  { id: 8, title: "Summary", description: "Review & Submit" },
+  { id: 7, title: "Glazing", description: "Glazing option" },
+  { id: 8, title: "Handle Color", description: "Handle finish" },
+  { id: 9, title: "Summary", description: "Review & Submit" },
 ];
 
 type ProductConfiguratorProps = {
@@ -123,6 +135,7 @@ export default function ProductConfigurator({
   const [panelStylePage, setPanelStylePage] = useState(1);
   const [externalColorPage, setExternalColorPage] = useState(1);
   const [internalColorPage, setInternalColorPage] = useState(1);
+  const [glazingOptionPage, setGlazingOptionPage] = useState(1);
   const [handleColorPage, setHandleColorPage] = useState(1);
   const CARDS_PER_PAGE = 12;
   const [currentStep, setCurrentStep] = useState(1);
@@ -133,6 +146,7 @@ export default function ProductConfigurator({
     postcode: null,
     externalColor: null,
     internalColor: null,
+    glazingOption: null,
     handleColor: null,
   });
 
@@ -142,6 +156,7 @@ export default function ProductConfigurator({
   const [postcodes, setPostcodes] = useState<Postcode[]>([]);
   const [externalColors, setExternalColors] = useState<ExternalColor[]>([]);
   const [internalColors, setInternalColors] = useState<InternalColor[]>([]);
+  const [glazingOptions, setGlazingOptions] = useState<GlazingOption[]>([]);
   const [handleColors, setHandleColors] = useState<HandleColor[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -163,6 +178,7 @@ export default function ProductConfigurator({
           postcodesRes,
           externalColorsRes,
           internalColorsRes,
+          glazingOptionsRes,
           handleColorsRes,
         ] = await Promise.all([
           fetch(
@@ -173,7 +189,8 @@ export default function ProductConfigurator({
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/postcodes`),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/external-colors`),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/internal-colors`),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/handle-colors`),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/glazing-options`),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/handle-colors${productId ? `?product_id=${productId}` : ""}`),
         ]);
 
         if (doorTypesRes.ok) {
@@ -199,6 +216,10 @@ export default function ProductConfigurator({
         if (internalColorsRes.ok) {
           const data = await internalColorsRes.json();
           setInternalColors(Array.isArray(data) ? data : data.data || []);
+        }
+        if (glazingOptionsRes.ok) {
+          const data = await glazingOptionsRes.json();
+          setGlazingOptions(Array.isArray(data) ? data : data.data || []);
         }
         if (handleColorsRes.ok) {
           const data = await handleColorsRes.json();
@@ -258,6 +279,8 @@ export default function ProductConfigurator({
       case 6:
         return selection.internalColor !== null;
       case 7:
+        return selection.glazingOption !== null;
+      case 8:
         return selection.handleColor !== null;
       default:
         return true;
@@ -290,6 +313,7 @@ export default function ProductConfigurator({
             postcode: selection.postcode?.code || "",
             externalColor: selection.externalColor?.name || "",
             internalColor: selection.internalColor?.name || "",
+            glazingOption: selection.glazingOption?.name || "",
             handleColor: selection.handleColor?.name || "",
           }),
         },
@@ -313,7 +337,8 @@ export default function ProductConfigurator({
     if (currentStep === 2) setPanelStylePage(1);
     if (currentStep === 5) setExternalColorPage(1);
     if (currentStep === 6) setInternalColorPage(1);
-    if (currentStep === 7) setHandleColorPage(1);
+    if (currentStep === 7) setGlazingOptionPage(1);
+    if (currentStep === 8) setHandleColorPage(1);
   }, [currentStep]);
 
   const handleNext = () => {
@@ -387,6 +412,18 @@ export default function ProductConfigurator({
       selection.postcode &&
       selection.externalColor &&
       selection.internalColor &&
+      selection.glazingOption
+    ) {
+      setCurrentStep(step);
+    } else if (
+      step === 9 &&
+      selection.doorType &&
+      panelStepOk &&
+      selection.dimension &&
+      selection.postcode &&
+      selection.externalColor &&
+      selection.internalColor &&
+      selection.glazingOption &&
       selection.handleColor
     ) {
       setCurrentStep(step);
@@ -1000,8 +1037,112 @@ export default function ProductConfigurator({
             </div>
           )}
 
-          {/* Step 7: Handle Colors */}
+          {/* Step 7: Glazing Options */}
           {currentStep === 7 && (
+            <div>
+              <div className="text-center mb-3 sm:mb-4">
+                <h2 className="text-xl sm:text-2xl font-bold">
+                  Choose Glazing Option
+                </h2>
+                <p className="text-muted-foreground mt-1">
+                  Select the glazing for your product
+                </p>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
+                {glazingOptions
+                  .slice(
+                    (glazingOptionPage - 1) * CARDS_PER_PAGE,
+                    glazingOptionPage * CARDS_PER_PAGE,
+                  )
+                  .map((option) => (
+                    <div
+                      key={option.id}
+                      className={cn(
+                        "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] sm:min-h-[180px] relative overflow-hidden",
+                        selection.glazingOption?.id === option.id
+                          ? "ring-2 ring-primary scale-105 shadow-primary/20"
+                          : "hover:ring-1 hover:ring-primary/40",
+                      )}
+                      onClick={() => {
+                        setSelection({ ...selection, glazingOption: option });
+                        setTimeout(
+                          () =>
+                            setCurrentStep((s) =>
+                              Math.min(s + 1, STEPS.length),
+                            ),
+                          300,
+                        );
+                      }}
+                      style={{ marginTop: 0, marginBottom: 0 }}
+                    >
+                      <div className="w-full flex-1 flex items-center justify-center">
+                        {option.image ? (
+                          <img
+                            src={option.image}
+                            alt={option.name}
+                            className="w-full h-20 sm:h-28 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="w-full h-20 sm:h-28 bg-gray-100 rounded-xl flex items-center justify-center">
+                            <Layers className="w-10 h-10 text-gray-400" />
+                          </div>
+                        )}
+                        {selection.glazingOption?.id === option.id && (
+                          <div className="absolute top-2 right-2 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
+                            <Check className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="w-full mt-2">
+                        <h3 className="font-semibold text-sm text-center text-emerald-700 group-hover:text-emerald-900 transition-colors">
+                          {option.name}
+                        </h3>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+              {glazingOptions.length > CARDS_PER_PAGE && (
+                <div className="flex justify-center gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setGlazingOptionPage((p) => Math.max(1, p - 1))
+                    }
+                    disabled={glazingOptionPage === 1}
+                  >
+                    Prev
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setGlazingOptionPage((p) =>
+                        Math.min(
+                          Math.ceil(glazingOptions.length / CARDS_PER_PAGE),
+                          p + 1,
+                        ),
+                      )
+                    }
+                    disabled={
+                      glazingOptionPage ===
+                      Math.ceil(glazingOptions.length / CARDS_PER_PAGE)
+                    }
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
+              {glazingOptions.length === 0 && (
+                <div className="text-center py-12 text-muted-foreground">
+                  No glazing options available
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Step 8: Handle Colors */}
+          {currentStep === 8 && (
             <div>
               <div className="text-center mb-3 sm:mb-4">
                 <h2 className="text-xl sm:text-2xl font-bold">
@@ -1109,8 +1250,8 @@ export default function ProductConfigurator({
             </div>
           )}
 
-          {/* Step 8: Summary with Contact Details */}
-          {currentStep === 8 && (
+          {/* Step 9: Summary with Contact Details */}
+          {currentStep === 9 && (
             <div>
               <div>
                 {!submitted && (
@@ -1215,6 +1356,18 @@ export default function ProductConfigurator({
                                     {selection.internalColor && (
                                       <p className="font-medium text-[10px] sm:text-xs">
                                         {selection.internalColor.name}
+                                      </p>
+                                    )}
+                                  </li>
+                                  <li className="flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3">
+                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">
+                                      <Layers className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />{" "}
+                                      Glazing
+                                    </h3>{" "}
+                                    -
+                                    {selection.glazingOption && (
+                                      <p className="font-medium text-[10px] sm:text-xs">
+                                        {selection.glazingOption.name}
                                       </p>
                                     )}
                                   </li>
@@ -1382,7 +1535,7 @@ export default function ProductConfigurator({
           <span className="text-xs text-muted-foreground hidden sm:inline">
             Step {currentStep} of {STEPS.length}
           </span>
-          {currentStep < 8 && (
+          {currentStep < STEPS.length && (
             <Button
               onClick={handleNext}
               disabled={!canProceed()}

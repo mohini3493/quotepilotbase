@@ -7,51 +7,36 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import ImageUpload from "@/components/admin/ImageUpload";
 
-type HandleColor = {
+type GlazingOption = {
   name: string;
   image: string;
   isActive: boolean;
-  productId: number | string;
 };
 
-type Product = { id: number; title: string };
-
-export default function EditHandleColorPage() {
+export default function EditGlazingOptionPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const [form, setForm] = useState<HandleColor | null>(null);
+  const [form, setForm] = useState<GlazingOption | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [products, setProducts] = useState<Product[]>([]);
-
-  useEffect(() => {
-    fetch(`/api/products/admin/all`, { credentials: "include" })
-      .then((res) => res.json())
-      .then((data) => {
-        const arr = Array.isArray(data) ? data : data.data || [];
-        setProducts(arr.filter((p: any) => p.is_active ?? p.isActive));
-      })
-      .catch(() => {});
-  }, []);
 
   useEffect(() => {
     if (!id) return;
 
-    fetch(`/api/handle-colors/admin/${id}`, {
+    fetch(`/api/glazing-options/admin/${id}`, {
       credentials: "include",
     })
       .then((res) => {
-        if (!res.ok) throw new Error("Failed to load handle color");
+        if (!res.ok) throw new Error("Failed to load glazing option");
         return res.json();
       })
       .then((data) => {
         setForm({
           ...data,
           isActive: data.is_active ?? data.isActive ?? true,
-          productId: data.product_id ?? data.productId ?? "",
         });
       })
-      .catch(() => setError("Failed to load handle color"));
+      .catch(() => setError("Failed to load glazing option"));
   }, [id]);
 
   if (error) return <p className="text-destructive">{error}</p>;
@@ -60,19 +45,16 @@ export default function EditHandleColorPage() {
   async function save() {
     setSaving(true);
     try {
-      await fetch(`/api/handle-colors/${id}`, {
+      await fetch(`/api/glazing-options/${id}`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          productId: form.productId ? Number(form.productId) : null,
-        }),
+        body: JSON.stringify(form),
       });
 
-      router.push("/admin/handle-colors");
+      router.push("/admin/glazing-options");
     } catch (error) {
-      console.error("Error saving handle color:", error);
+      console.error("Error saving glazing option:", error);
     } finally {
       setSaving(false);
     }
@@ -80,29 +62,9 @@ export default function EditHandleColorPage() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <h1 className="text-2xl font-semibold">Edit Handle Color</h1>
+      <h1 className="text-2xl font-semibold">Edit Glazing Option</h1>
 
       <div className="space-y-4">
-        <div>
-          <label className="text-sm font-medium mb-2 block">
-            Select Product
-          </label>
-          <select
-            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            value={form.productId || ""}
-            onChange={(e) =>
-              setForm({ ...form, productId: e.target.value })
-            }
-          >
-            <option value="">-- All Products --</option>
-            {products.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.title}
-              </option>
-            ))}
-          </select>
-        </div>
-
         <div>
           <label className="text-sm font-medium mb-2 block">Name</label>
           <Input
@@ -140,7 +102,7 @@ export default function EditHandleColorPage() {
         </Button>
         <Button
           variant="outline"
-          onClick={() => router.push("/admin/handle-colors")}
+          onClick={() => router.push("/admin/glazing-options")}
         >
           Cancel
         </Button>

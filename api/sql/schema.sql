@@ -105,6 +105,18 @@ CREATE TABLE IF NOT EXISTS handle_colors (
   name TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
   image TEXT,
+  product_id INT REFERENCES products(id) ON DELETE SET NULL,
+  "order" INT DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT now()
+);
+
+-- Glazing Options table
+CREATE TABLE IF NOT EXISTS glazing_options (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  image TEXT,
   "order" INT DEFAULT 0,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP DEFAULT now()
@@ -122,6 +134,7 @@ CREATE TABLE IF NOT EXISTS customers (
   postcode TEXT,
   external_color TEXT,
   internal_color TEXT,
+  glazing_option TEXT,
   handle_color TEXT,
   created_at TIMESTAMP DEFAULT now()
 );

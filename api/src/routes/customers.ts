@@ -21,11 +21,12 @@ router.post("/", async (req, res) => {
       postcode,
       externalColor,
       internalColor,
+      glazingOption,
       handleColor,
     } = req.body;
     const result = await pool.query(
-      `INSERT INTO customers (name, email, phone, door_type, panel_style, dimension, postcode, external_color, internal_color, handle_color) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+      `INSERT INTO customers (name, email, phone, door_type, panel_style, dimension, postcode, external_color, internal_color, glazing_option, handle_color)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
       [
         name,
         email,
@@ -36,6 +37,7 @@ router.post("/", async (req, res) => {
         postcode,
         externalColor,
         internalColor,
+        glazingOption,
         handleColor,
       ],
     );

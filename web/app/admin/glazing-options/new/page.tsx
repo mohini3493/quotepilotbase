@@ -1,52 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useRouter } from "next/navigation";
 import ImageUpload from "@/components/admin/ImageUpload";
 
-type Product = { id: number; title: string };
-
-export default function AddHandleColorPage() {
+export default function AddGlazingOptionPage() {
   const router = useRouter();
   const [form, setForm] = useState<any>({
     name: "",
     image: "",
     isActive: true,
-    productId: "",
   });
   const [saving, setSaving] = useState(false);
-  const [products, setProducts] = useState<Product[]>([]);
 
-  useEffect(() => {
-    fetch(`/api/products/admin/all`, { credentials: "include" })
-      .then((res) => res.json())
-      .then((data) => {
-        const arr = Array.isArray(data) ? data : data.data || [];
-        setProducts(arr.filter((p: any) => p.is_active ?? p.isActive));
-      })
-      .catch(() => {});
-  }, []);
-
-  async function saveHandleColor() {
+  async function saveGlazingOption() {
     setSaving(true);
     try {
-      await fetch(`/api/handle-colors`, {
+      await fetch(`/api/glazing-options`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
           slug: form.name?.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-          productId: form.productId ? Number(form.productId) : null,
         }),
       });
 
-      router.push("/admin/handle-colors");
+      router.push("/admin/glazing-options");
     } catch (error) {
-      console.error("Error saving handle color:", error);
+      console.error("Error saving glazing option:", error);
     } finally {
       setSaving(false);
     }
@@ -54,33 +39,13 @@ export default function AddHandleColorPage() {
 
   return (
     <div className="max-w-xl space-y-6">
-      <h1 className="text-2xl font-semibold">Add New Handle Color</h1>
+      <h1 className="text-2xl font-semibold">Add New Glazing Option</h1>
 
       <div className="space-y-4">
         <div>
-          <label className="text-sm font-medium mb-2 block">
-            Select Product
-          </label>
-          <select
-            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            value={form.productId || ""}
-            onChange={(e) =>
-              setForm({ ...form, productId: e.target.value })
-            }
-          >
-            <option value="">-- All Products --</option>
-            {products.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.title}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
           <label className="text-sm font-medium mb-2 block">Name</label>
           <Input
-            placeholder="e.g., Chrome"
+            placeholder="e.g., Double Glazed"
             value={form.name || ""}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
@@ -110,12 +75,12 @@ export default function AddHandleColorPage() {
       </div>
 
       <div className="flex gap-3">
-        <Button onClick={saveHandleColor} disabled={saving}>
-          {saving ? "Saving..." : "Save Handle Color"}
+        <Button onClick={saveGlazingOption} disabled={saving}>
+          {saving ? "Saving..." : "Save Glazing Option"}
         </Button>
         <Button
           variant="outline"
-          onClick={() => router.push("/admin/handle-colors")}
+          onClick={() => router.push("/admin/glazing-options")}
         >
           Cancel
         </Button>

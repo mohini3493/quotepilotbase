@@ -17,6 +17,7 @@ import {
   PaintBucket,
   Grip,
   Users,
+  Layers,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { layouts } from "chart.js";
@@ -59,6 +60,14 @@ const handleColorLinks = [
   {
     name: "Add Handle Color",
     href: "/admin/handle-colors/new",
+    icon: Plus,
+  },
+];
+
+const glazingOptionLinks = [
+  {
+    name: "Add Glazing Option",
+    href: "/admin/glazing-options/new",
     icon: Plus,
   },
 ];
@@ -243,6 +252,30 @@ export default function AdminSidebar() {
             </Link>
             <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
               {handleColorLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">{link.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Glazing Options Section */}
+            <Link
+              href="/admin/glazing-options"
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group"
+            >
+              <Layers className="w-5 h-5 flex-shrink-0" />
+              <span className="truncate">Glazing Options</span>
+            </Link>
+            <div className="ml-3 space-y-1 border-l border-sidebar-border/50 pl-3">
+              {glazingOptionLinks.map((link) => {
                 const Icon = link.icon;
                 return (
                   <Link

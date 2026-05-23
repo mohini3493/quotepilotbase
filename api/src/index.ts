@@ -15,6 +15,29 @@ import externalColorsRoutes from "./routes/externalColors";
 import internalColorsRoutes from "./routes/internalColors";
 import handleColorsRoutes from "./routes/handleColors";
 import customersRoutes from "./routes/customers";
+import glazingOptionsRoutes from "./routes/glazingOptions";
+import { pool } from "./db";
+
+async function runMigrations() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS glazing_options (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      slug TEXT UNIQUE NOT NULL,
+      image TEXT,
+      "order" INT DEFAULT 0,
+      is_active BOOLEAN DEFAULT true,
+      created_at TIMESTAMP DEFAULT now()
+    )
+  `);
+  await pool.query(`
+    ALTER TABLE customers ADD COLUMN IF NOT EXISTS glazing_option TEXT
+  `);
+  await pool.query(`
+    ALTER TABLE handle_colors ADD COLUMN IF NOT EXISTS product_id INT REFERENCES products(id) ON DELETE SET NULL
+  `);
+  console.log("Migrations complete");
+}
 
 const app = express();
 
@@ -69,6 +92,7 @@ app.use("/api/external-colors", externalColorsRoutes);
 app.use("/api/internal-colors", internalColorsRoutes);
 app.use("/api/handle-colors", handleColorsRoutes);
 app.use("/api/customers", customersRoutes);
+app.use("/api/glazing-options", glazingOptionsRoutes);
 
 // Global error handler
 app.use((err: any, req: any, res: any, next: any) => {
@@ -86,6 +110,8 @@ process.on("unhandledRejection", (reason, promise) => {
 });
 
 const PORT = Number(process.env.PORT) || 3000;
+
+runMigrations().catch(console.error);
 
 const server = app.listen(PORT, () => {
   console.log(`API running on http://localhost:${PORT}`);
