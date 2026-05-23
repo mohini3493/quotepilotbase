@@ -56,6 +56,7 @@ export default function AdminDashboard() {
   const [panelStyles, setPanelStyles] = useState<any[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [adminEmail, setAdminEmail] = useState<string>("");
 
   useEffect(() => {
     setMounted(true);
@@ -66,12 +67,16 @@ export default function AdminDashboard() {
     async function fetchData() {
       setLoading(true);
       try {
-        // These endpoints require admin auth (cookie/session)
-        const [doorTypesRes, panelStylesRes, customersRes] = await Promise.all([
+        const [doorTypesRes, panelStylesRes, customersRes, meRes] = await Promise.all([
           fetch("/api/door-types/admin/all"),
           fetch("/api/panel-styles/admin/all"),
           fetch("/api/customers", { credentials: "include" }),
+          fetch("/api/auth/me", { credentials: "include" }),
         ]);
+        if (meRes.ok) {
+          const me = await meRes.json();
+          if (me.email) setAdminEmail(me.email);
+        }
         setProductTypes(doorTypesRes.ok ? await doorTypesRes.json() : []);
         setPanelStyles(panelStylesRes.ok ? await panelStylesRes.json() : []);
         const customersData: Customer[] = customersRes.ok
@@ -159,19 +164,21 @@ export default function AdminDashboard() {
           <CardContent className="p-6 flex flex-colgap-4">
             <div>
               <h2 className="text-2xl font-bold mb-2">
-                Hi, Infinity Glazing Admin 👋
+                Hi, Welcome Back 👋
               </h2>
               <p className="text-muted-foreground">
                 Manage your products, view analytics, and oversee customer
                 interactions all in one place.
               </p>
-              <Link
-                href="mailto:admin@infinityglazing.com"
-                className="flex items-center gap-3 rounded-lg py-3 font-medium group"
-              >
-                <Briefcase className="w-5 h-5 flex-shrink-0 text-primary" />
-                <span className="truncate">admin@infinityglazing.com</span>
-              </Link>
+              {adminEmail && (
+                <Link
+                  href={`mailto:${adminEmail}`}
+                  className="flex items-center gap-3 rounded-lg py-3 font-medium group"
+                >
+                  <Briefcase className="w-5 h-5 flex-shrink-0 text-primary" />
+                  <span className="truncate">{adminEmail}</span>
+                </Link>
+              )}
             </div>
             <img
               src="https://shadcnuikit.com/images/avatars/01.png"

@@ -45,7 +45,15 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/me", requireAdmin, async (req, res) => {
-  res.json({ authenticated: true });
+  const adminId = (req as any).admin?.adminId;
+  const result = await pool.query(
+    "SELECT id, email, role FROM admins WHERE id = $1",
+    [adminId],
+  );
+  if (result.rows.length === 0) {
+    return res.status(404).json({ authenticated: false });
+  }
+  res.json({ authenticated: true, ...result.rows[0] });
 });
 
 router.post("/logout", (req, res) => {

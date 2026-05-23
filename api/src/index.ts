@@ -16,6 +16,7 @@ import internalColorsRoutes from "./routes/internalColors";
 import handleColorsRoutes from "./routes/handleColors";
 import customersRoutes from "./routes/customers";
 import glazingOptionsRoutes from "./routes/glazingOptions";
+import adminUsersRoutes from "./routes/adminUsers";
 import { pool } from "./db";
 
 async function runMigrations() {
@@ -35,6 +36,14 @@ async function runMigrations() {
   `);
   await pool.query(`
     ALTER TABLE handle_colors ADD COLUMN IF NOT EXISTS product_id INT REFERENCES products(id) ON DELETE SET NULL
+  `);
+  await pool.query(`
+    ALTER TABLE admins ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'admin'
+  `);
+  await pool.query(`
+    UPDATE admins SET role = 'superadmin'
+    WHERE id = (SELECT MIN(id) FROM admins)
+    AND NOT EXISTS (SELECT 1 FROM admins WHERE role = 'superadmin')
   `);
   console.log("Migrations complete");
 }
@@ -93,6 +102,7 @@ app.use("/api/internal-colors", internalColorsRoutes);
 app.use("/api/handle-colors", handleColorsRoutes);
 app.use("/api/customers", customersRoutes);
 app.use("/api/glazing-options", glazingOptionsRoutes);
+app.use("/api/admin-users", adminUsersRoutes);
 
 // Global error handler
 app.use((err: any, req: any, res: any, next: any) => {
