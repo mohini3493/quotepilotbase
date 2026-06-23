@@ -5,6 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Eye, Mail, Phone, User, Calendar } from "lucide-react";
 
+type ProductConfig = {
+  productId?: number;
+  productTitle?: string;
+  doorType?: string;
+  panelStyle?: string;
+  dimension?: string;
+  postcode?: string;
+  externalColor?: string;
+  internalColor?: string;
+  glazingOption?: string;
+  handleColor?: string;
+};
+
 type Customer = {
   id: number;
   name: string;
@@ -18,7 +31,9 @@ type Customer = {
   postcode?: string;
   externalColor?: string;
   internalColor?: string;
+  glazingOption?: string;
   handleColor?: string;
+  productsConfig?: ProductConfig[];
   created_at: string;
 };
 
@@ -38,6 +53,15 @@ export default function CustomersPage() {
         if (response.ok) {
           const data = await response.json();
           // Map backend snake_case fields to camelCase for UI
+          const parseProductsConfig = (raw: string | null | undefined): ProductConfig[] | undefined => {
+            if (!raw) return undefined;
+            try {
+              const parsed = JSON.parse(raw);
+              return Array.isArray(parsed) ? parsed : undefined;
+            } catch {
+              return undefined;
+            }
+          };
           const toCamel = (obj: any) => ({
             ...obj,
             productId: obj.product_id,
@@ -48,7 +72,9 @@ export default function CustomersPage() {
             postcode: obj.postcode,
             externalColor: obj.external_color,
             internalColor: obj.internal_color,
+            glazingOption: obj.glazing_option,
             handleColor: obj.handle_color,
+            productsConfig: parseProductsConfig(obj.products_config),
             created_at: obj.created_at,
           });
           const arr = Array.isArray(data) ? data : data.data || [];
@@ -108,6 +134,9 @@ export default function CustomersPage() {
                   Phone
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Products
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Submitted
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -130,6 +159,13 @@ export default function CustomersPage() {
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-sm">
                     {customer.phone}
+                  </td>
+                  <td className="px-4 py-2 whitespace-nowrap text-sm">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                      {customer.productsConfig
+                        ? customer.productsConfig.length
+                        : 1}
+                    </span>
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-xs text-muted-foreground">
                     {customer.created_at &&
@@ -219,90 +255,199 @@ export default function CustomersPage() {
                   {/* Configuration Details */}
                   <div className="space-y-4">
                     <h3 className="font-semibold text-lg border-b pb-2">
-                      Configuration
+                      Products
+                      {selectedCustomer.productsConfig &&
+                        selectedCustomer.productsConfig.length > 1 &&
+                        ` (${selectedCustomer.productsConfig.length})`}
                     </h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {selectedCustomer.productTitle && (
-                        <div className="bg-muted/50 rounded-lg p-3">
-                          <p className="text-xs text-muted-foreground uppercase">
-                            Product
-                          </p>
-                          <p className="font-medium text-sm">
-                            {selectedCustomer.productTitle}
-                          </p>
-                        </div>
-                      )}
-                      {selectedCustomer.doorType && (
-                        <div className="bg-muted/50 rounded-lg p-3">
-                          <p className="text-xs text-muted-foreground uppercase">
-                            Product Type
-                          </p>
-                          <p className="font-medium text-sm">
-                            {selectedCustomer.doorType}
-                          </p>
-                        </div>
-                      )}
-                      {selectedCustomer.panelStyle && (
-                        <div className="bg-muted/50 rounded-lg p-3">
-                          <p className="text-xs text-muted-foreground uppercase">
-                            Panel Style
-                          </p>
-                          <p className="font-medium text-sm">
-                            {selectedCustomer.panelStyle}
-                          </p>
-                        </div>
-                      )}
-                      {selectedCustomer.dimension && (
-                        <div className="bg-muted/50 rounded-lg p-3">
-                          <p className="text-xs text-muted-foreground uppercase">
-                            Dimensions
-                          </p>
-                          <p className="font-medium text-sm">
-                            {selectedCustomer.dimension}
-                          </p>
-                        </div>
-                      )}
-                      {selectedCustomer.postcode && (
-                        <div className="bg-muted/50 rounded-lg p-3">
-                          <p className="text-xs text-muted-foreground uppercase">
-                            Postcode
-                          </p>
-                          <p className="font-medium text-sm">
-                            {selectedCustomer.postcode}
-                          </p>
-                        </div>
-                      )}
-                      {selectedCustomer.externalColor && (
-                        <div className="bg-muted/50 rounded-lg p-3">
-                          <p className="text-xs text-muted-foreground uppercase">
-                            External Color
-                          </p>
-                          <p className="font-medium text-sm">
-                            {selectedCustomer.externalColor}
-                          </p>
-                        </div>
-                      )}
-                      {selectedCustomer.internalColor && (
-                        <div className="bg-muted/50 rounded-lg p-3">
-                          <p className="text-xs text-muted-foreground uppercase">
-                            Internal Color
-                          </p>
-                          <p className="font-medium text-sm">
-                            {selectedCustomer.internalColor}
-                          </p>
-                        </div>
-                      )}
-                      {selectedCustomer.handleColor && (
-                        <div className="bg-muted/50 rounded-lg p-3">
-                          <p className="text-xs text-muted-foreground uppercase">
-                            Handle Color
-                          </p>
-                          <p className="font-medium text-sm">
-                            {selectedCustomer.handleColor}
-                          </p>
-                        </div>
-                      )}
-                    </div>
+                    {selectedCustomer.productsConfig &&
+                    selectedCustomer.productsConfig.length > 0 ? (
+                      <div className="space-y-4">
+                        {selectedCustomer.productsConfig.map((product, idx) => (
+                          <div key={idx} className="border rounded-lg p-4">
+                            <p className="text-xs font-semibold text-primary mb-3">
+                              Product {idx + 1}
+                              {product.productTitle && ` — ${product.productTitle}`}
+                            </p>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                              {product.doorType && (
+                                <div className="bg-muted/50 rounded-lg p-3">
+                                  <p className="text-xs text-muted-foreground uppercase">
+                                    Product Type
+                                  </p>
+                                  <p className="font-medium text-sm">
+                                    {product.doorType}
+                                  </p>
+                                </div>
+                              )}
+                              {product.panelStyle && (
+                                <div className="bg-muted/50 rounded-lg p-3">
+                                  <p className="text-xs text-muted-foreground uppercase">
+                                    Panel Style
+                                  </p>
+                                  <p className="font-medium text-sm">
+                                    {product.panelStyle}
+                                  </p>
+                                </div>
+                              )}
+                              {product.dimension && (
+                                <div className="bg-muted/50 rounded-lg p-3">
+                                  <p className="text-xs text-muted-foreground uppercase">
+                                    Dimensions
+                                  </p>
+                                  <p className="font-medium text-sm">
+                                    {product.dimension}
+                                  </p>
+                                </div>
+                              )}
+                              {product.postcode && (
+                                <div className="bg-muted/50 rounded-lg p-3">
+                                  <p className="text-xs text-muted-foreground uppercase">
+                                    Postcode
+                                  </p>
+                                  <p className="font-medium text-sm">
+                                    {product.postcode}
+                                  </p>
+                                </div>
+                              )}
+                              {product.externalColor && (
+                                <div className="bg-muted/50 rounded-lg p-3">
+                                  <p className="text-xs text-muted-foreground uppercase">
+                                    External Color
+                                  </p>
+                                  <p className="font-medium text-sm">
+                                    {product.externalColor}
+                                  </p>
+                                </div>
+                              )}
+                              {product.internalColor && (
+                                <div className="bg-muted/50 rounded-lg p-3">
+                                  <p className="text-xs text-muted-foreground uppercase">
+                                    Internal Color
+                                  </p>
+                                  <p className="font-medium text-sm">
+                                    {product.internalColor}
+                                  </p>
+                                </div>
+                              )}
+                              {product.glazingOption && (
+                                <div className="bg-muted/50 rounded-lg p-3">
+                                  <p className="text-xs text-muted-foreground uppercase">
+                                    Glazing
+                                  </p>
+                                  <p className="font-medium text-sm">
+                                    {product.glazingOption}
+                                  </p>
+                                </div>
+                              )}
+                              {product.handleColor && (
+                                <div className="bg-muted/50 rounded-lg p-3">
+                                  <p className="text-xs text-muted-foreground uppercase">
+                                    Handle Color
+                                  </p>
+                                  <p className="font-medium text-sm">
+                                    {product.handleColor}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {selectedCustomer.productTitle && (
+                          <div className="bg-muted/50 rounded-lg p-3">
+                            <p className="text-xs text-muted-foreground uppercase">
+                              Product
+                            </p>
+                            <p className="font-medium text-sm">
+                              {selectedCustomer.productTitle}
+                            </p>
+                          </div>
+                        )}
+                        {selectedCustomer.doorType && (
+                          <div className="bg-muted/50 rounded-lg p-3">
+                            <p className="text-xs text-muted-foreground uppercase">
+                              Product Type
+                            </p>
+                            <p className="font-medium text-sm">
+                              {selectedCustomer.doorType}
+                            </p>
+                          </div>
+                        )}
+                        {selectedCustomer.panelStyle && (
+                          <div className="bg-muted/50 rounded-lg p-3">
+                            <p className="text-xs text-muted-foreground uppercase">
+                              Panel Style
+                            </p>
+                            <p className="font-medium text-sm">
+                              {selectedCustomer.panelStyle}
+                            </p>
+                          </div>
+                        )}
+                        {selectedCustomer.dimension && (
+                          <div className="bg-muted/50 rounded-lg p-3">
+                            <p className="text-xs text-muted-foreground uppercase">
+                              Dimensions
+                            </p>
+                            <p className="font-medium text-sm">
+                              {selectedCustomer.dimension}
+                            </p>
+                          </div>
+                        )}
+                        {selectedCustomer.postcode && (
+                          <div className="bg-muted/50 rounded-lg p-3">
+                            <p className="text-xs text-muted-foreground uppercase">
+                              Postcode
+                            </p>
+                            <p className="font-medium text-sm">
+                              {selectedCustomer.postcode}
+                            </p>
+                          </div>
+                        )}
+                        {selectedCustomer.externalColor && (
+                          <div className="bg-muted/50 rounded-lg p-3">
+                            <p className="text-xs text-muted-foreground uppercase">
+                              External Color
+                            </p>
+                            <p className="font-medium text-sm">
+                              {selectedCustomer.externalColor}
+                            </p>
+                          </div>
+                        )}
+                        {selectedCustomer.internalColor && (
+                          <div className="bg-muted/50 rounded-lg p-3">
+                            <p className="text-xs text-muted-foreground uppercase">
+                              Internal Color
+                            </p>
+                            <p className="font-medium text-sm">
+                              {selectedCustomer.internalColor}
+                            </p>
+                          </div>
+                        )}
+                        {selectedCustomer.glazingOption && (
+                          <div className="bg-muted/50 rounded-lg p-3">
+                            <p className="text-xs text-muted-foreground uppercase">
+                              Glazing
+                            </p>
+                            <p className="font-medium text-sm">
+                              {selectedCustomer.glazingOption}
+                            </p>
+                          </div>
+                        )}
+                        {selectedCustomer.handleColor && (
+                          <div className="bg-muted/50 rounded-lg p-3">
+                            <p className="text-xs text-muted-foreground uppercase">
+                              Handle Color
+                            </p>
+                            <p className="font-medium text-sm">
+                              {selectedCustomer.handleColor}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div className="mt-6 flex justify-end">

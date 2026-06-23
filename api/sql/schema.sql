@@ -136,5 +136,16 @@ CREATE TABLE IF NOT EXISTS customers (
   internal_color TEXT,
   glazing_option TEXT,
   handle_color TEXT,
+  products_config TEXT,
   created_at TIMESTAMP DEFAULT now()
 );
+
+-- Migration: add products_config column if it doesn't exist
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'customers' AND column_name = 'products_config'
+  ) THEN
+    ALTER TABLE customers ADD COLUMN products_config TEXT;
+  END IF;
+END $$;

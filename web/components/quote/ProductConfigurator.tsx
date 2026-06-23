@@ -22,6 +22,8 @@ import {
   Users,
   ClipboardList,
   Layers,
+  Plus,
+  Trash2,
 } from "lucide-react";
 
 type DoorType = {
@@ -97,6 +99,12 @@ type Selection = {
   handleColor: HandleColor | null;
 };
 
+type SavedProduct = {
+  productId?: number;
+  productTitle?: string;
+  selection: Selection;
+};
+
 const STEP_ICONS = [
   DoorOpen,
   PanelTop,
@@ -161,6 +169,7 @@ export default function ProductConfigurator({
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [savedProducts, setSavedProducts] = useState<SavedProduct[]>([]);
   const [contactDetails, setContactDetails] = useState({
     name: "",
     email: "",
@@ -287,9 +296,54 @@ export default function ProductConfigurator({
     }
   };
 
+  const emptySelection: Selection = {
+    doorType: null,
+    panelStyle: null,
+    dimension: null,
+    postcode: null,
+    externalColor: null,
+    internalColor: null,
+    glazingOption: null,
+    handleColor: null,
+  };
+
+  const handleAddMoreProducts = () => {
+    setSavedProducts((prev) => [
+      ...prev,
+      { productId, productTitle, selection: { ...selection } },
+    ]);
+    setSelection({ ...emptySelection });
+    setCurrentStep(1);
+  };
+
+  const handleRemoveProduct = (index: number) => {
+    setSavedProducts((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const formatProductForSubmit = (sel: Selection) => ({
+    productId: productId,
+    productTitle: productTitle,
+    doorType: sel.doorType?.name || "",
+    panelStyle: sel.panelStyle?.name || "",
+    dimension:
+      sel.dimension && (sel.dimension.width || sel.dimension.height)
+        ? `${sel.dimension.width || ""} x ${sel.dimension.height || ""}`
+        : "",
+    postcode: sel.postcode?.code || "",
+    externalColor: sel.externalColor?.name || "",
+    internalColor: sel.internalColor?.name || "",
+    glazingOption: sel.glazingOption?.name || "",
+    handleColor: sel.handleColor?.name || "",
+  });
+
   const handleSubmitQuote = async () => {
     setSubmitting(true);
     try {
+      const allProducts = [
+        ...savedProducts.map((p) => formatProductForSubmit(p.selection)),
+        formatProductForSubmit(selection),
+      ];
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/customers`,
         {
@@ -301,20 +355,7 @@ export default function ProductConfigurator({
             name: contactDetails.name,
             email: contactDetails.email,
             phone: contactDetails.phone,
-            productId: productId,
-            productTitle: productTitle,
-            doorType: selection.doorType?.name || "",
-            panelStyle: selection.panelStyle?.name || "",
-            dimension:
-              selection.dimension &&
-              (selection.dimension.width || selection.dimension.height)
-                ? `${selection.dimension.width || ""} x ${selection.dimension.height || ""}`
-                : "",
-            postcode: selection.postcode?.code || "",
-            externalColor: selection.externalColor?.name || "",
-            internalColor: selection.internalColor?.name || "",
-            glazingOption: selection.glazingOption?.name || "",
-            handleColor: selection.handleColor?.name || "",
+            products: allProducts,
           }),
         },
       );
@@ -1257,10 +1298,95 @@ export default function ProductConfigurator({
                 {!submitted && (
                   <>
                     <div className="space-y-4 sm:space-y-6">
+                      {/* Previously saved products */}
+                      {savedProducts.length > 0 && (
+                        <div className="px-1 sm:px-2">
+                          <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-3">
+                            Your Products ({savedProducts.length + 1})
+                          </h2>
+                          <div className="space-y-3">
+                            {savedProducts.map((saved, index) => (
+                              <Card key={index} className="relative">
+                                <div className="p-3 sm:p-4">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                                      Product {index + 1}
+                                    </span>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-7 w-7 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                      onClick={() => handleRemoveProduct(index)}
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  </div>
+                                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px] sm:text-xs">
+                                    {saved.selection.doorType && (
+                                      <div>
+                                        <span className="text-muted-foreground">Type:</span>{" "}
+                                        <span className="font-medium">{saved.selection.doorType.name}</span>
+                                      </div>
+                                    )}
+                                    {saved.selection.panelStyle && (
+                                      <div>
+                                        <span className="text-muted-foreground">Panel:</span>{" "}
+                                        <span className="font-medium">{saved.selection.panelStyle.name}</span>
+                                      </div>
+                                    )}
+                                    {saved.selection.dimension && (
+                                      <div>
+                                        <span className="text-muted-foreground">Size:</span>{" "}
+                                        <span className="font-medium">
+                                          {saved.selection.dimension.width} x {saved.selection.dimension.height} mm
+                                        </span>
+                                      </div>
+                                    )}
+                                    {saved.selection.postcode && (
+                                      <div>
+                                        <span className="text-muted-foreground">Postcode:</span>{" "}
+                                        <span className="font-medium">{saved.selection.postcode.code}</span>
+                                      </div>
+                                    )}
+                                    {saved.selection.externalColor && (
+                                      <div>
+                                        <span className="text-muted-foreground">Ext Color:</span>{" "}
+                                        <span className="font-medium">{saved.selection.externalColor.name}</span>
+                                      </div>
+                                    )}
+                                    {saved.selection.internalColor && (
+                                      <div>
+                                        <span className="text-muted-foreground">Int Color:</span>{" "}
+                                        <span className="font-medium">{saved.selection.internalColor.name}</span>
+                                      </div>
+                                    )}
+                                    {saved.selection.glazingOption && (
+                                      <div>
+                                        <span className="text-muted-foreground">Glazing:</span>{" "}
+                                        <span className="font-medium">{saved.selection.glazingOption.name}</span>
+                                      </div>
+                                    )}
+                                    {saved.selection.handleColor && (
+                                      <div>
+                                        <span className="text-muted-foreground">Handle:</span>{" "}
+                                        <span className="font-medium">{saved.selection.handleColor.name}</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </Card>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Current product review */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
                         <div className="px-1 sm:px-2">
                           <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-3">
-                            Review Your Selection
+                            {savedProducts.length > 0
+                              ? `Product ${savedProducts.length + 1} (Current)`
+                              : "Review Your Selection"}
                           </h2>
                           <Card>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-3 sm:p-4">
@@ -1387,6 +1513,18 @@ export default function ProductConfigurator({
                               </div>
                             </div>
                           </Card>
+
+                          {/* Add More Products Button */}
+                          <div className="mt-4">
+                            <Button
+                              variant="outline"
+                              className="w-full gap-2 border-dashed border-2 border-primary/40 text-primary hover:bg-primary/5 hover:border-primary"
+                              onClick={handleAddMoreProducts}
+                            >
+                              <Plus className="w-4 h-4" />
+                              Add More Products
+                            </Button>
+                          </div>
                         </div>
                         {/* Contact Details Form */}
                         <div className="mt-4 sm:mt-6 md:mt-8">
@@ -1396,6 +1534,8 @@ export default function ProductConfigurator({
                             </h3>
                             <p className="text-xs sm:text-sm text-muted-foreground">
                               Fill in your details to receive your quote
+                              {savedProducts.length > 0 &&
+                                ` for ${savedProducts.length + 1} product${savedProducts.length > 0 ? "s" : ""}`}
                             </p>
                           </div>
                           <div className="mx-auto space-y-3 sm:space-y-4 px-2 sm:px-0">
@@ -1490,7 +1630,7 @@ export default function ProductConfigurator({
                             Submitting...
                           </>
                         ) : (
-                          "Get Quote"
+                          `Get Quote${savedProducts.length > 0 ? ` (${savedProducts.length + 1} Products)` : ""}`
                         )}
                       </Button>
                     </div>
@@ -1508,7 +1648,10 @@ export default function ProductConfigurator({
                         </h3>
                         <p className="text-sm sm:text-base text-muted-foreground mt-2">
                           Thank you, {contactDetails.name}! We'll contact you
-                          soon at {contactDetails.email}.
+                          soon at {contactDetails.email}
+                          {savedProducts.length > 0 &&
+                            ` regarding your ${savedProducts.length + 1} products`}
+                          .
                         </p>
                       </div>
                     </div>

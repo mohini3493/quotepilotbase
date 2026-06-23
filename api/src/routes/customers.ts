@@ -15,6 +15,7 @@ router.post("/", async (req, res) => {
       name,
       email,
       phone,
+      products,
       doorType,
       panelStyle,
       dimension,
@@ -24,21 +25,35 @@ router.post("/", async (req, res) => {
       glazingOption,
       handleColor,
     } = req.body;
+
+    const productsArray = Array.isArray(products) ? products : [];
+    const firstProduct = productsArray[0] || {
+      doorType,
+      panelStyle,
+      dimension,
+      postcode,
+      externalColor,
+      internalColor,
+      glazingOption,
+      handleColor,
+    };
+
     const result = await pool.query(
-      `INSERT INTO customers (name, email, phone, door_type, panel_style, dimension, postcode, external_color, internal_color, glazing_option, handle_color)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
+      `INSERT INTO customers (name, email, phone, door_type, panel_style, dimension, postcode, external_color, internal_color, glazing_option, handle_color, products_config)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
       [
         name,
         email,
         phone,
-        doorType,
-        panelStyle,
-        dimension,
-        postcode,
-        externalColor,
-        internalColor,
-        glazingOption,
-        handleColor,
+        firstProduct.doorType || "",
+        firstProduct.panelStyle || "",
+        firstProduct.dimension || "",
+        firstProduct.postcode || "",
+        firstProduct.externalColor || "",
+        firstProduct.internalColor || "",
+        firstProduct.glazingOption || "",
+        firstProduct.handleColor || "",
+        productsArray.length > 0 ? JSON.stringify(productsArray) : null,
       ],
     );
     res.json(result.rows[0]);
