@@ -167,6 +167,7 @@ export default function ProductConfigurator({
   const [glazingOptions, setGlazingOptions] = useState<GlazingOption[]>([]);
   const [handleColors, setHandleColors] = useState<HandleColor[]>([]);
   const [loading, setLoading] = useState(true);
+  const [panelStylesLoading, setPanelStylesLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [savedProducts, setSavedProducts] = useState<SavedProduct[]>([]);
@@ -248,6 +249,8 @@ export default function ProductConfigurator({
   useEffect(() => {
     if (!selection.doorType) return;
     const doorTypeId = selection.doorType.id;
+    setPanelStylesLoading(true);
+    setPanelStyles([]);
     fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/panel-styles?door_type_id=${doorTypeId}`,
     )
@@ -255,28 +258,29 @@ export default function ProductConfigurator({
       .then((data) => {
         const arr = Array.isArray(data) ? data : data.data || [];
         setPanelStyles(arr);
-        // Clear panel style selection if it no longer matches
-        if (
-          selection.panelStyle &&
-          !arr.some((s: PanelStyle) => s.id === selection.panelStyle?.id)
-        ) {
-          setSelection((prev) => ({ ...prev, panelStyle: null }));
-        }
-        // Auto-advance: skip to Step 3 if no panel styles, otherwise go to Step 2
+        setSelection((prev) => {
+          if (prev.panelStyle && !arr.some((s: PanelStyle) => s.id === prev.panelStyle?.id)) {
+            return { ...prev, panelStyle: null };
+          }
+          return prev;
+        });
         setCurrentStep((s) => {
           if (s <= 2) return arr.length === 0 ? 3 : 2;
           return s;
         });
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        setPanelStylesLoading(false);
+      });
   }, [selection.doorType]);
 
-  const skipPanelStep = panelStyles.length === 0 && selection.doorType !== null;
+  const skipPanelStep = panelStyles.length === 0 && selection.doorType !== null && !panelStylesLoading;
 
   const canProceed = () => {
     switch (currentStep) {
       case 1:
-        return selection.doorType !== null;
+        return selection.doorType !== null && !panelStylesLoading;
       case 2:
         return skipPanelStep || selection.panelStyle !== null;
       case 3:
@@ -313,6 +317,8 @@ export default function ProductConfigurator({
       { productId, productTitle, selection: { ...selection } },
     ]);
     setSelection({ ...emptySelection });
+    setPanelStyles([]);
+    setPanelStylesLoading(false);
     setCurrentStep(1);
   };
 
