@@ -12,7 +12,6 @@ import {
   ChevronRight,
   DoorOpen,
   Loader2,
-  MapPin,
   Palette,
   Ruler,
   Grip,
@@ -46,11 +45,6 @@ type Dimension = {
   id: number;
   width: number;
   height: number;
-};
-
-type Postcode = {
-  id: number;
-  code: string;
 };
 
 type ExternalColor = {
@@ -92,7 +86,6 @@ type Selection = {
   doorType: DoorType | null;
   panelStyle: PanelStyle | null;
   dimension: Dimension | null;
-  postcode: Postcode | null;
   externalColor: ExternalColor | null;
   internalColor: InternalColor | null;
   glazingOption: GlazingOption | null;
@@ -109,7 +102,6 @@ const STEP_ICONS = [
   DoorOpen,
   PanelTop,
   Ruler,
-  MapPin,
   Palette,
   PaintBucket,
   Layers,
@@ -121,12 +113,11 @@ const STEPS = [
   { id: 1, title: "Product Type", description: "Choose your product type" },
   { id: 2, title: "Panel Style", description: "Select panel style" },
   { id: 3, title: "Dimensions", description: "Pick dimensions" },
-  { id: 4, title: "Postcode", description: "Your location" },
-  { id: 5, title: "External Color", description: "Outside finish" },
-  { id: 6, title: "Internal Color", description: "Inside finish" },
-  { id: 7, title: "Glazing", description: "Glazing option" },
-  { id: 8, title: "Handle Color", description: "Handle finish" },
-  { id: 9, title: "Summary", description: "Review & Submit" },
+  { id: 4, title: "External Color", description: "Outside finish" },
+  { id: 5, title: "Internal Color", description: "Inside finish" },
+  { id: 6, title: "Glazing", description: "Glazing option" },
+  { id: 7, title: "Handle Color", description: "Handle finish" },
+  { id: 8, title: "Summary", description: "Review & Submit" },
 ];
 
 type ProductConfiguratorProps = {
@@ -151,7 +142,6 @@ export default function ProductConfigurator({
     doorType: null,
     panelStyle: null,
     dimension: null,
-    postcode: null,
     externalColor: null,
     internalColor: null,
     glazingOption: null,
@@ -161,7 +151,6 @@ export default function ProductConfigurator({
   const [doorTypes, setDoorTypes] = useState<DoorType[]>([]);
   const [panelStyles, setPanelStyles] = useState<PanelStyle[]>([]);
   const [dimensions, setDimensions] = useState<Dimension[]>([]);
-  const [postcodes, setPostcodes] = useState<Postcode[]>([]);
   const [externalColors, setExternalColors] = useState<ExternalColor[]>([]);
   const [internalColors, setInternalColors] = useState<InternalColor[]>([]);
   const [glazingOptions, setGlazingOptions] = useState<GlazingOption[]>([]);
@@ -185,7 +174,6 @@ export default function ProductConfigurator({
           doorTypesRes,
           panelStylesRes,
           dimensionsRes,
-          postcodesRes,
           externalColorsRes,
           internalColorsRes,
           glazingOptionsRes,
@@ -196,7 +184,6 @@ export default function ProductConfigurator({
           ),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/panel-styles`),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dimensions`),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/postcodes`),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/external-colors`),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/internal-colors`),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/glazing-options`),
@@ -214,10 +201,6 @@ export default function ProductConfigurator({
         if (dimensionsRes.ok) {
           const data = await dimensionsRes.json();
           setDimensions(Array.isArray(data) ? data : data.data || []);
-        }
-        if (postcodesRes.ok) {
-          const data = await postcodesRes.json();
-          setPostcodes(Array.isArray(data) ? data : data.data || []);
         }
         if (externalColorsRes.ok) {
           const data = await externalColorsRes.json();
@@ -286,14 +269,12 @@ export default function ProductConfigurator({
       case 3:
         return selection.dimension !== null;
       case 4:
-        return selection.postcode !== null;
-      case 5:
         return selection.externalColor !== null;
-      case 6:
+      case 5:
         return selection.internalColor !== null;
-      case 7:
+      case 6:
         return selection.glazingOption !== null;
-      case 8:
+      case 7:
         return selection.handleColor !== null;
       default:
         return true;
@@ -304,7 +285,6 @@ export default function ProductConfigurator({
     doorType: null,
     panelStyle: null,
     dimension: null,
-    postcode: null,
     externalColor: null,
     internalColor: null,
     glazingOption: null,
@@ -335,7 +315,6 @@ export default function ProductConfigurator({
       sel.dimension && (sel.dimension.width || sel.dimension.height)
         ? `${sel.dimension.width || ""} x ${sel.dimension.height || ""}`
         : "",
-    postcode: sel.postcode?.code || "",
     externalColor: sel.externalColor?.name || "",
     internalColor: sel.internalColor?.name || "",
     glazingOption: sel.glazingOption?.name || "",
@@ -382,10 +361,10 @@ export default function ProductConfigurator({
   useEffect(() => {
     if (currentStep === 1) setDoorTypePage(1);
     if (currentStep === 2) setPanelStylePage(1);
-    if (currentStep === 5) setExternalColorPage(1);
-    if (currentStep === 6) setInternalColorPage(1);
-    if (currentStep === 7) setGlazingOptionPage(1);
-    if (currentStep === 8) setHandleColorPage(1);
+    if (currentStep === 4) setExternalColorPage(1);
+    if (currentStep === 5) setInternalColorPage(1);
+    if (currentStep === 6) setGlazingOptionPage(1);
+    if (currentStep === 7) setHandleColorPage(1);
   }, [currentStep]);
 
   const handleNext = () => {
@@ -429,7 +408,7 @@ export default function ProductConfigurator({
       selection.doorType &&
       panelStepOk &&
       selection.dimension &&
-      selection.postcode
+      selection.externalColor
     ) {
       setCurrentStep(step);
     } else if (
@@ -437,8 +416,8 @@ export default function ProductConfigurator({
       selection.doorType &&
       panelStepOk &&
       selection.dimension &&
-      selection.postcode &&
-      selection.externalColor
+      selection.externalColor &&
+      selection.internalColor
     ) {
       setCurrentStep(step);
     } else if (
@@ -446,9 +425,9 @@ export default function ProductConfigurator({
       selection.doorType &&
       panelStepOk &&
       selection.dimension &&
-      selection.postcode &&
       selection.externalColor &&
-      selection.internalColor
+      selection.internalColor &&
+      selection.glazingOption
     ) {
       setCurrentStep(step);
     } else if (
@@ -456,18 +435,6 @@ export default function ProductConfigurator({
       selection.doorType &&
       panelStepOk &&
       selection.dimension &&
-      selection.postcode &&
-      selection.externalColor &&
-      selection.internalColor &&
-      selection.glazingOption
-    ) {
-      setCurrentStep(step);
-    } else if (
-      step === 9 &&
-      selection.doorType &&
-      panelStepOk &&
-      selection.dimension &&
-      selection.postcode &&
       selection.externalColor &&
       selection.internalColor &&
       selection.glazingOption &&
@@ -841,33 +808,8 @@ export default function ProductConfigurator({
             </div>
           )}
 
-          {/* Step 4: Postcode */}
+          {/* Step 4: External Colors */}
           {currentStep === 4 && (
-            <div className="space-y-4 sm:space-y-6 max-w-md mx-auto px-1">
-              <div className="text-center">
-                <h2 className="text-xl sm:text-2xl font-bold">
-                  Enter Postcode
-                </h2>
-                <p className="text-muted-foreground mt-2">
-                  Enter your postcode
-                </p>
-              </div>
-              <Input
-                type="text"
-                placeholder="Postcode"
-                value={selection.postcode?.code || ""}
-                onChange={(e) => {
-                  setSelection({
-                    ...selection,
-                    postcode: { id: 0, code: e.target.value },
-                  });
-                }}
-              />
-            </div>
-          )}
-
-          {/* Step 5: External Colors */}
-          {currentStep === 5 && (
             <div>
               <div className="text-center mb-3 sm:mb-4">
                 <h2 className="text-xl sm:text-2xl font-bold">
@@ -975,8 +917,8 @@ export default function ProductConfigurator({
             </div>
           )}
 
-          {/* Step 6: Internal Colors */}
-          {currentStep === 6 && (
+          {/* Step 5: Internal Colors */}
+          {currentStep === 5 && (
             <div>
               <div className="text-center mb-3 sm:mb-4">
                 <h2 className="text-xl sm:text-2xl font-bold">
@@ -1084,8 +1026,8 @@ export default function ProductConfigurator({
             </div>
           )}
 
-          {/* Step 7: Glazing Options */}
-          {currentStep === 7 && (
+          {/* Step 6: Glazing Options */}
+          {currentStep === 6 && (
             <div>
               <div className="text-center mb-3 sm:mb-4">
                 <h2 className="text-xl sm:text-2xl font-bold">
@@ -1188,8 +1130,8 @@ export default function ProductConfigurator({
             </div>
           )}
 
-          {/* Step 8: Handle Colors */}
-          {currentStep === 8 && (
+          {/* Step 7: Handle Colors */}
+          {currentStep === 7 && (
             <div>
               <div className="text-center mb-3 sm:mb-4">
                 <h2 className="text-xl sm:text-2xl font-bold">
@@ -1297,8 +1239,8 @@ export default function ProductConfigurator({
             </div>
           )}
 
-          {/* Step 9: Summary with Contact Details */}
-          {currentStep === 9 && (
+          {/* Step 8: Summary with Contact Details */}
+          {currentStep === 8 && (
             <div>
               <div>
                 {!submitted && (
@@ -1346,12 +1288,6 @@ export default function ProductConfigurator({
                                         <span className="font-medium">
                                           {saved.selection.dimension.width} x {saved.selection.dimension.height} mm
                                         </span>
-                                      </div>
-                                    )}
-                                    {saved.selection.postcode && (
-                                      <div>
-                                        <span className="text-muted-foreground">Postcode:</span>{" "}
-                                        <span className="font-medium">{saved.selection.postcode.code}</span>
                                       </div>
                                     )}
                                     {saved.selection.externalColor && (
@@ -1453,18 +1389,6 @@ export default function ProductConfigurator({
                                           mm
                                         </p>
                                       </>
-                                    )}
-                                  </li>
-                                  <li className="flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3">
-                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">
-                                      <MapPin className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />{" "}
-                                      Postcode
-                                    </h3>{" "}
-                                    -
-                                    {selection.postcode && (
-                                      <p className="font-medium text-[10px] sm:text-xs">
-                                        {selection.postcode.code}
-                                      </p>
                                     )}
                                   </li>
                                   <li className="flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3">

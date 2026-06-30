@@ -9,7 +9,7 @@
 ## Features
 
 **Customer-facing**
-- 9-step visual quote configurator: Product Type → Panel Style → Dimensions → Postcode → External Color → Internal Color → Glazing → Handle Color → Summary
+- 8-step visual quote configurator: Product Type → Panel Style → Dimensions → External Color → Internal Color → Glazing → Handle Color → Summary
 - Embeddable product cards via a drop-in `<script>` tag (iframe-based, configurable columns)
 - Mobile-responsive multi-step flow with animated transitions
 
@@ -71,7 +71,6 @@ web/     Next.js frontend — public site, admin dashboard, configurator
 | `door_types` | Product types linked to a product |
 | `panel_styles` | Panel styles (many-to-many with door types) |
 | `dimensions` | Width/height options |
-| `postcodes` | Postcode / area options |
 | `external_colors` | External finish colours |
 | `internal_colors` | Internal finish colours |
 | `handle_colors` | Handle finish colours |

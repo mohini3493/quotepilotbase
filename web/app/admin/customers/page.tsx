@@ -11,7 +11,6 @@ type ProductConfig = {
   doorType?: string;
   panelStyle?: string;
   dimension?: string;
-  postcode?: string;
   externalColor?: string;
   internalColor?: string;
   glazingOption?: string;
@@ -28,7 +27,6 @@ type Customer = {
   doorType?: string;
   panelStyle?: string;
   dimension?: string;
-  postcode?: string;
   externalColor?: string;
   internalColor?: string;
   glazingOption?: string;
@@ -69,7 +67,6 @@ export default function CustomersPage() {
             doorType: obj.door_type,
             panelStyle: obj.panel_style,
             dimension: obj.dimension,
-            postcode: obj.postcode,
             externalColor: obj.external_color,
             internalColor: obj.internal_color,
             glazingOption: obj.glazing_option,
@@ -300,16 +297,6 @@ export default function CustomersPage() {
                                   </p>
                                 </div>
                               )}
-                              {product.postcode && (
-                                <div className="bg-muted/50 rounded-lg p-3">
-                                  <p className="text-xs text-muted-foreground uppercase">
-                                    Postcode
-                                  </p>
-                                  <p className="font-medium text-sm">
-                                    {product.postcode}
-                                  </p>
-                                </div>
-                              )}
                               {product.externalColor && (
                                 <div className="bg-muted/50 rounded-lg p-3">
                                   <p className="text-xs text-muted-foreground uppercase">
@@ -393,16 +380,6 @@ export default function CustomersPage() {
                             </p>
                             <p className="font-medium text-sm">
                               {selectedCustomer.dimension}
-                            </p>
-                          </div>
-                        )}
-                        {selectedCustomer.postcode && (
-                          <div className="bg-muted/50 rounded-lg p-3">
-                            <p className="text-xs text-muted-foreground uppercase">
-                              Postcode
-                            </p>
-                            <p className="font-medium text-sm">
-                              {selectedCustomer.postcode}
                             </p>
                           </div>
                         )}

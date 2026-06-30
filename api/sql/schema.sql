@@ -67,16 +67,6 @@ CREATE TABLE IF NOT EXISTS dimensions (
   created_at TIMESTAMP DEFAULT now()
 );
 
--- Postcodes table
-CREATE TABLE IF NOT EXISTS postcodes (
-  id SERIAL PRIMARY KEY,
-  code TEXT UNIQUE NOT NULL,
-  area TEXT,
-  "order" INT DEFAULT 0,
-  is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMP DEFAULT now()
-);
-
 -- External Colors table
 CREATE TABLE IF NOT EXISTS external_colors (
   id SERIAL PRIMARY KEY,
@@ -131,7 +121,6 @@ CREATE TABLE IF NOT EXISTS customers (
   door_type TEXT,
   panel_style TEXT,
   dimension TEXT,
-  postcode TEXT,
   external_color TEXT,
   internal_color TEXT,
   glazing_option TEXT,
@@ -149,3 +138,7 @@ DO $$ BEGIN
     ALTER TABLE customers ADD COLUMN products_config TEXT;
   END IF;
 END $$;
+
+-- Migration: remove postcode column and table (feature removed)
+ALTER TABLE customers DROP COLUMN IF EXISTS postcode;
+DROP TABLE IF EXISTS postcodes;
