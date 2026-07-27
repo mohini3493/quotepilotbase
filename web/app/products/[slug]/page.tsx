@@ -49,10 +49,7 @@ export default async function ProductPage({
       <section className="relative z-10 py-4">
         <div className="max-w-7xl mx-auto px-3 sm:px-6">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border p-3 sm:p-6 md:p-8">
-            <ProductConfigurator
-              productId={product.id}
-              productTitle={product.title}
-            />
+            <ProductConfigurator />
           </div>
         </div>
       </section>

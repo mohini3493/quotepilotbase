@@ -59,10 +59,7 @@ export default async function EmbedProductPage({
           </div>
 
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border p-6 md:p-8">
-            <ProductConfigurator
-              productId={product.id}
-              productTitle={product.title}
-            />
+            <ProductConfigurator />
           </div>
         </div>
       </section>
