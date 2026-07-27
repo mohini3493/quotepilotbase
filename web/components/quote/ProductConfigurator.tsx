@@ -839,7 +839,14 @@ export default function ProductConfigurator() {
                 <p className="text-muted-foreground mt-1">Select the glazing for your product</p>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
-                {glazingOptions
+                {[...glazingOptions]
+                  .sort((a, b) => {
+                    const aClear = a.name.toLowerCase().includes("clear");
+                    const bClear = b.name.toLowerCase().includes("clear");
+                    if (aClear && !bClear) return -1;
+                    if (!aClear && bClear) return 1;
+                    return 0;
+                  })
                   .slice((glazingOptionPage - 1) * CARDS_PER_PAGE, glazingOptionPage * CARDS_PER_PAGE)
                   .map((option) => (
                     <div
