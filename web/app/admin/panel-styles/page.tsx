@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 
 type DoorType = { id: number; name: string };
+type CompositeStyle = { id: number; name: string };
 type PanelStyle = {
   id: number;
   name: string;
@@ -26,6 +27,8 @@ type PanelStyle = {
   isActive: boolean;
   order: number;
   door_types?: DoorType[];
+  composite_style_name?: string;
+  composite_style_id?: number | null;
 };
 
 function SortableRow({
@@ -73,13 +76,18 @@ function SortableRow({
           </div>
         </div>
         <p className="text-xs text-muted-foreground">/{panelStyle.slug}</p>
-        {panelStyle.door_types && panelStyle.door_types.length > 0 && (
+        {(panelStyle.door_types && panelStyle.door_types.length > 0 || panelStyle.composite_style_name) && (
           <div className="mt-1 flex flex-wrap gap-1">
-            {panelStyle.door_types.map((dt) => (
+            {panelStyle.door_types?.map((dt) => (
               <span key={dt.id} className="bg-emerald-50 text-emerald-700 text-xs px-2 py-0.5 rounded-full border border-emerald-100">
                 {dt.name}
               </span>
             ))}
+            {panelStyle.composite_style_name && (
+              <span className="bg-violet-50 text-violet-700 text-xs px-2 py-0.5 rounded-full border border-violet-100">
+                {panelStyle.composite_style_name}
+              </span>
+            )}
           </div>
         )}
       </div>
@@ -107,6 +115,8 @@ export default function PanelStylesPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [doorTypeFilter, setDoorTypeFilter] = useState<number | "all">("all");
+  const [compositeStyleFilter, setCompositeStyleFilter] = useState<number | "all" | "none">("all");
+  const [compositeStyles, setCompositeStyles] = useState<CompositeStyle[]>([]);
 
   async function loadPanelStyles() {
     try {
@@ -168,7 +178,13 @@ export default function PanelStylesPage() {
     }
   }
 
-  useEffect(() => { loadPanelStyles(); }, []);
+  useEffect(() => {
+    loadPanelStyles();
+    fetch(`/api/composite-styles`, { credentials: "include" })
+      .then((res) => res.json())
+      .then((data) => setCompositeStyles(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, []);
 
   const uniqueDoorTypes = Array.from(
     new Map(
@@ -180,10 +196,15 @@ export default function PanelStylesPage() {
     const matchSearch = ps.name.toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter === "all" || (statusFilter === "active" ? ps.isActive : !ps.isActive);
     const matchDt = doorTypeFilter === "all" || (ps.door_types || []).some((dt) => dt.id === doorTypeFilter);
-    return matchSearch && matchStatus && matchDt;
+    const matchComposite =
+      compositeStyleFilter === "all" ||
+      (compositeStyleFilter === "none"
+        ? !ps.composite_style_id
+        : ps.composite_style_id === compositeStyleFilter);
+    return matchSearch && matchStatus && matchDt && matchComposite;
   });
 
-  const hasFilter = search !== "" || statusFilter !== "all" || doorTypeFilter !== "all";
+  const hasFilter = search !== "" || statusFilter !== "all" || doorTypeFilter !== "all" || compositeStyleFilter !== "all";
 
   if (loading) {
     return (
@@ -259,11 +280,25 @@ export default function PanelStylesPage() {
           </select>
         )}
 
+        {compositeStyles.length > 0 && (
+          <select
+            value={compositeStyleFilter}
+            onChange={(e) => setCompositeStyleFilter(e.target.value === "all" ? "all" : e.target.value === "none" ? "none" : Number(e.target.value))}
+            className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+          >
+            <option value="all">All Composite Styles</option>
+            <option value="none">No Style Assigned</option>
+            {compositeStyles.map((cs) => (
+              <option key={cs.id} value={cs.id}>{cs.name}</option>
+            ))}
+          </select>
+        )}
+
         {hasFilter && (
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => { setSearch(""); setStatusFilter("all"); setDoorTypeFilter("all"); }}
+            onClick={() => { setSearch(""); setStatusFilter("all"); setDoorTypeFilter("all"); setCompositeStyleFilter("all"); }}
             className="gap-1 text-muted-foreground"
           >
             <X className="w-3 h-3" /> Clear

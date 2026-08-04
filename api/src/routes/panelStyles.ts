@@ -20,16 +20,16 @@ router.get("/", async (req, res) => {
              LEFT JOIN panel_style_door_types psdt ON psdt.panel_style_id = ps.id
              WHERE ps.is_active = true
                AND (psdt.door_type_id = $1 OR ps.door_type_id = $1)
-               AND ps.composite_style_id = $2
-             ORDER BY ps."order" ASC`;
+               AND (ps.composite_style_id = $2 OR ps.composite_style_id IS NULL)
+             ORDER BY ps."order" ASC, ps.id DESC`;
   } else if (door_type_id) {
     params.push(door_type_id);
     query = `SELECT DISTINCT ps.* FROM panel_styles ps
              LEFT JOIN panel_style_door_types psdt ON psdt.panel_style_id = ps.id
              WHERE ps.is_active = true AND (psdt.door_type_id = $1 OR ps.door_type_id = $1)
-             ORDER BY ps."order" ASC`;
+             ORDER BY ps."order" ASC, ps.id DESC`;
   } else {
-    query = 'SELECT * FROM panel_styles WHERE is_active = true ORDER BY "order" ASC';
+    query = 'SELECT * FROM panel_styles WHERE is_active = true ORDER BY "order" ASC, id DESC';
   }
 
   const result = await pool.query(query, params);
@@ -42,9 +42,12 @@ router.get("/", async (req, res) => {
 
 /** Admin – get ALL panel styles (with associated door types) */
 router.get("/admin/all", requireAdmin, async (_, res) => {
-  // Get all panel styles
+  // Get all panel styles with composite style name
   const result = await pool.query(
-    "SELECT * FROM panel_styles ORDER BY created_at DESC",
+    `SELECT ps.*, cds.name as composite_style_name
+     FROM panel_styles ps
+     LEFT JOIN composite_door_styles cds ON cds.id = ps.composite_style_id
+     ORDER BY ps.created_at DESC`,
   );
   const panelStyles = result.rows;
 
@@ -123,6 +126,17 @@ router.post("/", requireAdmin, async (req, res) => {
   res.json(panelStyle);
 });
 
+/** Admin – reorder panel styles (must be before PUT /:id) */
+router.put("/reorder", requireAdmin, async (req, res) => {
+  const { order } = req.body;
+  await Promise.all(
+    (order as { id: number; order: number }[]).map((item) =>
+      pool.query('UPDATE panel_styles SET "order" = $1 WHERE id = $2', [item.order, item.id])
+    )
+  );
+  res.json({ success: true });
+});
+
 /** Admin – update panel style */
 router.put("/:id", requireAdmin, async (req, res) => {
   const { name, slug, image, order, isActive, doorTypeId, doorTypeIds, compositeStyleId } =
@@ -174,20 +188,5 @@ router.patch("/:id/toggle", requireAdmin, async (req, res) => {
   res.json(result.rows[0]);
 });
 
-/** Admin – reorder panel styles */
-router.post("/reorder", requireAdmin, async (req, res) => {
-  const { items } = req.body;
-
-  await Promise.all(
-    items.map((item: { id: number; order: number }) =>
-      pool.query('UPDATE panel_styles SET "order" = $1 WHERE id = $2', [
-        item.order,
-        item.id,
-      ]),
-    ),
-  );
-
-  res.json({ success: true });
-});
 
 export default router;

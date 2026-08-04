@@ -46,6 +46,7 @@ type PanelStyle = {
   slug: string;
   image: string;
   description?: string;
+  order?: number;
 };
 
 type Dimension = {
@@ -261,16 +262,23 @@ export default function ProductConfigurator() {
     fetch(url)
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => {
-        const arr = Array.isArray(data) ? data : data.data || [];
+        const raw = Array.isArray(data) ? data : data.data || [];
+        // Sort: explicit order first, then newest (id DESC) within same order group
+        const arr = [...raw].sort(
+          (a: PanelStyle, b: PanelStyle) =>
+            (a.order ?? 0) - (b.order ?? 0) || b.id - a.id
+        );
         setPanelStyles(arr);
+        setPanelStylePage(1);
         setSelection((prev) => {
           if (prev.panelStyle && !arr.some((s: PanelStyle) => s.id === prev.panelStyle?.id)) {
             return { ...prev, panelStyle: null };
           }
           return prev;
         });
+        // Only auto-advance from door type step (step 2), not while browsing panel styles
         setCurrentStep((s) => {
-          if (s <= 3) return arr.length === 0 ? 4 : 3;
+          if (s === 2) return arr.length === 0 ? 4 : 3;
           return s;
         });
       })
@@ -279,7 +287,8 @@ export default function ProductConfigurator() {
   }, [selection.doorType, selection.compositeDoorStyle]);
 
   const isCompositeDoor = selection.doorType?.name.toLowerCase().includes("composite") ?? false;
-  const skipPanelStep = panelStyles.length === 0 && selection.doorType !== null && !panelStylesLoading;
+  // Don't skip the panel step while a composite filter is active (0 results means no match, not no panel styles)
+  const skipPanelStep = panelStyles.length === 0 && selection.doorType !== null && !panelStylesLoading && !selection.compositeDoorStyle;
 
   const emptySelection: Selection = {
     doorType: null,
