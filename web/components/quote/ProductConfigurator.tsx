@@ -29,7 +29,7 @@ type Product = {
   title: string;
   slug: string;
   image: string;
-  description?: string;
+  description: string;
 };
 
 type DoorType = {
@@ -96,6 +96,7 @@ type Selection = {
   externalColor: ExternalColor | null;
   internalColor: InternalColor | null;
   glazingOption: GlazingOption | null;
+  glazingType: "double" | "triple" | null;
   handleColor: HandleColor | null;
 };
 
@@ -143,10 +144,11 @@ export default function ProductConfigurator() {
   const [selection, setSelection] = useState<Selection>({
     doorType: null,
     panelStyle: null,
-    dimension: null,
+    dimension: { id: 0, width: 0, height: 0 },
     externalColor: null,
     internalColor: null,
     glazingOption: null,
+    glazingType: null,
     handleColor: null,
   });
 
@@ -266,10 +268,11 @@ export default function ProductConfigurator() {
   const emptySelection: Selection = {
     doorType: null,
     panelStyle: null,
-    dimension: null,
+    dimension: { id: 0, width: 0, height: 0 },
     externalColor: null,
     internalColor: null,
     glazingOption: null,
+    glazingType: null,
     handleColor: null,
   };
 
@@ -278,10 +281,10 @@ export default function ProductConfigurator() {
       case 1: return selectedProduct !== null;
       case 2: return selection.doorType !== null && !panelStylesLoading;
       case 3: return skipPanelStep || selection.panelStyle !== null;
-      case 4: return selection.dimension !== null;
+      case 4: return selection.dimension !== null && (selection.dimension.width ?? 0) > 0 && (selection.dimension.height ?? 0) > 0;
       case 5: return selection.externalColor !== null;
       case 6: return selection.internalColor !== null;
-      case 7: return selection.glazingOption !== null;
+      case 7: return selection.glazingOption !== null && selection.glazingType !== null;
       case 8: return selection.handleColor !== null;
       default: return true;
     }
@@ -314,6 +317,7 @@ export default function ProductConfigurator() {
     externalColor: sel.externalColor?.name || "",
     internalColor: sel.internalColor?.name || "",
     glazingOption: sel.glazingOption?.name || "",
+    glazingType: sel.glazingType || "",
     handleColor: sel.handleColor?.name || "",
   });
 
@@ -506,21 +510,21 @@ export default function ProductConfigurator() {
           {/* Step 1: Select Product */}
           {currentStep === 1 && (
             <div>
-              <div className="text-center mb-3 sm:mb-4">
+              <div className="text-center mb-5 sm:mb-6">
                 <h2 className="text-xl sm:text-2xl font-bold">Select a Product</h2>
                 <p className="text-muted-foreground mt-1">Choose the product you'd like to configure</p>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
                 {products
                   .slice((productPage - 1) * CARDS_PER_PAGE, productPage * CARDS_PER_PAGE)
                   .map((product) => (
                     <div
                       key={product.id}
                       className={cn(
-                        "group cursor-pointer rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col items-center justify-between p-2 min-h-[140px] sm:min-h-[180px] relative overflow-hidden",
+                        "group relative rounded-3xl overflow-hidden cursor-pointer transition-all duration-300",
                         selectedProduct?.id === product.id
-                          ? "ring-2 ring-primary scale-105 shadow-primary/20"
-                          : "hover:ring-1 hover:ring-primary/40",
+                          ? "ring-4 ring-primary shadow-2xl shadow-primary/30"
+                          : "hover:shadow-2xl",
                       )}
                       onClick={() => {
                         if (selectedProduct?.id !== product.id) {
@@ -532,28 +536,44 @@ export default function ProductConfigurator() {
                         setTimeout(() => setCurrentStep(2), 300);
                       }}
                     >
-                      <div className="w-full flex-1 flex items-center justify-center relative">
+                      {/* Full-bleed image */}
+                      <div className="relative h-[260px] sm:h-[320px] overflow-hidden">
                         {product.image ? (
                           <img
                             src={product.image}
                             alt={product.title}
-                            className="w-full h-20 sm:h-28 object-contain drop-shadow-sm transition-transform group-hover:scale-105"
+                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                           />
                         ) : (
-                          <div className="w-full h-20 sm:h-28 bg-gray-100 rounded-xl flex items-center justify-center">
-                            <ShoppingBag className="w-10 h-10 text-gray-400" />
+                          <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
+                            <ShoppingBag className="w-16 h-16 text-gray-300" />
                           </div>
                         )}
+
+                        {/* Gradient overlay */}
+                        <div className={cn(
+                          "absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-all duration-500",
+                          selectedProduct?.id === product.id
+                            ? "from-primary/80 via-primary/20"
+                            : "group-hover:from-black/90 group-hover:via-black/40",
+                        )} />
+
+                        {/* Selected checkmark */}
                         {selectedProduct?.id === product.id && (
-                          <div className="absolute top-0 right-0 w-7 h-7 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
-                            <Check className="w-4 h-4 text-white" />
+                          <div className="absolute top-4 right-4 w-10 h-10 bg-primary rounded-full flex items-center justify-center shadow-lg">
+                            <Check className="w-5 h-5 text-white" />
                           </div>
                         )}
-                      </div>
-                      <div className="w-full mt-2">
-                        <h3 className="font-semibold text-sm text-center text-emerald-700 group-hover:text-emerald-900 transition-colors">
-                          {product.title}
-                        </h3>
+
+                        {/* Bottom content */}
+                        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
+                          <h3 className={cn(
+                            "text-xl sm:text-2xl font-bold text-white transition-transform duration-300",
+                            selectedProduct?.id !== product.id && "group-hover:translate-x-1",
+                          )}>
+                            {product.title}
+                          </h3>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -695,34 +715,54 @@ export default function ProductConfigurator() {
           {currentStep === 4 && (
             <div className="space-y-4 sm:space-y-6 max-w-md mx-auto px-1">
               <div className="text-center">
-                <h2 className="text-xl sm:text-2xl font-bold">Enter Dimensions</h2>
-                <p className="text-muted-foreground mt-2">Enter width and height in mm</p>
+                <h2 className="text-xl sm:text-2xl font-bold">Dimensions</h2>
+                <p className="text-muted-foreground mt-2">Enter your required dimensions</p>
               </div>
-              <div className="flex flex-col gap-4">
-                <Input
-                  type="number"
-                  placeholder="Width (mm)"
-                  value={selection.dimension?.width || ""}
-                  onChange={(e) => {
-                    const width = parseInt(e.target.value, 10) || 0;
-                    setSelection({
-                      ...selection,
-                      dimension: { id: selection.dimension?.id ?? 0, width, height: selection.dimension?.height || 0 },
-                    });
-                  }}
-                />
-                <Input
-                  type="number"
-                  placeholder="Height (mm)"
-                  value={selection.dimension?.height || ""}
-                  onChange={(e) => {
-                    const height = parseInt(e.target.value, 10) || 0;
-                    setSelection({
-                      ...selection,
-                      dimension: { id: selection.dimension?.id ?? 0, width: selection.dimension?.width || 0, height },
-                    });
-                  }}
-                />
+              <div className="flex flex-col gap-5">
+                <div>
+                  <label className="text-sm font-medium text-slate-700 mb-1.5 block">Width</label>
+                  <div className="relative">
+                    <Input
+                      type="number"
+                      min={1}
+                      max={1000}
+                      value={selection.dimension?.width || ""}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value) || 0;
+                        setSelection((prev) => ({
+                          ...prev,
+                          dimension: { id: prev.dimension?.id ?? 0, width: val, height: prev.dimension?.height ?? 0 },
+                        }));
+                      }}
+                      className="h-11 pr-14 text-sm"
+                      placeholder="Enter width"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium pointer-events-none">mm</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1.5 px-1">Maximum width: 1000 mm</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700 mb-1.5 block">Height</label>
+                  <div className="relative">
+                    <Input
+                      type="number"
+                      min={1}
+                      max={2100}
+                      value={selection.dimension?.height || ""}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value) || 0;
+                        setSelection((prev) => ({
+                          ...prev,
+                          dimension: { id: prev.dimension?.id ?? 0, width: prev.dimension?.width ?? 0, height: val },
+                        }));
+                      }}
+                      className="h-11 pr-14 text-sm"
+                      placeholder="Enter height"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium pointer-events-none">mm</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1.5 px-1">Maximum height: 2100 mm</p>
+                </div>
               </div>
             </div>
           )}
@@ -838,6 +878,62 @@ export default function ProductConfigurator() {
                 <h2 className="text-xl sm:text-2xl font-bold">Choose Glazing Option</h2>
                 <p className="text-muted-foreground mt-1">Select the glazing for your product</p>
               </div>
+
+              {/* Glazing Type — radio buttons */}
+              <div className="flex items-center justify-between gap-4 mb-5 sm:mb-6 p-4 sm:p-5 rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-sm">
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-slate-800 text-sm sm:text-base">Glazing Type</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Choose double or triple glazing</p>
+                  {selection.glazingType === null && (
+                    <p className="text-xs text-red-500 mt-1">Required — please select one</p>
+                  )}
+                </div>
+                <div className="flex gap-3 sm:gap-4 flex-shrink-0">
+                  {([
+                    { value: "double", label: "Double Glazing", desc: "2 panes" },
+                    { value: "triple", label: "Triple Glazing", desc: "3 panes" },
+                  ] as const).map((opt) => (
+                    <label
+                      key={opt.value}
+                      className={cn(
+                        "flex items-center gap-2.5 cursor-pointer rounded-xl border px-3 py-2.5 sm:px-4 sm:py-3 transition-all duration-200",
+                        selection.glazingType === opt.value
+                          ? "border-primary bg-primary/5 shadow-sm shadow-primary/20"
+                          : "border-gray-200 hover:border-primary/40 hover:bg-gray-50"
+                      )}
+                    >
+                      <div className={cn(
+                        "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0",
+                        selection.glazingType === opt.value
+                          ? "border-primary"
+                          : "border-gray-300"
+                      )}>
+                        {selection.glazingType === opt.value && (
+                          <div className="w-2 h-2 rounded-full bg-primary" />
+                        )}
+                      </div>
+                      <input
+                        type="radio"
+                        name="glazingType"
+                        value={opt.value}
+                        checked={selection.glazingType === opt.value}
+                        onChange={() => setSelection({ ...selection, glazingType: opt.value })}
+                        className="sr-only"
+                      />
+                      <div>
+                        <p className={cn(
+                          "text-xs sm:text-sm font-semibold leading-tight",
+                          selection.glazingType === opt.value ? "text-primary" : "text-slate-700"
+                        )}>
+                          {opt.label}
+                        </p>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">{opt.desc}</p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
                 {[...glazingOptions]
                   .sort((a, b) => {
@@ -999,6 +1095,9 @@ export default function ProductConfigurator() {
                                   {saved.selection.glazingOption && (
                                     <div><span className="text-muted-foreground">Glazing:</span> <span className="font-medium">{saved.selection.glazingOption.name}</span></div>
                                   )}
+                                  {saved.selection.glazingType && (
+                                    <div><span className="text-muted-foreground">Glazing Type:</span> <span className="font-medium capitalize">{saved.selection.glazingType} glazing</span></div>
+                                  )}
                                   {saved.selection.handleColor && (
                                     <div><span className="text-muted-foreground">Handle:</span> <span className="font-medium">{saved.selection.handleColor.name}</span></div>
                                   )}
@@ -1023,10 +1122,10 @@ export default function ProductConfigurator() {
                         </div>
                         <Card>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-3 sm:p-4">
-                            {selection.doorType && (
+                            {(selection.panelStyle?.image || selection.doorType?.image) && (
                               <img
-                                src={selection.doorType.image || "/placeholder.jpg"}
-                                alt={selection.doorType.name}
+                                src={selection.panelStyle?.image || selection.doorType?.image || ""}
+                                alt={selection.panelStyle?.name || selection.doorType?.name || ""}
                                 className="w-full h-40 sm:h-52 md:h-64 object-contain bg-gray-50"
                               />
                             )}
@@ -1075,6 +1174,14 @@ export default function ProductConfigurator() {
                                   </h3>{" "}-
                                   {selection.glazingOption && <p className="font-medium text-[10px] sm:text-xs">{selection.glazingOption.name}</p>}
                                 </li>
+                                {selection.glazingType && (
+                                  <li className="flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3">
+                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">
+                                      <Layers className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> Glazing Type
+                                    </h3>{" "}-
+                                    <p className="font-medium text-[10px] sm:text-xs capitalize">{selection.glazingType} glazing</p>
+                                  </li>
+                                )}
                                 <li className="flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3">
                                   <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">
                                     <Grip className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> Handle Color

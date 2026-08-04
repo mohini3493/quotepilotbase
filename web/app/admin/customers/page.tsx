@@ -14,6 +14,7 @@ type ProductConfig = {
   externalColor?: string;
   internalColor?: string;
   glazingOption?: string;
+  glazingType?: string;
   handleColor?: string;
 };
 
@@ -30,6 +31,7 @@ type Customer = {
   externalColor?: string;
   internalColor?: string;
   glazingOption?: string;
+  glazingType?: string;
   handleColor?: string;
   productsConfig?: ProductConfig[];
   created_at: string;
@@ -70,6 +72,7 @@ export default function CustomersPage() {
             externalColor: obj.external_color,
             internalColor: obj.internal_color,
             glazingOption: obj.glazing_option,
+            glazingType: obj.glazing_type,
             handleColor: obj.handle_color,
             productsConfig: parseProductsConfig(obj.products_config),
             created_at: obj.created_at,
@@ -327,6 +330,16 @@ export default function CustomersPage() {
                                   </p>
                                 </div>
                               )}
+                              {product.glazingType && (
+                                <div className="bg-muted/50 rounded-lg p-3">
+                                  <p className="text-xs text-muted-foreground uppercase">
+                                    Glazing Type
+                                  </p>
+                                  <p className="font-medium text-sm capitalize">
+                                    {product.glazingType} glazing
+                                  </p>
+                                </div>
+                              )}
                               {product.handleColor && (
                                 <div className="bg-muted/50 rounded-lg p-3">
                                   <p className="text-xs text-muted-foreground uppercase">
@@ -410,6 +423,16 @@ export default function CustomersPage() {
                             </p>
                             <p className="font-medium text-sm">
                               {selectedCustomer.glazingOption}
+                            </p>
+                          </div>
+                        )}
+                        {selectedCustomer.glazingType && (
+                          <div className="bg-muted/50 rounded-lg p-3">
+                            <p className="text-xs text-muted-foreground uppercase">
+                              Glazing Type
+                            </p>
+                            <p className="font-medium text-sm capitalize">
+                              {selectedCustomer.glazingType} glazing
                             </p>
                           </div>
                         )}
