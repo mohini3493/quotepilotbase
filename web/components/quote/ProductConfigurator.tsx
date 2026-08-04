@@ -89,8 +89,11 @@ type GlazingOption = {
   description?: string;
 };
 
+type CompositeStyle = { id: number; name: string; slug: string };
+
 type Selection = {
   doorType: DoorType | null;
+  compositeDoorStyle: CompositeStyle | null;
   panelStyle: PanelStyle | null;
   dimension: Dimension | null;
   externalColor: ExternalColor | null;
@@ -143,6 +146,7 @@ export default function ProductConfigurator() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selection, setSelection] = useState<Selection>({
     doorType: null,
+    compositeDoorStyle: null,
     panelStyle: null,
     dimension: { id: 0, width: 0, height: 0 },
     externalColor: null,
@@ -153,6 +157,7 @@ export default function ProductConfigurator() {
   });
 
   const [products, setProducts] = useState<Product[]>([]);
+  const [compositeDoorStyles, setCompositeDoorStyles] = useState<CompositeStyle[]>([]);
   const [doorTypes, setDoorTypes] = useState<DoorType[]>([]);
   const [panelStyles, setPanelStyles] = useState<PanelStyle[]>([]);
   const [dimensions, setDimensions] = useState<Dimension[]>([]);
@@ -174,17 +179,22 @@ export default function ProductConfigurator() {
     async function loadData() {
       setLoading(true);
       try {
-        const [productsRes, dimensionsRes, externalColorsRes, internalColorsRes, glazingOptionsRes] =
+        const [productsRes, dimensionsRes, externalColorsRes, internalColorsRes, glazingOptionsRes, compositeStylesRes] =
           await Promise.all([
             fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`),
             fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dimensions`),
             fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/external-colors`),
             fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/internal-colors`),
             fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/glazing-options`),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/composite-styles`),
           ]);
         if (productsRes.ok) {
           const data = await productsRes.json();
           setProducts(Array.isArray(data) ? data : data.data || []);
+        }
+        if (compositeStylesRes.ok) {
+          const data = await compositeStylesRes.json();
+          setCompositeDoorStyles(Array.isArray(data) ? data : []);
         }
         if (dimensionsRes.ok) {
           const data = await dimensionsRes.json();
@@ -237,13 +247,18 @@ export default function ProductConfigurator() {
       .finally(() => setDoorTypesLoading(false));
   }, [selectedProduct]);
 
-  // Reload panel styles when door type changes
+  // Reload panel styles when door type or composite style changes
   useEffect(() => {
     if (!selection.doorType) return;
+    const isComposite = selection.doorType.name.toLowerCase().includes("composite");
     const doorTypeId = selection.doorType.id;
+    let url = `${process.env.NEXT_PUBLIC_API_URL}/api/panel-styles?door_type_id=${doorTypeId}`;
+    if (isComposite && selection.compositeDoorStyle) {
+      url += `&composite_style_id=${selection.compositeDoorStyle.id}`;
+    }
     setPanelStylesLoading(true);
     setPanelStyles([]);
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/panel-styles?door_type_id=${doorTypeId}`)
+    fetch(url)
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => {
         const arr = Array.isArray(data) ? data : data.data || [];
@@ -261,12 +276,14 @@ export default function ProductConfigurator() {
       })
       .catch(() => {})
       .finally(() => setPanelStylesLoading(false));
-  }, [selection.doorType]);
+  }, [selection.doorType, selection.compositeDoorStyle]);
 
+  const isCompositeDoor = selection.doorType?.name.toLowerCase().includes("composite") ?? false;
   const skipPanelStep = panelStyles.length === 0 && selection.doorType !== null && !panelStylesLoading;
 
   const emptySelection: Selection = {
     doorType: null,
+    compositeDoorStyle: null,
     panelStyle: null,
     dimension: { id: 0, width: 0, height: 0 },
     externalColor: null,
@@ -309,6 +326,7 @@ export default function ProductConfigurator() {
     productId: prod?.id,
     productTitle: prod?.title,
     doorType: sel.doorType?.name || "",
+    compositeDoorStyle: sel.compositeDoorStyle?.name || "",
     panelStyle: sel.panelStyle?.name || "",
     dimension:
       sel.dimension && (sel.dimension.width || sel.dimension.height)
@@ -617,7 +635,7 @@ export default function ProductConfigurator() {
                               ? "ring-2 ring-primary scale-105 shadow-primary/20"
                               : "hover:ring-1 hover:ring-primary/40",
                           )}
-                          onClick={() => setSelection({ ...selection, doorType: type })}
+                          onClick={() => setSelection({ ...selection, doorType: type, compositeDoorStyle: null, panelStyle: null })}
                         >
                           <div className="w-full flex-1 flex items-center justify-center relative">
                             {type.image ? (
@@ -661,6 +679,41 @@ export default function ProductConfigurator() {
                 <h2 className="text-xl sm:text-2xl font-bold">Choose Panel Style</h2>
                 <p className="text-muted-foreground mt-1">Select your panel style</p>
               </div>
+
+              {/* Composite Door Style filter — shown only for composite door types */}
+              {isCompositeDoor && (
+                <div className="mb-5 sm:mb-6 p-4 sm:p-5 rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-sm flex items-center justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-slate-800 text-sm sm:text-base">Filter by Style</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Tap a style to filter panel options</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2 sm:gap-3 flex-shrink-0">
+                    {compositeDoorStyles.map((style) => (
+                      <button
+                        key={style.id}
+                        onClick={() =>
+                          setSelection((prev) => ({
+                            ...prev,
+                            compositeDoorStyle: prev.compositeDoorStyle?.id === style.id ? null : style,
+                            panelStyle: null,
+                          }))
+                        }
+                        className={cn(
+                          "flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold transition-all duration-200",
+                          selection.compositeDoorStyle?.id === style.id
+                            ? "border-primary bg-primary text-white shadow-md shadow-primary/30"
+                            : "border-gray-200 bg-white text-slate-700 hover:border-primary/50 hover:bg-primary/5"
+                        )}
+                      >
+                        {selection.compositeDoorStyle?.id === style.id && (
+                          <Check className="w-3.5 h-3.5" />
+                        )}
+                        {style.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
                 {panelStyles
                   .slice((panelStylePage - 1) * CARDS_PER_PAGE, panelStylePage * CARDS_PER_PAGE)
@@ -1080,6 +1133,9 @@ export default function ProductConfigurator() {
                                   {saved.selection.doorType && (
                                     <div><span className="text-muted-foreground">Type:</span> <span className="font-medium">{saved.selection.doorType.name}</span></div>
                                   )}
+                                  {saved.selection.compositeDoorStyle && (
+                                    <div><span className="text-muted-foreground">Style:</span> <span className="font-medium">{saved.selection.compositeDoorStyle.name}</span></div>
+                                  )}
                                   {saved.selection.panelStyle && (
                                     <div><span className="text-muted-foreground">Panel:</span> <span className="font-medium">{saved.selection.panelStyle.name}</span></div>
                                   )}
@@ -1140,6 +1196,14 @@ export default function ProductConfigurator() {
                                   </h3>{" "}-
                                   {selection.doorType && <p className="font-medium text-[10px] sm:text-xs">{selection.doorType.name}</p>}
                                 </li>
+                                {selection.compositeDoorStyle && (
+                                  <li className="flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3">
+                                    <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">
+                                      <PanelTop className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" /> Door Style
+                                    </h3>{" "}-
+                                    <p className="font-medium text-[10px] sm:text-xs">{selection.compositeDoorStyle.name}</p>
+                                  </li>
+                                )}
                                 {!skipPanelStep && (
                                   <li className="flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3">
                                     <h3 className="font-semibold text-primary text-[10px] sm:text-xs flex-shrink-0 flex items-center gap-1">

@@ -24,6 +24,7 @@ router.post("/", async (req, res) => {
       glazingOption,
       glazingType,
       handleColor,
+      compositeDoorStyle,
     } = req.body;
 
     const productsArray = Array.isArray(products) ? products : [];
@@ -36,11 +37,12 @@ router.post("/", async (req, res) => {
       glazingOption,
       glazingType,
       handleColor,
+      compositeDoorStyle,
     };
 
     const result = await pool.query(
-      `INSERT INTO customers (name, email, phone, door_type, panel_style, dimension, external_color, internal_color, glazing_option, glazing_type, handle_color, products_config)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
+      `INSERT INTO customers (name, email, phone, door_type, panel_style, dimension, external_color, internal_color, glazing_option, glazing_type, handle_color, composite_door_style, products_config)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
       [
         name,
         email,
@@ -53,6 +55,7 @@ router.post("/", async (req, res) => {
         firstProduct.glazingOption || "",
         firstProduct.glazingType || null,
         firstProduct.handleColor || "",
+        firstProduct.compositeDoorStyle || null,
         productsArray.length > 0 ? JSON.stringify(productsArray) : null,
       ],
     );

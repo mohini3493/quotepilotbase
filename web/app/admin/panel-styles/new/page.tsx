@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import ImageUpload from "@/components/admin/ImageUpload";
 
 type DoorType = { id: number; name: string };
+type CompositeStyle = { id: number; name: string };
 
 export default function AddPanelStylePage() {
   const router = useRouter();
@@ -16,9 +17,11 @@ export default function AddPanelStylePage() {
     image: "",
     isActive: true,
     doorTypeIds: [] as number[],
+    compositeStyleId: null as number | null,
   });
   const [saving, setSaving] = useState(false);
   const [doorTypes, setDoorTypes] = useState<DoorType[]>([]);
+  const [compositeStyles, setCompositeStyles] = useState<CompositeStyle[]>([]);
 
   useEffect(() => {
     fetch(`/api/door-types/admin/all`, { credentials: "include" })
@@ -28,7 +31,15 @@ export default function AddPanelStylePage() {
         setDoorTypes(arr.filter((d: any) => d.is_active ?? d.isActive));
       })
       .catch(() => {});
+
+    fetch(`/api/composite-styles`, { credentials: "include" })
+      .then((res) => res.json())
+      .then((data) => setCompositeStyles(Array.isArray(data) ? data : []))
+      .catch(() => {});
   }, []);
+
+  const selectedDoorTypes = doorTypes.filter((d) => form.doorTypeIds.includes(d.id));
+  const hasCompositeDoor = selectedDoorTypes.some((d) => d.name.toLowerCase().includes("composite"));
 
   async function savePanelStyle() {
     setSaving(true);
@@ -40,9 +51,9 @@ export default function AddPanelStylePage() {
         body: JSON.stringify({
           ...form,
           slug: form.name?.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+          compositeStyleId: hasCompositeDoor ? form.compositeStyleId : null,
         }),
       });
-
       router.push("/admin/panel-styles");
     } catch (error) {
       console.error("Error saving panel style:", error);
@@ -57,15 +68,10 @@ export default function AddPanelStylePage() {
 
       <div className="space-y-4">
         <div>
-          <label className="text-sm font-medium mb-2 block">
-            Select Product Types
-          </label>
+          <label className="text-sm font-medium mb-2 block">Select Product Types</label>
           <div className="space-y-2 max-h-48 overflow-y-auto border rounded-md p-3">
             {doorTypes.map((d) => (
-              <label
-                key={d.id}
-                className="flex items-center gap-2 cursor-pointer"
-              >
+              <label key={d.id} className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={form.doorTypeIds.includes(d.id)}
@@ -76,6 +82,7 @@ export default function AddPanelStylePage() {
                       doorTypeIds: checked
                         ? [...prev.doorTypeIds, d.id]
                         : prev.doorTypeIds.filter((id: number) => id !== d.id),
+                      compositeStyleId: null,
                     }));
                   }}
                   className="rounded border-gray-300"
@@ -84,12 +91,26 @@ export default function AddPanelStylePage() {
               </label>
             ))}
             {doorTypes.length === 0 && (
-              <p className="text-sm text-muted-foreground">
-                No product types available
-              </p>
+              <p className="text-sm text-muted-foreground">No product types available</p>
             )}
           </div>
         </div>
+
+        {hasCompositeDoor && (
+          <div>
+            <label className="text-sm font-medium mb-2 block">Composite Door Style</label>
+            <select
+              value={form.compositeStyleId ?? ""}
+              onChange={(e) => setForm({ ...form, compositeStyleId: e.target.value ? Number(e.target.value) : null })}
+              className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="">— Select a composite style —</option>
+              {compositeStyles.map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div>
           <label className="text-sm font-medium mb-2 block">Name</label>
@@ -104,11 +125,7 @@ export default function AddPanelStylePage() {
           <label className="text-sm font-medium mb-2 block">Image</label>
           <ImageUpload onUploaded={(url) => setForm({ ...form, image: url })} />
           {form.image && (
-            <img
-              src={form.image}
-              alt="Preview"
-              className="mt-2 w-32 h-32 object-cover rounded border"
-            />
+            <img src={form.image} alt="Preview" className="mt-2 w-32 h-32 object-cover rounded border" />
           )}
         </div>
 
@@ -125,10 +142,7 @@ export default function AddPanelStylePage() {
         <Button onClick={savePanelStyle} disabled={saving}>
           {saving ? "Saving..." : "Save Panel Style"}
         </Button>
-        <Button
-          variant="outline"
-          onClick={() => router.push("/admin/panel-styles")}
-        >
+        <Button variant="outline" onClick={() => router.push("/admin/panel-styles")}>
           Cancel
         </Button>
       </div>

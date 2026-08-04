@@ -12,9 +12,11 @@ type PanelStyle = {
   image: string;
   isActive: boolean;
   doorTypeIds: number[];
+  compositeStyleId: number | null;
 };
 
 type DoorType = { id: number; name: string };
+type CompositeStyle = { id: number; name: string };
 
 export default function EditPanelStylePage() {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +25,7 @@ export default function EditPanelStylePage() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [doorTypes, setDoorTypes] = useState<DoorType[]>([]);
+  const [compositeStyles, setCompositeStyles] = useState<CompositeStyle[]>([]);
 
   useEffect(() => {
     fetch(`/api/door-types/admin/all`, { credentials: "include" })
@@ -32,14 +35,16 @@ export default function EditPanelStylePage() {
         setDoorTypes(arr.filter((d: any) => d.is_active ?? d.isActive));
       })
       .catch(() => {});
+
+    fetch(`/api/composite-styles`, { credentials: "include" })
+      .then((res) => res.json())
+      .then((data) => setCompositeStyles(Array.isArray(data) ? data : []))
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
     if (!id) return;
-
-    fetch(`/api/panel-styles/admin/${id}`, {
-      credentials: "include",
-    })
+    fetch(`/api/panel-styles/admin/${id}`, { credentials: "include" })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load panel style");
         return res.json();
@@ -54,6 +59,7 @@ export default function EditPanelStylePage() {
               : data.door_type_id
                 ? [data.door_type_id]
                 : [],
+          compositeStyleId: data.composite_style_id ?? null,
         });
       })
       .catch(() => setError("Failed to load panel style"));
@@ -62,6 +68,9 @@ export default function EditPanelStylePage() {
   if (error) return <p className="text-destructive">{error}</p>;
   if (!form) return <p>Loading...</p>;
 
+  const selectedDoorTypes = doorTypes.filter((d) => form.doorTypeIds.includes(d.id));
+  const hasCompositeDoor = selectedDoorTypes.some((d) => d.name.toLowerCase().includes("composite"));
+
   async function save() {
     setSaving(true);
     try {
@@ -69,9 +78,11 @@ export default function EditPanelStylePage() {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          compositeStyleId: hasCompositeDoor ? form.compositeStyleId : null,
+        }),
       });
-
       router.push("/admin/panel-styles");
     } catch (error) {
       console.error("Error saving panel style:", error);
@@ -86,15 +97,10 @@ export default function EditPanelStylePage() {
 
       <div className="space-y-4">
         <div>
-          <label className="text-sm font-medium mb-2 block">
-            Select Product Types
-          </label>
+          <label className="text-sm font-medium mb-2 block">Select Product Types</label>
           <div className="space-y-2 max-h-48 overflow-y-auto border rounded-md p-3">
             {doorTypes.map((d) => (
-              <label
-                key={d.id}
-                className="flex items-center gap-2 cursor-pointer"
-              >
+              <label key={d.id} className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={form.doorTypeIds.includes(d.id)}
@@ -106,11 +112,10 @@ export default function EditPanelStylePage() {
                             ...prev,
                             doorTypeIds: checked
                               ? [...prev.doorTypeIds, d.id]
-                              : prev.doorTypeIds.filter(
-                                  (id: number) => id !== d.id,
-                                ),
+                              : prev.doorTypeIds.filter((tid) => tid !== d.id),
+                            compositeStyleId: null,
                           }
-                        : prev,
+                        : prev
                     );
                   }}
                   className="rounded border-gray-300"
@@ -119,12 +124,26 @@ export default function EditPanelStylePage() {
               </label>
             ))}
             {doorTypes.length === 0 && (
-              <p className="text-sm text-muted-foreground">
-                No product types available
-              </p>
+              <p className="text-sm text-muted-foreground">No product types available</p>
             )}
           </div>
         </div>
+
+        {hasCompositeDoor && (
+          <div>
+            <label className="text-sm font-medium mb-2 block">Composite Door Style</label>
+            <select
+              value={form.compositeStyleId ?? ""}
+              onChange={(e) => setForm({ ...form, compositeStyleId: e.target.value ? Number(e.target.value) : null })}
+              className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="">— Select a composite style —</option>
+              {compositeStyles.map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div>
           <label className="text-sm font-medium mb-2 block">Name</label>
@@ -138,11 +157,7 @@ export default function EditPanelStylePage() {
           <label className="text-sm font-medium mb-2 block">Image</label>
           <ImageUpload onUploaded={(url) => setForm({ ...form, image: url })} />
           {form.image && (
-            <img
-              src={form.image}
-              alt="Preview"
-              className="mt-2 w-32 h-32 object-cover rounded border"
-            />
+            <img src={form.image} alt="Preview" className="mt-2 w-32 h-32 object-cover rounded border" />
           )}
         </div>
 
@@ -159,10 +174,7 @@ export default function EditPanelStylePage() {
         <Button onClick={save} disabled={saving}>
           {saving ? "Saving..." : "Save Changes"}
         </Button>
-        <Button
-          variant="outline"
-          onClick={() => router.push("/admin/panel-styles")}
-        >
+        <Button variant="outline" onClick={() => router.push("/admin/panel-styles")}>
           Cancel
         </Button>
       </div>

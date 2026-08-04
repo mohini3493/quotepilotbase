@@ -9,6 +9,7 @@ type ProductConfig = {
   productId?: number;
   productTitle?: string;
   doorType?: string;
+  compositeDoorStyle?: string;
   panelStyle?: string;
   dimension?: string;
   externalColor?: string;
@@ -26,6 +27,7 @@ type Customer = {
   productId?: number;
   productTitle?: string;
   doorType?: string;
+  compositeDoorStyle?: string;
   panelStyle?: string;
   dimension?: string;
   externalColor?: string;
@@ -67,6 +69,7 @@ export default function CustomersPage() {
             productId: obj.product_id,
             productTitle: obj.product_title,
             doorType: obj.door_type,
+            compositeDoorStyle: obj.composite_door_style,
             panelStyle: obj.panel_style,
             dimension: obj.dimension,
             externalColor: obj.external_color,
@@ -280,6 +283,16 @@ export default function CustomersPage() {
                                   </p>
                                 </div>
                               )}
+                              {product.compositeDoorStyle && (
+                                <div className="bg-muted/50 rounded-lg p-3">
+                                  <p className="text-xs text-muted-foreground uppercase">
+                                    Composite Style
+                                  </p>
+                                  <p className="font-medium text-sm">
+                                    {product.compositeDoorStyle}
+                                  </p>
+                                </div>
+                              )}
                               {product.panelStyle && (
                                 <div className="bg-muted/50 rounded-lg p-3">
                                   <p className="text-xs text-muted-foreground uppercase">
@@ -373,6 +386,16 @@ export default function CustomersPage() {
                             </p>
                             <p className="font-medium text-sm">
                               {selectedCustomer.doorType}
+                            </p>
+                          </div>
+                        )}
+                        {selectedCustomer.compositeDoorStyle && (
+                          <div className="bg-muted/50 rounded-lg p-3">
+                            <p className="text-xs text-muted-foreground uppercase">
+                              Composite Style
+                            </p>
+                            <p className="font-medium text-sm">
+                              {selectedCustomer.compositeDoorStyle}
                             </p>
                           </div>
                         )}

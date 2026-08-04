@@ -8,21 +8,30 @@ const router = Router();
    PUBLIC ROUTES (FRONTEND)
 ================================ */
 
-/** Get ACTIVE panel styles (optionally filtered by door_type_id) */
+/** Get ACTIVE panel styles (optionally filtered by door_type_id and composite_style_id) */
 router.get("/", async (req, res) => {
-  const { door_type_id } = req.query;
+  const { door_type_id, composite_style_id } = req.query;
   let query: string;
   const params: any[] = [];
-  if (door_type_id) {
+
+  if (door_type_id && composite_style_id) {
+    params.push(door_type_id, composite_style_id);
+    query = `SELECT DISTINCT ps.* FROM panel_styles ps
+             LEFT JOIN panel_style_door_types psdt ON psdt.panel_style_id = ps.id
+             WHERE ps.is_active = true
+               AND (psdt.door_type_id = $1 OR ps.door_type_id = $1)
+               AND ps.composite_style_id = $2
+             ORDER BY ps."order" ASC`;
+  } else if (door_type_id) {
     params.push(door_type_id);
     query = `SELECT DISTINCT ps.* FROM panel_styles ps
              LEFT JOIN panel_style_door_types psdt ON psdt.panel_style_id = ps.id
              WHERE ps.is_active = true AND (psdt.door_type_id = $1 OR ps.door_type_id = $1)
              ORDER BY ps."order" ASC`;
   } else {
-    query =
-      'SELECT * FROM panel_styles WHERE is_active = true ORDER BY "order" ASC';
+    query = 'SELECT * FROM panel_styles WHERE is_active = true ORDER BY "order" ASC';
   }
+
   const result = await pool.query(query, params);
   res.json(result.rows);
 });
@@ -88,12 +97,12 @@ router.get("/admin/:id", requireAdmin, async (req, res) => {
 
 /** Admin – create panel style */
 router.post("/", requireAdmin, async (req, res) => {
-  const { name, slug, image, order, isActive, doorTypeId, doorTypeIds } =
+  const { name, slug, image, order, isActive, doorTypeId, doorTypeIds, compositeStyleId } =
     req.body;
   const result = await pool.query(
-    `INSERT INTO panel_styles (name, slug, image, "order", is_active, door_type_id) 
-     VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-    [name, slug, image, order || 0, isActive ?? true, doorTypeId || null],
+    `INSERT INTO panel_styles (name, slug, image, "order", is_active, door_type_id, composite_style_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+    [name, slug, image, order || 0, isActive ?? true, doorTypeId || null, compositeStyleId || null],
   );
   const panelStyle = result.rows[0];
 
@@ -116,12 +125,12 @@ router.post("/", requireAdmin, async (req, res) => {
 
 /** Admin – update panel style */
 router.put("/:id", requireAdmin, async (req, res) => {
-  const { name, slug, image, order, isActive, doorTypeId, doorTypeIds } =
+  const { name, slug, image, order, isActive, doorTypeId, doorTypeIds, compositeStyleId } =
     req.body;
   const result = await pool.query(
-    `UPDATE panel_styles SET name = $1, slug = $2, image = $3, "order" = $4, is_active = $5, door_type_id = $6 
-     WHERE id = $7 RETURNING *`,
-    [name, slug, image, order, isActive, doorTypeId || null, req.params.id],
+    `UPDATE panel_styles SET name = $1, slug = $2, image = $3, "order" = $4, is_active = $5, door_type_id = $6, composite_style_id = $7
+     WHERE id = $8 RETURNING *`,
+    [name, slug, image, order, isActive, doorTypeId || null, compositeStyleId || null, req.params.id],
   );
 
   // Sync junction table

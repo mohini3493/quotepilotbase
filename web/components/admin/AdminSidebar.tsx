@@ -15,6 +15,7 @@ import {
   Grip,
   Users,
   Layers,
+  LayoutGrid,
 } from "lucide-react";
 
 const productLinks = [
@@ -25,6 +26,8 @@ const doorTypeLinks = [
 ];
 const panelStyleLinks = [
   { name: "Add Panel Style", href: "/admin/panel-styles/new", icon: Plus },
+  { name: "Composite Door Styles", href: "/admin/composite-styles", icon: LayoutGrid },
+  { name: "Add Composite Style", href: "/admin/composite-styles/new", icon: Plus },
 ];
 const externalColorLinks = [
   { name: "Add External Color", href: "/admin/external-colors/new", icon: Plus },

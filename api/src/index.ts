@@ -16,6 +16,7 @@ import handleColorsRoutes from "./routes/handleColors";
 import customersRoutes from "./routes/customers";
 import glazingOptionsRoutes from "./routes/glazingOptions";
 import adminUsersRoutes from "./routes/adminUsers";
+import compositeStylesRoutes from "./routes/compositeStyles";
 import { pool } from "./db";
 
 async function runMigrations() {
@@ -101,6 +102,7 @@ app.use("/api/handle-colors", handleColorsRoutes);
 app.use("/api/customers", customersRoutes);
 app.use("/api/glazing-options", glazingOptionsRoutes);
 app.use("/api/admin-users", adminUsersRoutes);
+app.use("/api/composite-styles", compositeStylesRoutes);
 
 // Global error handler
 app.use((err: any, req: any, res: any, next: any) => {
